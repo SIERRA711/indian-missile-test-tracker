@@ -1,0 +1,11 @@
+location_id,location_name,state,latitude,longitude
+LOC-001,ITR Chandipur,Odisha,21.4398,87.0135
+LOC-002,Dr APJ Abdul Kalam Island,Odisha,20.7511,87.0116
+LOC-003,Pokhran Test Range,Rajasthan,27.095,71.7583
+LOC-004,Andaman & Nicobar,A&N Islands,11.7401,92.6586
+LOC-005,Arabian Sea,Maritime,15.0,65.0
+LOC-006,Bay of Bengal,Maritime,15.0,88.0
+LOC-007,NOAR Kurnool,Andhra Pradesh,15.8281,78.0373
+LOC-008,KK Ranges,Maharashtra,19.0952,74.7496
+LOC-009,Gopalpur Seaward Firing Range,Odisha,19.2564,84.871
+LOC-010,KNF Firing Range Dras,Ladakh,34.4287,75.7512
