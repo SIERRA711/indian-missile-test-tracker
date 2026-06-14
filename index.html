@@ -70,7 +70,7 @@
         }
 
         // Fetch dataset straight from the repository file
-        fetch('missiles.csv')
+        fetch('test.csv')
             .then(res => res.text())
             .then(csvText => {
                 dataset = parseCSV(csvText);
