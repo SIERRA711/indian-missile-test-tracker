@@ -24,9 +24,29 @@
         .btn-download { background-color: #cc0000; color: white; border: none; padding: 12px 20px; font-size: 14px; font-weight: 600; text-transform: uppercase; border-radius: 4px; cursor: pointer; }
         .btn-download:hover { background-color: #990000; }
 
-        .dashboard-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; margin-bottom: 2rem; height: 350px; }
-        .dashboard-panel { background: #ffffff; padding: 1rem; border: 1px solid #e0e0e0; border-radius: 4px; display: flex; flex-direction: column; }
-        #map { flex-grow: 1; border-radius: 4px; border: 1px solid #e0e0e0; z-index: 1; }
+        .dashboard-grid { 
+            display: grid; 
+            grid-template-columns: 2fr 1fr; 
+            gap: 2rem; 
+            margin-bottom: 2rem; 
+            /* Removed the rigid 350px height so the grid can breathe */
+        }
+        .dashboard-panel { 
+            background: #ffffff; 
+            padding: 1rem; 
+            border: 1px solid #e0e0e0; 
+            border-radius: 4px; 
+            display: flex; 
+            flex-direction: column; 
+            overflow: hidden; /* This acts as a hard wall to prevent map bleeding */
+        }
+        #map { 
+            width: 100%; 
+            min-height: 300px; /* Gives Leaflet a concrete height to calculate its grid */
+            border-radius: 4px; 
+            border: 1px solid #e0e0e0; 
+            z-index: 1; 
+        }
         .panel-title { font-size: 14px; font-weight: 700; text-transform: uppercase; color: #555555; margin-top: 0; margin-bottom: 10px; }
 
         .counter { margin-bottom: 1rem; font-weight: 600; color: #cc0000; text-transform: uppercase; font-size: 14px; }
