@@ -54,7 +54,7 @@
         let dataset = [];
 
         // Simple CSV Parser logic to handle quotes and commas natively
-        def parseCSV(text) {
+        function parseCSV(text) {
             let lines = text.split('\n');
             let result = [];
             for(let i = 1; i < lines.length; i++) {
