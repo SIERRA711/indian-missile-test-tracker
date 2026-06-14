@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Indian Missile Test Tracker</title>
+    <style>
+        body { font-family: system-ui, -apple-system, sans-serif; padding: 2rem; max-width: 1200px; margin: auto; background: #f9f9f9; color: #242424; }
+        .controls { display: flex; gap: 1rem; margin-bottom: 1.5rem; }
+        input, select { padding: 12px; border: 1px solid #e5e5e5; border-radius: 6px; font-size: 16px; flex: 1; }
+        select { max-width: 200px; cursor: pointer; }
+        .counter { margin-bottom: 1rem; font-weight: 500; color: #6b6b6b; }
+        table { width: 100%; border-collapse: collapse; text-align: left; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        th, td { padding: 14px; border-bottom: 1px solid #f2f2f2; }
+        th { background-color: #f4f4f4; font-weight: 600; text-transform: uppercase; font-size: 12px; letter-spacing: 0.5px; }
+        tr:hover { background-color: #fcfcfc; }
+        .btn-link { color: #1a8917; text-decoration: none; font-weight: 500; }
+        .btn-link:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+    <h1>Missile Test Tracker — India</h1>
+    <p>An interactive, open-source repository tracing development and user evaluation flight trials.</p>
+    
+    <div class="controls">
+        <input type="text" id="searchBox" placeholder="Filter by missile name, deployment platform, testing range...">
+        <select id="yearFilter">
+            <option value="">All Years</option>
+            <option value="2026">2026</option>
+            <option value="2025">2025</option>
+            <option value="2024">2024</option>
+            <option value="2023">2023</option>
+            <option value="2022">2022</option>
+            <option value="2021">2021</option>
+        </select>
+    </div>
+
+    <div class="counter" id="recordCounter">Loading tracking database...</div>
+
+    <table id="trackerTable">
+        <thead>
+            <tr>
+                <th style="width: 12%;">Timeline</th>
+                <th style="width: 18%;">System Name</th>
+                <th>Flight Trial Parameters / Technical Details</th>
+                <th style="width: 10%;">Verification</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+    </table>
+
+    <script>
+        let dataset = [];
+
+        // Simple CSV Parser logic to handle quotes and commas natively
+        def parseCSV(text) {
+            let lines = text.split('\n');
+            let result = [];
+            for(let i = 1; i < lines.length; i++) {
+                let line = lines[i].trim();
+                if (!line) continue;
+                let matches = line.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
+                if (matches) {
+                    let cleanRow = matches.map(val => val.replace(/^"|"$/g, '').trim());
+                    if(cleanRow.length >= 5) result.push(cleanRow);
+                }
+            }
+            return result;
+        }
+
+        // Fetch dataset straight from the repository file
+        fetch('missiles.csv')
+            .then(res => res.text())
+            .then(csvText => {
+                dataset = parseCSV(csvText);
+                renderDatabase(dataset);
+            });
+
+        function renderDatabase(rows) {
+            const tbody = document.getElementById('tableBody');
+            const counter = document.getElementById('recordCounter');
+            tbody.innerHTML = '';
+            
+            counter.innerText = `${rows.length} flight trials matched standard parameters.`;
+
+            rows.forEach(row => {
+                let dateStr = row[2] ? `${row[2]} ${row[1]}` : `${row[1]}`;
+                let linkOutput = row[5] ? `<a href="${row[5]}" target="_blank" class="btn-link">Source ↗</a>` : `<span style="color:#b5b5b5">—</span>`;
+                
+                let tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${row[0]}</strong><br><small style="color:#6b6b6b">${dateStr}</small></td>
+                    <td><span style="font-size:15px; font-weight:600; color:#111;">${row[3]}</span></td>
+                    <td style="font-size:14px; line-height:1.5; color:#333;">${row[4]}</td>
+                    <td>${linkOutput}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function filterData() {
+            let search = document.getElementById('searchBox').value.toLowerCase();
+            let year = document.getElementById('yearFilter').value;
+
+            let filtered = dataset.filter(row => {
+                let matchSearch = row[3].toLowerCase().includes(search) || row[4].toLowerCase().includes(search);
+                let matchYear = year === "" || row[0] === year;
+                return matchSearch && matchYear;
+            });
+            renderDatabase(filtered);
+        }
+
+        document.getElementById('searchBox').addEventListener('input', filterData);
+        document.getElementById('yearFilter').addEventListener('change', filterData);
+    </script>
+</body>
+</html>
