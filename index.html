@@ -6,28 +6,33 @@
     <title>Indian Missile Test Tracker | INDRA Networks</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body { font-family: system-ui, -apple-system, sans-serif; padding: 2rem; max-width: 1200px; margin: auto; background: #f9f9f9; color: #242424; }
-        .header-container { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 1.5rem; }
-        .header-container h1 { margin: 0; }
+        /* Two-Tone White & Red Theme */
+        body { font-family: system-ui, -apple-system, sans-serif; padding: 2rem; max-width: 1200px; margin: auto; background: #ffffff; color: #111111; }
+        
+        .header-container { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 1.5rem; border-bottom: 2px solid #cc0000; padding-bottom: 1rem; }
+        .header-container h1 { margin: 0; color: #cc0000; text-transform: uppercase; letter-spacing: 1px; }
         
         .controls { display: flex; gap: 1rem; margin-bottom: 1.5rem; }
-        input, select, button { padding: 12px; border: 1px solid #e5e5e5; border-radius: 6px; font-size: 16px; }
+        input, select { padding: 12px; border: 1px solid #e0e0e0; border-radius: 4px; font-size: 16px; transition: border-color 0.2s; }
         input { flex: 1; }
+        input:focus, select:focus { outline: none; border-color: #cc0000; box-shadow: 0 0 0 2px rgba(204, 0, 0, 0.1); }
         select { cursor: pointer; }
         
-        .btn-download { background-color: #1a8917; color: white; border: none; font-weight: 600; cursor: pointer; transition: background 0.2s; }
-        .btn-download:hover { background-color: #126310; }
+        .btn-download { background-color: #cc0000; color: white; border: none; padding: 12px 20px; font-size: 14px; font-weight: 600; text-transform: uppercase; border-radius: 4px; cursor: pointer; transition: background 0.2s; }
+        .btn-download:hover { background-color: #990000; }
 
         .dashboard-grid { display: grid; grid-template-columns: 1fr; gap: 2rem; margin-bottom: 2rem; }
-        .chart-container { background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .chart-container { background: #ffffff; padding: 1.5rem; border: 1px solid #e0e0e0; border-radius: 4px; }
 
-        .counter { margin-bottom: 1rem; font-weight: 500; color: #6b6b6b; }
-        table { width: 100%; border-collapse: collapse; text-align: left; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        th, td { padding: 14px; border-bottom: 1px solid #f2f2f2; }
-        th { background-color: #f4f4f4; font-weight: 600; text-transform: uppercase; font-size: 12px; letter-spacing: 0.5px; }
-        tr:hover { background-color: #fcfcfc; }
-        .btn-link { color: #1a8917; text-decoration: none; font-weight: 500; }
-        .btn-link:hover { text-decoration: underline; }
+        .counter { margin-bottom: 1rem; font-weight: 600; color: #cc0000; text-transform: uppercase; font-size: 14px; }
+        
+        table { width: 100%; border-collapse: collapse; text-align: left; background: #ffffff; border: 1px solid #e0e0e0; }
+        th, td { padding: 14px; border-bottom: 1px solid #e0e0e0; }
+        th { background-color: #fafafa; font-weight: 700; text-transform: uppercase; font-size: 12px; letter-spacing: 0.5px; color: #111111; }
+        tr:hover { background-color: #fff9f9; } /* Extremely subtle red tint on hover */
+        
+        .btn-link { color: #cc0000; text-decoration: none; font-weight: 600; }
+        .btn-link:hover { text-decoration: underline; color: #990000; }
     </style>
 </head>
 <body>
@@ -35,7 +40,7 @@
     <div class="header-container">
         <div>
             <h1>Missile Test Tracker — India</h1>
-            <p style="margin: 5px 0 0 0; color: #6b6b6b;">An interactive repository by INDRA Networks.</p>
+            <p style="margin: 5px 0 0 0; color: #555555; font-weight: 500;">An interactive repository by INDRA Networks.</p>
         </div>
         <button class="btn-download" onclick="downloadCSVWithWatermark()">📥 Download CSV</button>
     </div>
@@ -75,7 +80,7 @@
 
     <script>
         let dataset = [];
-        let activityChartInstance = null; // Holds the chart so we can destroy/rebuild it on filter
+        let activityChartInstance = null; 
 
         function parseCSV(text) {
             let lines = text.split('\n');
@@ -93,7 +98,12 @@
         }
 
         fetch('test.csv')
-            .then(res => res.text())
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error(`File not found (HTTP ${res.status}). Check that the file is named exactly 'test.csv' in your repository.`);
+                }
+                return res.text();
+            })
             .then(csvText => {
                 dataset = parseCSV(csvText);
                 
@@ -115,6 +125,11 @@
 
                 renderDatabase(dataset);
                 renderChart(dataset);
+            })
+            .catch(error => {
+                document.getElementById('recordCounter').innerHTML = `
+                    <span style="color: #cc0000; font-weight: bold;">Error loading data:</span> ${error.message}
+                `;
             });
 
         function renderDatabase(rows) {
@@ -122,7 +137,7 @@
             const counter = document.getElementById('recordCounter');
             tbody.innerHTML = '';
             
-            counter.innerText = `${rows.length} flight trials matched.`;
+            counter.innerText = `${rows.length} flight trials matched`;
 
             rows.forEach(row => {
                 let dateStr = row[2] ? `${row[2]} ${row[1]}` : `${row[1]}`;
@@ -130,31 +145,27 @@
                 
                 let tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td><strong>${row[0]}</strong><br><small style="color:#6b6b6b">${dateStr}</small></td>
-                    <td><span style="font-size:15px; font-weight:600; color:#111;">${row[3]}</span></td>
-                    <td style="font-size:14px; line-height:1.5; color:#333;">${row[4]}</td>
+                    <td><strong>${row[0]}</strong><br><small style="color:#555555">${dateStr}</small></td>
+                    <td><span style="font-size:15px; font-weight:700; color:#cc0000;">${row[3]}</span></td>
+                    <td style="font-size:14px; line-height:1.5; color:#111111;">${row[4]}</td>
                     <td>${linkOutput}</td>
                 `;
                 tbody.appendChild(tr);
             });
         }
 
-        // --- NEW: Chart Rendering Logic ---
         function renderChart(rows) {
             const ctx = document.getElementById('activityChart').getContext('2d');
             
-            // Count tests per year dynamically based on the filtered data
             let yearCounts = {};
             rows.forEach(row => {
                 let year = row[0];
                 yearCounts[year] = (yearCounts[year] || 0) + 1;
             });
 
-            // Sort years chronologically for the X-axis
             const labels = Object.keys(yearCounts).sort();
             const data = labels.map(year => yearCounts[year]);
 
-            // If a chart already exists, destroy it before drawing a new one
             if (activityChartInstance) {
                 activityChartInstance.destroy();
             }
@@ -166,18 +177,19 @@
                     datasets: [{
                         label: 'Recorded Flight Trials',
                         data: data,
-                        backgroundColor: '#1a8917',
-                        borderRadius: 4
+                        backgroundColor: '#cc0000', /* Updated to Theme Red */
+                        borderRadius: 2
                     }]
                 },
                 options: {
                     responsive: true,
                     plugins: {
                         legend: { display: false },
-                        title: { display: true, text: 'Flight Trials Over Time (Filtered)', font: { size: 16 } }
+                        title: { display: true, text: 'Flight Trials Over Time (Filtered)', font: { size: 16, family: 'system-ui' }, color: '#111111' }
                     },
                     scales: {
-                        y: { beginAtZero: true, ticks: { stepSize: 1 } }
+                        y: { beginAtZero: true, ticks: { stepSize: 1, color: '#555555' }, grid: { color: '#e0e0e0' } },
+                        x: { ticks: { color: '#555555' }, grid: { display: false } }
                     }
                 }
             });
@@ -194,24 +206,19 @@
             });
             
             renderDatabase(filtered);
-            renderChart(filtered); // Update the chart when the user searches!
+            renderChart(filtered); 
         }
 
-        // --- NEW: Download & Watermark Logic ---
-        // --- NEW: Download & Watermark Logic ---
         function downloadCSVWithWatermark() {
             let csvContent = "";
             
-            // 1. Inject the Text "Watermark" / Branding
             csvContent += '"DATA CURATED BY:","Shwetabh Singh"\n';
             csvContent += '"PROJECT:","Indian Missile Test Tracker"\n';
             csvContent += '"NOTE:","This data is open-source but provided for informational purposes only."\n';
-            csvContent += '\n'; // Blank line before data starts
+            csvContent += '\n'; 
 
-            // 2. Add the Headers
             csvContent += '"Year","Month","Date","Missile","Details","Source Link"\n';
 
-            // 3. Append the currently filtered dataset
             let tableRows = document.querySelectorAll("#tableBody tr");
             
             if(tableRows.length === 0) {
@@ -238,7 +245,6 @@
                 csvContent += `"${year}","${month}","${date}","${missileName}","${details}","${sourceUrl}"\n`;
             });
 
-            // 4. Trigger the browser download
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             const link = document.createElement("a");
