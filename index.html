@@ -6,144 +6,694 @@
     <title>Indian Missile Test Tracker | @singhshwetabh71</title>
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
     <style>
-        /* Two-Tone White & Red Theme */
-        body { font-family: system-ui, -apple-system, sans-serif; padding: 2rem; max-width: 1400px; margin: auto; background: #ffffff; color: #111111; }
-        
-        .header-container { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 1.5rem; border-bottom: 2px solid #cc0000; padding-bottom: 1rem; }
-        .header-container h1 { margin: 0; color: #cc0000; text-transform: uppercase; letter-spacing: 1px; }
-        
-        .controls { display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; background: #fafafa; padding: 1rem; border: 1px solid #e0e0e0; border-radius: 4px; }
-        input, select { padding: 10px; border: 1px solid #cccccc; border-radius: 4px; font-size: 15px; flex: 1; min-width: 200px; }
-        input:focus, select:focus { outline: none; border-color: #cc0000; }
-        
-        .btn-download { background-color: #cc0000; color: white; border: none; padding: 12px 20px; font-size: 14px; font-weight: 600; text-transform: uppercase; border-radius: 4px; cursor: pointer; }
-        .btn-download:hover { background-color: #990000; }
+        :root {
+            --primary: #cc0000;
+            --primary-dark: #990000;
+            --primary-light: #ff3333;
+            --bg: #fafbfc;
+            --surface: #ffffff;
+            --surface-hover: #fff5f5;
+            --border: #e8e8e8;
+            --text: #1a1a1a;
+            --text-secondary: #666666;
+            --text-muted: #999999;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+            --shadow: 0 4px 24px rgba(0,0,0,0.06);
+            --shadow-lg: 0 12px 48px rgba(0,0,0,0.08);
+            --radius-sm: 6px;
+            --radius: 12px;
+            --radius-lg: 16px;
+        }
 
-        .dashboard-grid { 
-            display: grid; 
-            grid-template-columns: 2fr 1fr; 
-            gap: 2rem; 
-            margin-bottom: 2rem; 
-            /* Removed the rigid 350px height so the grid can breathe */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
         }
-        .dashboard-panel { 
-            background: #ffffff; 
-            padding: 1rem; 
-            border: 1px solid #e0e0e0; 
-            border-radius: 4px; 
-            display: flex; 
-            flex-direction: column; 
-            overflow: hidden; /* This acts as a hard wall to prevent map bleeding */
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #ffffff 0%, #fff5f5 100%);
+            border-bottom: 1px solid var(--border);
+            padding: 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(12px);
         }
-        /* ADD this rule */
+
+        .header-inner {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .brand-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            box-shadow: var(--shadow);
+        }
+
+        .brand-text h1 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--text);
+            letter-spacing: -0.02em;
+            line-height: 1.2;
+        }
+
+        .brand-text p {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+            margin-top: 2px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.625rem 1.25rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.875rem;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 2px 8px rgba(204,0,0,0.25);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 16px rgba(204,0,0,0.35);
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-ghost:hover {
+            background: var(--surface-hover);
+            color: var(--primary);
+            border-color: var(--primary-light);
+        }
+
+        /* Controls Bar */
+        .controls-bar {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 0;
+            position: sticky;
+            top: 89px;
+            z-index: 99;
+        }
+
+        .controls-inner {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .search-box {
+            position: relative;
+            flex: 1;
+            min-width: 260px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 0.625rem 1rem 0.625rem 2.5rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 0.875rem;
+            font-family: inherit;
+            background: var(--bg);
+            transition: all 0.2s;
+        }
+
+        .search-box::before {
+            content: "🔍";
+            position: absolute;
+            left: 0.875rem;
+            top: 50%;
+            transform: translateY(-50%);
+            opacity: 0.5;
+            font-size: 0.875rem;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--primary-light);
+            background: var(--surface);
+            box-shadow: 0 0 0 3px rgba(204,0,0,0.08);
+        }
+
+        .filter-select {
+            padding: 0.625rem 2rem 0.625rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 0.875rem;
+            font-family: inherit;
+            background: var(--bg);
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            min-width: 140px;
+            transition: all 0.2s;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 3px rgba(204,0,0,0.08);
+        }
+
+        /* Main Content */
+        .main {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .panel {
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            transition: box-shadow 0.3s ease;
+        }
+
+        .panel:hover {
+            box-shadow: var(--shadow-lg);
+        }
+
+        .panel-header {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-title {
+            font-size: 0.875rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+        }
+
+        .panel-badge {
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 0.25rem 0.625rem;
+            border-radius: 100px;
+            background: var(--surface-hover);
+            color: var(--primary);
+        }
+
+        .panel-body {
+            padding: 1rem;
+            height: 320px;
+        }
+
         #map {
-            flex-grow: 1;
-            border-radius: 4px;
-            border: 1px solid #e0e0e0;
-            z-index: 1;
-            min-height: 300px;  /* ADD THIS - ensures Leaflet has height */
+            width: 100%;
+            height: 100%;
+            border-radius: var(--radius-sm);
         }
-        .panel-title { font-size: 14px; font-weight: 700; text-transform: uppercase; color: #555555; margin-top: 0; margin-bottom: 10px; }
 
-        .counter { margin-bottom: 1rem; font-weight: 600; color: #cc0000; text-transform: uppercase; font-size: 14px; }
-        
-        table { width: 100%; border-collapse: collapse; text-align: left; border: 1px solid #e0e0e0; font-size: 14px; }
-        th, td { padding: 12px; border-bottom: 1px solid #e0e0e0; }
-        th { background-color: #fafafa; font-weight: 700; text-transform: uppercase; font-size: 12px; color: #111111; }
-        tr:hover { background-color: #fff9f9; }
-        
-        .badge { display: inline-block; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 700; text-transform: uppercase; margin-right: 5px; margin-bottom: 5px; background: #e0e0e0; color: #333; }
-        .badge-success { background: #e8f5e9; color: #2e7d32; }
-        .badge-iaf { background: #e3f2fd; color: #1565c0; }
-        .badge-navy { background: #e0f7fa; color: #00838f; }
-        .badge-army { background: #f1f8e9; color: #558b2f; }
-        .badge-drdo { background: #fce4ec; color: #c2185b; }
-        .badge-sfc { background: #fff3e0; color: #e65100; }
-        
-        .btn-link { color: #cc0000; text-decoration: none; font-weight: 600; }
-        .btn-link:hover { text-decoration: underline; color: #990000; }
+        /* Stats Bar */
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 1.25rem 1.5rem;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-sm);
+            transition: all 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+            border-color: var(--primary-light);
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--text);
+            line-height: 1;
+        }
+
+        .stat-value.primary { color: var(--primary); }
+
+        /* Table */
+        .table-wrap {
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .table-header {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+
+        .table-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .counter {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .counter strong {
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            font-size: 0.875rem;
+        }
+
+        thead {
+            background: var(--bg);
+        }
+
+        th {
+            padding: 0.875rem 1.25rem;
+            font-size: 0.6875rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            text-align: left;
+            border-bottom: 2px solid var(--border);
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--border);
+            vertical-align: top;
+        }
+
+        tbody tr {
+            transition: all 0.15s ease;
+        }
+
+        tbody tr:hover {
+            background: var(--surface-hover);
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Cell Content */
+        .cell-date {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8125rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .cell-id {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.6875rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+
+        .cell-family {
+            font-size: 1rem;
+            font-weight: 800;
+            color: var(--primary);
+            letter-spacing: -0.01em;
+        }
+
+        .cell-variant {
+            font-size: 0.8125rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+
+        .cell-location {
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .cell-location small {
+            display: block;
+            font-weight: 400;
+            color: var(--text-muted);
+            margin-top: 0.125rem;
+        }
+
+        .cell-notes {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            max-width: 400px;
+        }
+
+        /* Badges */
+        .badge-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.375rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.625rem;
+            border-radius: 100px;
+            font-size: 0.6875rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+            white-space: nowrap;
+        }
+
+        .badge-success { background: #dcfce7; color: #166534; }
+        .badge-iaf { background: #dbeafe; color: #1e40af; }
+        .badge-navy { background: #cffafe; color: #0e7490; }
+        .badge-army { background: #ecfccb; color: #3f6212; }
+        .badge-drdo { background: #fce7f3; color: #9d174d; }
+        .badge-sfc { background: #ffedd5; color: #9a3412; }
+
+        .meta-line {
+            font-size: 0.8125rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+
+        .meta-line strong {
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        /* Links */
+        .btn-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.8125rem;
+            padding: 0.375rem 0.75rem;
+            border-radius: var(--radius-sm);
+            transition: all 0.2s;
+        }
+
+        .btn-link:hover {
+            background: var(--surface-hover);
+            text-decoration: none;
+        }
+
+        .btn-link.muted {
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        /* Loading State */
+        .skeleton {
+            background: linear-gradient(90deg, var(--bg) 25%, #f0f0f0 50%, var(--bg) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: var(--radius-sm);
+        }
+
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-muted);
+        }
+
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            .panel-body { height: 280px; }
+        }
+
+        @media (max-width: 768px) {
+            .header-inner { padding: 1rem; flex-direction: column; gap: 1rem; align-items: flex-start; }
+            .controls-inner { padding: 0 1rem; }
+            .main { padding: 1rem; }
+            .stats-bar { grid-template-columns: repeat(2, 1fr); }
+            th, td { padding: 0.75rem; }
+            .table-wrap { border-radius: var(--radius); }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
     </style>
 </head>
 <body>
 
-    <div class="header-container">
-        <div>
-            <h1>Missile Test Tracker — India</h1>
-            <p style="margin: 5px 0 0 0; color: #555555; font-weight: 500;">Geospatial & Technical Intelligence Dashboard | INDRA Networks</p>
+    <header class="header">
+        <div class="header-inner">
+            <div class="brand">
+                <div class="brand-icon">🚀</div>
+                <div class="brand-text">
+                    <h1>Missile Test Tracker</h1>
+                    <p>Geospatial & Technical Intelligence Dashboard — India</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-ghost" onclick="window.open('https://github.com/singhshwetabh71', '_blank')">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+                    GitHub
+                </button>
+                <button class="btn btn-primary" onclick="downloadExport()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    Export Data
+                </button>
+            </div>
         </div>
-        <button class="btn-download" onclick="downloadExport()">📥 Export Filtered Data</button>
-    </div>
-    
-    <div class="controls">
-        <input type="text" id="searchBox" placeholder="Search family, variant, or platform...">
-        <select id="serviceFilter">
-            <option value="">All Services</option>
-            <option value="IAF">Indian Air Force</option>
-            <option value="Indian Navy">Indian Navy</option>
-            <option value="Indian Army">Indian Army</option>
-            <option value="SFC">Strategic Forces Command</option>
-            <option value="DRDO">DRDO</option>
-        </select>
-        <select id="typeFilter">
-            <option value="">All Event Types</option>
-            <option value="Development Test">Development Test</option>
-            <option value="User Trial">User Trial</option>
-            <option value="Operational Launch">Operational Launch</option>
-            <option value="Training Launch">Training Launch</option>
-        </select>
-        <select id="yearFilter">
-            <option value="">All Years</option>
-            <option value="2026">2026</option>
-            <option value="2025">2025</option>
-            <option value="2024">2024</option>
-            <option value="2023">2023</option>
-            <option value="2022">2022</option>
-            <option value="2021">2021</option>
-        </select>
+    </header>
+
+    <div class="controls-bar">
+        <div class="controls-inner">
+            <div class="search-box">
+                <input type="text" id="searchBox" placeholder="Search family, variant, or platform...">
+            </div>
+            <select id="serviceFilter" class="filter-select">
+                <option value="">All Services</option>
+                <option value="IAF">Indian Air Force</option>
+                <option value="Indian Navy">Indian Navy</option>
+                <option value="Indian Army">Indian Army</option>
+                <option value="SFC">Strategic Forces Command</option>
+                <option value="DRDO">DRDO</option>
+            </select>
+            <select id="typeFilter" class="filter-select">
+                <option value="">All Event Types</option>
+                <option value="Development Test">Development Test</option>
+                <option value="User Trial">User Trial</option>
+                <option value="Operational Launch">Operational Launch</option>
+                <option value="Training Launch">Training Launch</option>
+            </select>
+            <select id="yearFilter" class="filter-select">
+                <option value="">All Years</option>
+                <option value="2026">2026</option>
+                <option value="2025">2025</option>
+                <option value="2024">2024</option>
+                <option value="2023">2023</option>
+                <option value="2022">2022</option>
+                <option value="2021">2021</option>
+            </select>
+        </div>
     </div>
 
-    <div class="dashboard-grid">
-        <div class="dashboard-panel">
-            <p class="panel-title">Geospatial Launch Density</p>
-            <div id="map"></div>
+    <main class="main">
+        <!-- Stats -->
+        <div class="stats-bar" id="statsBar">
+            <div class="stat-card">
+                <div class="stat-label">Total Events</div>
+                <div class="stat-value primary" id="statTotal">—</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Success Rate</div>
+                <div class="stat-value" id="statSuccess">—</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Unique Systems</div>
+                <div class="stat-value" id="statSystems">—</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Test Ranges</div>
+                <div class="stat-value" id="statRanges">—</div>
+            </div>
         </div>
-        <div class="dashboard-panel">
-            <p class="panel-title">Launch Activity by Service</p>
-            <canvas id="activityChart"></canvas>
+
+        <!-- Dashboard -->
+        <div class="dashboard-grid">
+            <div class="panel">
+                <div class="panel-header">
+                    <span class="panel-title">Geospatial Launch Density</span>
+                    <span class="panel-badge" id="mapBadge">Live</span>
+                </div>
+                <div class="panel-body">
+                    <div id="map"></div>
+                </div>
+            </div>
+            <div class="panel">
+                <div class="panel-header">
+                    <span class="panel-title">Launch Activity by Service</span>
+                </div>
+                <div class="panel-body" style="position: relative;">
+                    <canvas id="activityChart"></canvas>
+                </div>
+            </div>
         </div>
-    </div>
 
-    <div class="counter" id="recordCounter">Initializing architecture...</div>
-
-    <table id="trackerTable">
-        <thead>
-            <tr>
-                <th style="width: 10%;">Date / ID</th>
-                <th style="width: 15%;">System Family</th>
-                <th style="width: 20%;">Deployment & Event</th>
-                <th style="width: 15%;">Launch Location</th>
-                <th>Engineering Notes</th>
-                <th style="width: 8%;">Source</th>
-            </tr>
-        </thead>
-        <tbody id="tableBody"></tbody>
-    </table>
+        <!-- Table -->
+        <div class="table-wrap">
+            <div class="table-header">
+                <span class="table-title">Flight Trial Records</span>
+                <span class="counter" id="recordCounter">Loading data...</span>
+            </div>
+            <div style="overflow-x: auto;">
+                <table id="trackerTable">
+                    <thead>
+                        <tr>
+                            <th>Date / ID</th>
+                            <th>System Family</th>
+                            <th>Deployment & Event</th>
+                            <th>Launch Location</th>
+                            <th>Engineering Notes</th>
+                            <th>Source</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <tr>
+                            <td colspan="6">
+                                <div class="empty-state">
+                                    <div class="empty-state-icon">⏳</div>
+                                    <p>Initializing architecture...</p>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
 
     <script>
         let eventData = [];
         let locationMap = {};
-        
-        let activityChartInstance = null; 
+        let activityChartInstance = null;
         let geoMap = null;
         let mapMarkers = [];
 
-        // Basic CSV to Array of Objects parser
-        // REPLACE this entire function
+        // Proper CSV Parser
         function parseCSVToObjects(csv) {
             const lines = csv.split('\n').filter(l => l.trim().length > 0);
             if (lines.length === 0) return [];
@@ -166,7 +716,7 @@
                         inQuotes = true;
                     } else if (inQuotes && char === '"' && nextChar === '"') {
                         current += '"';
-                        j++; // Skip escaped quote
+                        j++;
                     } else if (inQuotes && char === '"') {
                         inQuotes = false;
                     } else if (!inQuotes && char === ',') {
@@ -177,7 +727,6 @@
                         current += char;
                     }
                 }
-                // Push last field
                 if (colIndex < headers.length) {
                     row[headers[colIndex]] = current.trim();
                 }
@@ -186,30 +735,38 @@
             return result;
         }
 
-        // Initialize the Map
         function initMap() {
-            geoMap = L.map('map').setView([21.0, 82.0], 5); // Center on India
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; OpenStreetMap contributors'
+            geoMap = L.map('map', {
+                zoomControl: false,
+                attributionControl: false
+            }).setView([21.0, 82.0], 5);
+            
+            L.control.zoom({ position: 'bottomright' }).addTo(geoMap);
+            L.control.attribution({ position: 'bottomleft' }).addTo(geoMap);
+            
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+                subdomains: 'abcd',
+                maxZoom: 19
             }).addTo(geoMap);
         }
 
-        // Fetch Both CSVs Simultaneously using Promise.all
         Promise.all([
-            fetch('locations.csv').then(res => res.text()),
-            fetch('normalized_missiles.csv').then(res => res.text())
+            fetch('./locations.csv').then(res => {
+                if (!res.ok) throw new Error(`HTTP ${res.status} for locations.csv`);
+                return res.text();
+            }),
+            fetch('./normalized_missiles.csv').then(res => {
+                if (!res.ok) throw new Error(`HTTP ${res.status} for normalized_missiles.csv`);
+                return res.text();
+            })
         ]).then(([locText, dataText]) => {
-            
-            // 1. Build Location Dictionary
             let locArray = parseCSVToObjects(locText);
             locArray.forEach(loc => {
                 locationMap[loc.location_id] = loc;
             });
 
-            // 2. Parse Event Data
             eventData = parseCSVToObjects(dataText);
-            
-            // 3. Sort Chronologically
             eventData.sort((a, b) => {
                 if (a.date === "Unknown") return 1;
                 if (b.date === "Unknown") return -1;
@@ -217,45 +774,92 @@
             });
 
             initMap();
-            applyFilters(); // Initial render
+            applyFilters();
             setTimeout(() => { if(geoMap) geoMap.invalidateSize(); }, 100);
+        }).catch(err => {
+            console.error(err);
+            document.getElementById('recordCounter').innerHTML = 
+                `<span style="color: var(--primary)">Error:</span> ${err.message}`;
+            document.getElementById('tableBody').innerHTML = `
+                <tr><td colspan="6">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">⚠️</div>
+                        <p style="color: var(--primary); font-weight: 600;">Failed to load data</p>
+                        <p style="font-size: 0.875rem; margin-top: 0.5rem;">${err.message}</p>
+                    </div>
+                </td></tr>`;
         });
 
-        // Get badge color based on service
         function getServiceBadge(service) {
-            let cls = 'badge';
-            if(service === 'IAF') cls += ' badge-iaf';
-            else if(service === 'Indian Navy') cls += ' badge-navy';
-            else if(service === 'Indian Army') cls += ' badge-army';
-            else if(service === 'SFC') cls += ' badge-sfc';
-            else if(service === 'DRDO') cls += ' badge-drdo';
-            return `<span class="${cls}">${service}</span>`;
+            const classes = {
+                'IAF': 'badge-iaf',
+                'Indian Navy': 'badge-navy',
+                'Indian Army': 'badge-army',
+                'SFC': 'badge-sfc',
+                'DRDO': 'badge-drdo'
+            };
+            return `<span class="badge ${classes[service] || ''}">${service}</span>`;
+        }
+
+        function updateStats(rows) {
+            const total = rows.length;
+            const success = rows.filter(r => r.result === 'Success').length;
+            const systems = new Set(rows.map(r => r.family)).size;
+            const ranges = new Set(rows.map(r => r.location_id)).size;
+            
+            document.getElementById('statTotal').textContent = total;
+            document.getElementById('statSuccess').textContent = total ? Math.round((success/total)*100) + '%' : '—';
+            document.getElementById('statSystems').textContent = systems;
+            document.getElementById('statRanges').textContent = ranges;
         }
 
         function renderDatabase(rows) {
             const tbody = document.getElementById('tableBody');
-            document.getElementById('recordCounter').innerText = `${rows.length} Flight Trials matching query parameters`;
+            document.getElementById('recordCounter').innerHTML = 
+                `<strong>${rows.length}</strong> flight trials matching query parameters`;
             tbody.innerHTML = '';
             
+            if (rows.length === 0) {
+                tbody.innerHTML = `
+                    <tr><td colspan="6">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">🔍</div>
+                            <p>No records match your filters</p>
+                        </div>
+                    </td></tr>`;
+                return;
+            }
+            
             rows.forEach(row => {
-                // Resolve Location from the joined dictionary
                 let loc = locationMap[row.location_id] || { location_name: "Unknown Range", state: "" };
-                
-                let linkOutput = row.source_url ? `<a href="${row.source_url}" target="_blank" class="btn-link">${row.source_type} ↗</a>` : `<span style="color:#b5b5b5">${row.source_type}</span>`;
+                let linkOutput = row.source_url 
+                    ? `<a href="${row.source_url}" target="_blank" class="btn-link">${row.source_type} ↗</a>` 
+                    : `<span class="btn-link muted">${row.source_type || 'N/A'}</span>`;
                 
                 let tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td><strong>${row.date}</strong><br><small style="color:#555">${row.event_id}</small></td>
-                    <td><span style="font-size:15px; font-weight:700; color:#cc0000;">${row.family}</span><br><span style="color:#555; font-size:12px;">Variant: ${row.variant}</span></td>
                     <td>
-                        ${getServiceBadge(row.service)}
-                        <span class="badge badge-success">${row.result}</span>
-                        <br>
-                        <span style="font-weight:600; font-size:12px;">Type:</span> ${row.event_type}<br>
-                        <span style="font-weight:600; font-size:12px;">Platform:</span> ${row.platform}
+                        <div class="cell-date">${row.date}</div>
+                        <div class="cell-id">${row.event_id}</div>
                     </td>
-                    <td><strong>${loc.location_name}</strong><br><small>${loc.state}</small></td>
-                    <td style="color:#333; line-height: 1.4;">${row.notes}</td>
+                    <td>
+                        <div class="cell-family">${row.family}</div>
+                        <div class="cell-variant">Variant: ${row.variant}</div>
+                    </td>
+                    <td>
+                        <div class="badge-group">
+                            ${getServiceBadge(row.service)}
+                            <span class="badge badge-success">${row.result}</span>
+                        </div>
+                        <div class="meta-line"><strong>Type:</strong> ${row.event_type}</div>
+                        <div class="meta-line"><strong>Platform:</strong> ${row.platform}</div>
+                    </td>
+                    <td>
+                        <div class="cell-location">${loc.location_name}<small>${loc.state}</small></div>
+                    </td>
+                    <td>
+                        <div class="cell-notes">${row.notes}</div>
+                    </td>
                     <td>${linkOutput}</td>
                 `;
                 tbody.appendChild(tr);
@@ -263,7 +867,6 @@
         }
 
         function renderVisualizations(rows) {
-            // --- 1. Update Chart (Service Breakdown) ---
             const ctx = document.getElementById('activityChart').getContext('2d');
             let serviceCounts = {};
             rows.forEach(row => {
@@ -273,6 +876,7 @@
 
             const labels = Object.keys(serviceCounts);
             const data = labels.map(svc => serviceCounts[svc]);
+            const colors = ['#1565c0', '#00838f', '#558b2f', '#e65100', '#c2185b', '#9e9e9e'];
 
             if (activityChartInstance) activityChartInstance.destroy();
 
@@ -282,20 +886,42 @@
                     labels: labels,
                     datasets: [{
                         data: data,
-                        backgroundColor: ['#1565c0', '#00838f', '#558b2f', '#e65100', '#c2185b', '#999999'],
-                        borderWidth: 0
+                        backgroundColor: colors,
+                        borderWidth: 2,
+                        borderColor: '#ffffff',
+                        hoverOffset: 4
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { legend: { position: 'right', labels: { boxWidth: 12, font: { size: 11 } } } },
-                    cutout: '70%'
+                    cutout: '65%',
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                boxWidth: 12,
+                                padding: 15,
+                                font: { size: 11, family: 'Inter', weight: '500' },
+                                usePointStyle: true,
+                                pointStyle: 'circle'
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0,0,0,0.85)',
+                            padding: 12,
+                            cornerRadius: 8,
+                            titleFont: { family: 'Inter', weight: '600' },
+                            bodyFont: { family: 'Inter' }
+                        }
+                    },
+                    animation: {
+                        animateRotate: true,
+                        duration: 800
+                    }
                 }
             });
 
-            // --- 2. Update Map Markers ---
-            // Clear existing markers
             mapMarkers.forEach(m => geoMap.removeLayer(m));
             mapMarkers = [];
 
@@ -311,17 +937,24 @@
                 let loc = locationMap[locId];
                 let count = locationDensity[locId];
                 
-                // Draw circle proportional to amount of tests
                 let marker = L.circleMarker([loc.latitude, loc.longitude], {
-                    radius: Math.min(Math.max(count * 2, 8), 30), // Scale radius
+                    radius: Math.min(Math.max(count * 2.5, 10), 28),
                     fillColor: "#cc0000",
                     color: "#ffffff",
-                    weight: 2,
+                    weight: 2.5,
                     opacity: 1,
-                    fillOpacity: 0.7
+                    fillOpacity: 0.75
                 }).addTo(geoMap);
 
-                marker.bindPopup(`<strong>${loc.location_name}</strong><br>Recorded Events: ${count}`);
+                marker.bindPopup(`
+                    <div style="font-family: Inter, sans-serif; padding: 4px;">
+                        <strong style="font-size: 14px; color: #cc0000;">${loc.location_name}</strong><br>
+                        <span style="font-size: 12px; color: #666;">Recorded Events: <strong>${count}</strong></span>
+                    </div>
+                `, {
+                    closeButton: false,
+                    className: 'custom-popup'
+                });
                 mapMarkers.push(marker);
             });
         }
@@ -333,7 +966,10 @@
             let yearFilter = document.getElementById('yearFilter').value;
 
             let filtered = eventData.filter(row => {
-                let matchSearch = row.family.toLowerCase().includes(search) || row.variant.toLowerCase().includes(search) || row.platform.toLowerCase().includes(search);
+                let matchSearch = !search || 
+                    (row.family && row.family.toLowerCase().includes(search)) || 
+                    (row.variant && row.variant.toLowerCase().includes(search)) || 
+                    (row.platform && row.platform.toLowerCase().includes(search));
                 let matchSvc = svcFilter === "" || row.service === svcFilter;
                 let matchType = typeFilter === "" || row.event_type === typeFilter;
                 let matchYear = yearFilter === "" || (row.date && row.date.startsWith(yearFilter));
@@ -343,23 +979,23 @@
             
             renderDatabase(filtered);
             renderVisualizations(filtered);
+            updateStats(filtered);
         }
 
         function downloadExport() {
             let csvContent = '"DATA CURATED BY:","Shwetabh Singh"\n"PROJECT:","Indian Missile Test Tracker"\n\n';
             csvContent += '"Event ID","Date","Family","Variant","Service","Platform","Location","Event Type","Result","Source Type","Source URL","Notes"\n';
 
-            // We export exactly what is currently filtered on the screen
-            let activeFilters = document.getElementById('searchBox').value; // We trigger applyFilters again to get the exact array
-            
-            // Re-run the filter logic quietly to get the raw object array for pristine export
             let search = document.getElementById('searchBox').value.toLowerCase();
             let svcFilter = document.getElementById('serviceFilter').value;
             let typeFilter = document.getElementById('typeFilter').value;
             let yearFilter = document.getElementById('yearFilter').value;
 
             let filteredForExport = eventData.filter(row => {
-                let matchSearch = row.family.toLowerCase().includes(search) || row.variant.toLowerCase().includes(search) || row.platform.toLowerCase().includes(search);
+                let matchSearch = !search || 
+                    (row.family && row.family.toLowerCase().includes(search)) || 
+                    (row.variant && row.variant.toLowerCase().includes(search)) || 
+                    (row.platform && row.platform.toLowerCase().includes(search));
                 let matchSvc = svcFilter === "" || row.service === svcFilter;
                 let matchType = typeFilter === "" || row.event_type === typeFilter;
                 let matchYear = yearFilter === "" || (row.date && row.date.startsWith(yearFilter));
@@ -368,7 +1004,7 @@
 
             filteredForExport.forEach(row => {
                 let loc = locationMap[row.location_id] ? locationMap[row.location_id].location_name : "Unknown";
-                csvContent += `"${row.event_id}","${row.date}","${row.family}","${row.variant}","${row.service}","${row.platform}","${loc}","${row.event_type}","${row.result}","${row.source_type}","${row.source_url}","${row.notes.replace(/"/g, '""')}"\n`;
+                csvContent += `"${row.event_id || ''}","${row.date || ''}","${row.family || ''}","${row.variant || ''}","${row.service || ''}","${row.platform || ''}","${loc}","${row.event_type || ''}","${row.result || ''}","${row.source_type || ''}","${row.source_url || ''}","${(row.notes || '').replace(/"/g, '""')}"\n`;
             });
 
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -380,7 +1016,6 @@
             document.body.removeChild(link);
         }
 
-        // Event Listeners
         document.getElementById('searchBox').addEventListener('input', applyFilters);
         document.getElementById('serviceFilter').addEventListener('change', applyFilters);
         document.getElementById('typeFilter').addEventListener('change', applyFilters);
