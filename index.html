@@ -4,32 +4,45 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Indian Missile Test Tracker | INDRA Networks</title>
+    
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
     <style>
         /* Two-Tone White & Red Theme */
-        body { font-family: system-ui, -apple-system, sans-serif; padding: 2rem; max-width: 1200px; margin: auto; background: #ffffff; color: #111111; }
+        body { font-family: system-ui, -apple-system, sans-serif; padding: 2rem; max-width: 1400px; margin: auto; background: #ffffff; color: #111111; }
         
         .header-container { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 1.5rem; border-bottom: 2px solid #cc0000; padding-bottom: 1rem; }
         .header-container h1 { margin: 0; color: #cc0000; text-transform: uppercase; letter-spacing: 1px; }
         
-        .controls { display: flex; gap: 1rem; margin-bottom: 1.5rem; }
-        input, select { padding: 12px; border: 1px solid #e0e0e0; border-radius: 4px; font-size: 16px; transition: border-color 0.2s; }
-        input { flex: 1; }
-        input:focus, select:focus { outline: none; border-color: #cc0000; box-shadow: 0 0 0 2px rgba(204, 0, 0, 0.1); }
-        select { cursor: pointer; }
+        .controls { display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; background: #fafafa; padding: 1rem; border: 1px solid #e0e0e0; border-radius: 4px; }
+        input, select { padding: 10px; border: 1px solid #cccccc; border-radius: 4px; font-size: 15px; flex: 1; min-width: 200px; }
+        input:focus, select:focus { outline: none; border-color: #cc0000; }
         
-        .btn-download { background-color: #cc0000; color: white; border: none; padding: 12px 20px; font-size: 14px; font-weight: 600; text-transform: uppercase; border-radius: 4px; cursor: pointer; transition: background 0.2s; }
+        .btn-download { background-color: #cc0000; color: white; border: none; padding: 12px 20px; font-size: 14px; font-weight: 600; text-transform: uppercase; border-radius: 4px; cursor: pointer; }
         .btn-download:hover { background-color: #990000; }
 
-        .dashboard-grid { display: grid; grid-template-columns: 1fr; gap: 2rem; margin-bottom: 2rem; }
-        .chart-container { background: #ffffff; padding: 1.5rem; border: 1px solid #e0e0e0; border-radius: 4px; }
+        .dashboard-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; margin-bottom: 2rem; height: 350px; }
+        .dashboard-panel { background: #ffffff; padding: 1rem; border: 1px solid #e0e0e0; border-radius: 4px; display: flex; flex-direction: column; }
+        #map { flex-grow: 1; border-radius: 4px; border: 1px solid #e0e0e0; z-index: 1; }
+        .panel-title { font-size: 14px; font-weight: 700; text-transform: uppercase; color: #555555; margin-top: 0; margin-bottom: 10px; }
 
         .counter { margin-bottom: 1rem; font-weight: 600; color: #cc0000; text-transform: uppercase; font-size: 14px; }
         
-        table { width: 100%; border-collapse: collapse; text-align: left; background: #ffffff; border: 1px solid #e0e0e0; }
-        th, td { padding: 14px; border-bottom: 1px solid #e0e0e0; }
-        th { background-color: #fafafa; font-weight: 700; text-transform: uppercase; font-size: 12px; letter-spacing: 0.5px; color: #111111; }
-        tr:hover { background-color: #fff9f9; } /* Extremely subtle red tint on hover */
+        table { width: 100%; border-collapse: collapse; text-align: left; border: 1px solid #e0e0e0; font-size: 14px; }
+        th, td { padding: 12px; border-bottom: 1px solid #e0e0e0; }
+        th { background-color: #fafafa; font-weight: 700; text-transform: uppercase; font-size: 12px; color: #111111; }
+        tr:hover { background-color: #fff9f9; }
+        
+        .badge { display: inline-block; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 700; text-transform: uppercase; margin-right: 5px; margin-bottom: 5px; background: #e0e0e0; color: #333; }
+        .badge-success { background: #e8f5e9; color: #2e7d32; }
+        .badge-iaf { background: #e3f2fd; color: #1565c0; }
+        .badge-navy { background: #e0f7fa; color: #00838f; }
+        .badge-army { background: #f1f8e9; color: #558b2f; }
+        .badge-drdo { background: #fce4ec; color: #c2185b; }
+        .badge-sfc { background: #fff3e0; color: #e65100; }
         
         .btn-link { color: #cc0000; text-decoration: none; font-weight: 600; }
         .btn-link:hover { text-decoration: underline; color: #990000; }
@@ -40,13 +53,28 @@
     <div class="header-container">
         <div>
             <h1>Missile Test Tracker — India</h1>
-            <p style="margin: 5px 0 0 0; color: #555555; font-weight: 500;">An interactive repository by INDRA Networks.</p>
+            <p style="margin: 5px 0 0 0; color: #555555; font-weight: 500;">Geospatial & Technical Intelligence Dashboard | INDRA Networks</p>
         </div>
-        <button class="btn-download" onclick="downloadCSVWithWatermark()">📥 Download CSV</button>
+        <button class="btn-download" onclick="downloadExport()">📥 Export Filtered Data</button>
     </div>
     
     <div class="controls">
-        <input type="text" id="searchBox" placeholder="Filter by missile name, deployment platform, testing range...">
+        <input type="text" id="searchBox" placeholder="Search family, variant, or platform...">
+        <select id="serviceFilter">
+            <option value="">All Services</option>
+            <option value="IAF">Indian Air Force</option>
+            <option value="Indian Navy">Indian Navy</option>
+            <option value="Indian Army">Indian Army</option>
+            <option value="SFC">Strategic Forces Command</option>
+            <option value="DRDO">DRDO</option>
+        </select>
+        <select id="typeFilter">
+            <option value="">All Event Types</option>
+            <option value="Development Test">Development Test</option>
+            <option value="User Trial">User Trial</option>
+            <option value="Operational Launch">Operational Launch</option>
+            <option value="Training Launch">Training Launch</option>
+        </select>
         <select id="yearFilter">
             <option value="">All Years</option>
             <option value="2026">2026</option>
@@ -59,204 +87,261 @@
     </div>
 
     <div class="dashboard-grid">
-        <div class="chart-container">
-            <canvas id="activityChart" height="60"></canvas>
+        <div class="dashboard-panel">
+            <p class="panel-title">Geospatial Launch Density</p>
+            <div id="map"></div>
+        </div>
+        <div class="dashboard-panel">
+            <p class="panel-title">Launch Activity by Service</p>
+            <canvas id="activityChart"></canvas>
         </div>
     </div>
 
-    <div class="counter" id="recordCounter">Loading tracking database...</div>
+    <div class="counter" id="recordCounter">Initializing architecture...</div>
 
     <table id="trackerTable">
         <thead>
             <tr>
-                <th style="width: 12%;">Timeline</th>
-                <th style="width: 18%;">System Name</th>
-                <th>Flight Trial Parameters / Technical Details</th>
-                <th style="width: 10%;">Verification</th>
+                <th style="width: 10%;">Date / ID</th>
+                <th style="width: 15%;">System Family</th>
+                <th style="width: 20%;">Deployment & Event</th>
+                <th style="width: 15%;">Launch Location</th>
+                <th>Engineering Notes</th>
+                <th style="width: 8%;">Source</th>
             </tr>
         </thead>
         <tbody id="tableBody"></tbody>
     </table>
 
     <script>
-        let dataset = [];
+        let eventData = [];
+        let locationMap = {};
+        
         let activityChartInstance = null; 
+        let geoMap = null;
+        let mapMarkers = [];
 
-        function parseCSV(text) {
-            let lines = text.split('\n');
-            let result = [];
+        // Basic CSV to Array of Objects parser
+        function parseCSVToObjects(csv) {
+            const lines = csv.split('\n').filter(l => l.trim().length > 0);
+            const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
+            const result = [];
+            
             for(let i = 1; i < lines.length; i++) {
-                let line = lines[i].trim();
-                if (!line) continue;
-                let matches = line.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
+                // Regex handles commas inside quotes
+                const rowRegex = /(".*?"|[^",\s]+)(?=\s*,|\s*$)/g;
+                let matches = lines[i].match(rowRegex);
+                
                 if (matches) {
-                    let cleanRow = matches.map(val => val.replace(/^"|"$/g, '').trim());
-                    if(cleanRow.length >= 5) result.push(cleanRow);
+                    let obj = {};
+                    let vals = matches.map(v => v.replace(/^"|"$/g, '').trim());
+                    headers.forEach((h, index) => {
+                        obj[h] = vals[index] !== undefined ? vals[index] : "";
+                    });
+                    result.push(obj);
                 }
             }
             return result;
         }
 
-        fetch('test.csv')
-            .then(res => {
-                if (!res.ok) {
-                    throw new Error(`File not found (HTTP ${res.status}). Check that the file is named exactly 'test.csv' in your repository.`);
-                }
-                return res.text();
-            })
-            .then(csvText => {
-                dataset = parseCSV(csvText);
-                
-                // Chronological Sort
-                dataset.sort((a, b) => {
-                    let yearA = parseInt(a[0]) || 0;
-                    let yearB = parseInt(b[0]) || 0;
-                    if (yearB !== yearA) return yearB - yearA;
+        // Initialize the Map
+        function initMap() {
+            geoMap = L.map('map').setView([21.0, 82.0], 5); // Center on India
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(geoMap);
+        }
 
-                    const monthMap = { "January": 1, "February": 2, "March": 3, "April": 4, "May": 5, "June": 6, "July": 7, "August": 8, "September": 9, "October": 10, "November": 11, "December": 12, "Uncertain": 0 };
-                    let monthA = monthMap[a[1]] || 0;
-                    let monthB = monthMap[b[1]] || 0;
-                    if (monthB !== monthA) return monthB - monthA;
-
-                    let dateA = parseInt(a[2] ? a[2].split(/[&-]/)[0] : "0") || 0;
-                    let dateB = parseInt(b[2] ? b[2].split(/[&-]/)[0] : "0") || 0;
-                    return dateB - dateA;
-                });
-
-                renderDatabase(dataset);
-                renderChart(dataset);
-            })
-            .catch(error => {
-                document.getElementById('recordCounter').innerHTML = `
-                    <span style="color: #cc0000; font-weight: bold;">Error loading data:</span> ${error.message}
-                `;
+        // Fetch Both CSVs Simultaneously using Promise.all
+        Promise.all([
+            fetch('locations.csv').then(res => res.text()),
+            fetch('normalized_missiles.csv').then(res => res.text())
+        ]).then(([locText, dataText]) => {
+            
+            // 1. Build Location Dictionary
+            let locArray = parseCSVToObjects(locText);
+            locArray.forEach(loc => {
+                locationMap[loc.location_id] = loc;
             });
+
+            // 2. Parse Event Data
+            eventData = parseCSVToObjects(dataText);
+            
+            // 3. Sort Chronologically
+            eventData.sort((a, b) => {
+                if (a.date === "Unknown") return 1;
+                if (b.date === "Unknown") return -1;
+                return new Date(b.date) - new Date(a.date);
+            });
+
+            initMap();
+            applyFilters(); // Initial render
+        });
+
+        // Get badge color based on service
+        function getServiceBadge(service) {
+            let cls = 'badge';
+            if(service === 'IAF') cls += ' badge-iaf';
+            else if(service === 'Indian Navy') cls += ' badge-navy';
+            else if(service === 'Indian Army') cls += ' badge-army';
+            else if(service === 'SFC') cls += ' badge-sfc';
+            else if(service === 'DRDO') cls += ' badge-drdo';
+            return `<span class="${cls}">${service}</span>`;
+        }
 
         function renderDatabase(rows) {
             const tbody = document.getElementById('tableBody');
-            const counter = document.getElementById('recordCounter');
+            document.getElementById('recordCounter').innerText = `${rows.length} Flight Trials matching query parameters`;
             tbody.innerHTML = '';
             
-            counter.innerText = `${rows.length} flight trials matched`;
-
             rows.forEach(row => {
-                let dateStr = row[2] ? `${row[2]} ${row[1]}` : `${row[1]}`;
-                let linkOutput = row[5] ? `<a href="${row[5]}" target="_blank" class="btn-link">Source ↗</a>` : `<span style="color:#b5b5b5">—</span>`;
+                // Resolve Location from the joined dictionary
+                let loc = locationMap[row.location_id] || { location_name: "Unknown Range", state: "" };
+                
+                let linkOutput = row.source_url ? `<a href="${row.source_url}" target="_blank" class="btn-link">${row.source_type} ↗</a>` : `<span style="color:#b5b5b5">${row.source_type}</span>`;
                 
                 let tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td><strong>${row[0]}</strong><br><small style="color:#555555">${dateStr}</small></td>
-                    <td><span style="font-size:15px; font-weight:700; color:#cc0000;">${row[3]}</span></td>
-                    <td style="font-size:14px; line-height:1.5; color:#111111;">${row[4]}</td>
+                    <td><strong>${row.date}</strong><br><small style="color:#555">${row.event_id}</small></td>
+                    <td><span style="font-size:15px; font-weight:700; color:#cc0000;">${row.family}</span><br><span style="color:#555; font-size:12px;">Variant: ${row.variant}</span></td>
+                    <td>
+                        ${getServiceBadge(row.service)}
+                        <span class="badge badge-success">${row.result}</span>
+                        <br>
+                        <span style="font-weight:600; font-size:12px;">Type:</span> ${row.event_type}<br>
+                        <span style="font-weight:600; font-size:12px;">Platform:</span> ${row.platform}
+                    </td>
+                    <td><strong>${loc.location_name}</strong><br><small>${loc.state}</small></td>
+                    <td style="color:#333; line-height: 1.4;">${row.notes}</td>
                     <td>${linkOutput}</td>
                 `;
                 tbody.appendChild(tr);
             });
         }
 
-        function renderChart(rows) {
+        function renderVisualizations(rows) {
+            // --- 1. Update Chart (Service Breakdown) ---
             const ctx = document.getElementById('activityChart').getContext('2d');
-            
-            let yearCounts = {};
+            let serviceCounts = {};
             rows.forEach(row => {
-                let year = row[0];
-                yearCounts[year] = (yearCounts[year] || 0) + 1;
+                let svc = row.service || "Unknown";
+                serviceCounts[svc] = (serviceCounts[svc] || 0) + 1;
             });
 
-            const labels = Object.keys(yearCounts).sort();
-            const data = labels.map(year => yearCounts[year]);
+            const labels = Object.keys(serviceCounts);
+            const data = labels.map(svc => serviceCounts[svc]);
 
-            if (activityChartInstance) {
-                activityChartInstance.destroy();
-            }
+            if (activityChartInstance) activityChartInstance.destroy();
 
             activityChartInstance = new Chart(ctx, {
-                type: 'bar',
+                type: 'doughnut',
                 data: {
                     labels: labels,
                     datasets: [{
-                        label: 'Recorded Flight Trials',
                         data: data,
-                        backgroundColor: '#cc0000', /* Updated to Theme Red */
-                        borderRadius: 2
+                        backgroundColor: ['#1565c0', '#00838f', '#558b2f', '#e65100', '#c2185b', '#999999'],
+                        borderWidth: 0
                     }]
                 },
                 options: {
                     responsive: true,
-                    plugins: {
-                        legend: { display: false },
-                        title: { display: true, text: 'Flight Trials Over Time (Filtered)', font: { size: 16, family: 'system-ui' }, color: '#111111' }
-                    },
-                    scales: {
-                        y: { beginAtZero: true, ticks: { stepSize: 1, color: '#555555' }, grid: { color: '#e0e0e0' } },
-                        x: { ticks: { color: '#555555' }, grid: { display: false } }
-                    }
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'right', labels: { boxWidth: 12, font: { size: 11 } } } },
+                    cutout: '70%'
                 }
+            });
+
+            // --- 2. Update Map Markers ---
+            // Clear existing markers
+            mapMarkers.forEach(m => geoMap.removeLayer(m));
+            mapMarkers = [];
+
+            let locationDensity = {};
+            rows.forEach(row => {
+                let loc = locationMap[row.location_id];
+                if(loc && loc.latitude) {
+                    locationDensity[row.location_id] = (locationDensity[row.location_id] || 0) + 1;
+                }
+            });
+
+            Object.keys(locationDensity).forEach(locId => {
+                let loc = locationMap[locId];
+                let count = locationDensity[locId];
+                
+                // Draw circle proportional to amount of tests
+                let marker = L.circleMarker([loc.latitude, loc.longitude], {
+                    radius: Math.min(Math.max(count * 2, 8), 30), // Scale radius
+                    fillColor: "#cc0000",
+                    color: "#ffffff",
+                    weight: 2,
+                    opacity: 1,
+                    fillOpacity: 0.7
+                }).addTo(geoMap);
+
+                marker.bindPopup(`<strong>${loc.location_name}</strong><br>Recorded Events: ${count}`);
+                mapMarkers.push(marker);
             });
         }
 
-        function filterData() {
+        function applyFilters() {
             let search = document.getElementById('searchBox').value.toLowerCase();
-            let year = document.getElementById('yearFilter').value;
+            let svcFilter = document.getElementById('serviceFilter').value;
+            let typeFilter = document.getElementById('typeFilter').value;
+            let yearFilter = document.getElementById('yearFilter').value;
 
-            let filtered = dataset.filter(row => {
-                let matchSearch = row[3].toLowerCase().includes(search) || row[4].toLowerCase().includes(search);
-                let matchYear = year === "" || row[0] === year;
-                return matchSearch && matchYear;
+            let filtered = eventData.filter(row => {
+                let matchSearch = row.family.toLowerCase().includes(search) || row.variant.toLowerCase().includes(search) || row.platform.toLowerCase().includes(search);
+                let matchSvc = svcFilter === "" || row.service === svcFilter;
+                let matchType = typeFilter === "" || row.event_type === typeFilter;
+                let matchYear = yearFilter === "" || (row.date && row.date.startsWith(yearFilter));
+                
+                return matchSearch && matchSvc && matchType && matchYear;
             });
             
             renderDatabase(filtered);
-            renderChart(filtered); 
+            renderVisualizations(filtered);
         }
 
-        function downloadCSVWithWatermark() {
-            let csvContent = "";
+        function downloadExport() {
+            let csvContent = '"DATA CURATED BY:","Shwetabh Singh"\n"PROJECT:","Indian Missile Test Tracker"\n\n';
+            csvContent += '"Event ID","Date","Family","Variant","Service","Platform","Location","Event Type","Result","Source Type","Source URL","Notes"\n';
+
+            // We export exactly what is currently filtered on the screen
+            let activeFilters = document.getElementById('searchBox').value; // We trigger applyFilters again to get the exact array
             
-            csvContent += '"DATA CURATED BY:","Shwetabh Singh"\n';
-            csvContent += '"PROJECT:","Indian Missile Test Tracker"\n';
-            csvContent += '"NOTE:","This data is open-source but provided for informational purposes only."\n';
-            csvContent += '\n'; 
+            // Re-run the filter logic quietly to get the raw object array for pristine export
+            let search = document.getElementById('searchBox').value.toLowerCase();
+            let svcFilter = document.getElementById('serviceFilter').value;
+            let typeFilter = document.getElementById('typeFilter').value;
+            let yearFilter = document.getElementById('yearFilter').value;
 
-            csvContent += '"Year","Month","Date","Missile","Details","Source Link"\n';
+            let filteredForExport = eventData.filter(row => {
+                let matchSearch = row.family.toLowerCase().includes(search) || row.variant.toLowerCase().includes(search) || row.platform.toLowerCase().includes(search);
+                let matchSvc = svcFilter === "" || row.service === svcFilter;
+                let matchType = typeFilter === "" || row.event_type === typeFilter;
+                let matchYear = yearFilter === "" || (row.date && row.date.startsWith(yearFilter));
+                return matchSearch && matchSvc && matchType && matchYear;
+            });
 
-            let tableRows = document.querySelectorAll("#tableBody tr");
-            
-            if(tableRows.length === 0) {
-                alert("No data to download based on current filters.");
-                return;
-            }
-
-            tableRows.forEach(row => {
-                let cells = row.querySelectorAll("td");
-                
-                let timelineText = cells[0].innerText.split('\n');
-                let year = timelineText[0].trim();
-                let monthDay = timelineText[1] ? timelineText[1].trim() : "";
-                
-                let dateParts = monthDay.split(" ");
-                let date = dateParts[0] || "";
-                let month = dateParts[1] || "";
-                if(dateParts.length === 1) { month = dateParts[0]; date = ""; } 
-
-                let missileName = cells[1].innerText.trim().replace(/"/g, '""'); 
-                let details = cells[2].innerText.trim().replace(/"/g, '""');
-                let sourceUrl = cells[3].querySelector("a") ? cells[3].querySelector("a").href : "";
-
-                csvContent += `"${year}","${month}","${date}","${missileName}","${details}","${sourceUrl}"\n`;
+            filteredForExport.forEach(row => {
+                let loc = locationMap[row.location_id] ? locationMap[row.location_id].location_name : "Unknown";
+                csvContent += `"${row.event_id}","${row.date}","${row.family}","${row.variant}","${row.service}","${row.platform}","${loc}","${row.event_type}","${row.result}","${row.source_type}","${row.source_url}","${row.notes.replace(/"/g, '""')}"\n`;
             });
 
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
             const link = document.createElement("a");
-            link.setAttribute("href", url);
-            link.setAttribute("download", "Missile_Tracker_Export_Shwetabh_Singh.csv");
+            link.href = URL.createObjectURL(blob);
+            link.download = "Missile_Tracker_Export_Shwetabh_Singh.csv";
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
         }
 
-        document.getElementById('searchBox').addEventListener('input', filterData);
-        document.getElementById('yearFilter').addEventListener('change', filterData);
+        // Event Listeners
+        document.getElementById('searchBox').addEventListener('input', applyFilters);
+        document.getElementById('serviceFilter').addEventListener('change', applyFilters);
+        document.getElementById('typeFilter').addEventListener('change', applyFilters);
+        document.getElementById('yearFilter').addEventListener('change', applyFilters);
     </script>
 </body>
 </html>
