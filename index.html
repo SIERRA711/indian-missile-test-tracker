@@ -40,12 +40,13 @@
             flex-direction: column; 
             overflow: hidden; /* This acts as a hard wall to prevent map bleeding */
         }
-        #map { 
-            width: 100%; 
-            min-height: 300px; /* Gives Leaflet a concrete height to calculate its grid */
-            border-radius: 4px; 
-            border: 1px solid #e0e0e0; 
-            z-index: 1; 
+        /* ADD this rule */
+        #map {
+            flex-grow: 1;
+            border-radius: 4px;
+            border: 1px solid #e0e0e0;
+            z-index: 1;
+            min-height: 300px;  /* ADD THIS - ensures Leaflet has height */
         }
         .panel-title { font-size: 14px; font-weight: 700; text-transform: uppercase; color: #555555; margin-top: 0; margin-bottom: 10px; }
 
@@ -142,24 +143,45 @@
         let mapMarkers = [];
 
         // Basic CSV to Array of Objects parser
+        // REPLACE this entire function
         function parseCSVToObjects(csv) {
             const lines = csv.split('\n').filter(l => l.trim().length > 0);
+            if (lines.length === 0) return [];
+            
             const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
             const result = [];
             
-            for(let i = 1; i < lines.length; i++) {
-                // Regex handles commas inside quotes
-                const rowRegex = /(".*?"|[^",\s]+)(?=\s*,|\s*$)/g;
-                let matches = lines[i].match(rowRegex);
+            for (let i = 1; i < lines.length; i++) {
+                const row = {};
+                let current = "";
+                let inQuotes = false;
+                let colIndex = 0;
+                const chars = lines[i].split('');
                 
-                if (matches) {
-                    let obj = {};
-                    let vals = matches.map(v => v.replace(/^"|"$/g, '').trim());
-                    headers.forEach((h, index) => {
-                        obj[h] = vals[index] !== undefined ? vals[index] : "";
-                    });
-                    result.push(obj);
+                for (let j = 0; j < chars.length; j++) {
+                    const char = chars[j];
+                    const nextChar = chars[j + 1];
+                    
+                    if (!inQuotes && char === '"') {
+                        inQuotes = true;
+                    } else if (inQuotes && char === '"' && nextChar === '"') {
+                        current += '"';
+                        j++; // Skip escaped quote
+                    } else if (inQuotes && char === '"') {
+                        inQuotes = false;
+                    } else if (!inQuotes && char === ',') {
+                        row[headers[colIndex]] = current.trim();
+                        current = "";
+                        colIndex++;
+                    } else {
+                        current += char;
+                    }
                 }
+                // Push last field
+                if (colIndex < headers.length) {
+                    row[headers[colIndex]] = current.trim();
+                }
+                result.push(row);
             }
             return result;
         }
@@ -196,6 +218,7 @@
 
             initMap();
             applyFilters(); // Initial render
+            setTimeout(() => { if(geoMap) geoMap.invalidateSize(); }, 100);
         });
 
         // Get badge color based on service
