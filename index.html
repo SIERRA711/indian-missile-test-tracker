@@ -665,8 +665,7 @@
 
         // Proper CSV Parser
         function parseCSVToObjects(csv) {
-            const lines = csv.split('
-').filter(l => l.trim().length > 0);
+            const lines = csv.split('').filter(l => l.trim().length > 0);
             if (lines.length === 0) return [];
 
             const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
