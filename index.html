@@ -3,12 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Indian Missile Test Tracker</title>
+    <title>Indian Missile Test Tracker | INDRA Networks</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body { font-family: system-ui, -apple-system, sans-serif; padding: 2rem; max-width: 1200px; margin: auto; background: #f9f9f9; color: #242424; }
+        .header-container { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 1.5rem; }
+        .header-container h1 { margin: 0; }
+        
         .controls { display: flex; gap: 1rem; margin-bottom: 1.5rem; }
-        input, select { padding: 12px; border: 1px solid #e5e5e5; border-radius: 6px; font-size: 16px; flex: 1; }
-        select { max-width: 200px; cursor: pointer; }
+        input, select, button { padding: 12px; border: 1px solid #e5e5e5; border-radius: 6px; font-size: 16px; }
+        input { flex: 1; }
+        select { cursor: pointer; }
+        
+        .btn-download { background-color: #1a8917; color: white; border: none; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+        .btn-download:hover { background-color: #126310; }
+
+        .dashboard-grid { display: grid; grid-template-columns: 1fr; gap: 2rem; margin-bottom: 2rem; }
+        .chart-container { background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+
         .counter { margin-bottom: 1rem; font-weight: 500; color: #6b6b6b; }
         table { width: 100%; border-collapse: collapse; text-align: left; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
         th, td { padding: 14px; border-bottom: 1px solid #f2f2f2; }
@@ -20,8 +32,13 @@
 </head>
 <body>
 
-    <h1>Missile Test Tracker — India</h1>
-    <p>An interactive, open-source repository tracing development and user evaluation flight trials.</p>
+    <div class="header-container">
+        <div>
+            <h1>Missile Test Tracker — India</h1>
+            <p style="margin: 5px 0 0 0; color: #6b6b6b;">An interactive repository by INDRA Networks.</p>
+        </div>
+        <button class="btn-download" onclick="downloadCSVWithWatermark()">📥 Download CSV</button>
+    </div>
     
     <div class="controls">
         <input type="text" id="searchBox" placeholder="Filter by missile name, deployment platform, testing range...">
@@ -34,6 +51,12 @@
             <option value="2022">2022</option>
             <option value="2021">2021</option>
         </select>
+    </div>
+
+    <div class="dashboard-grid">
+        <div class="chart-container">
+            <canvas id="activityChart" height="60"></canvas>
+        </div>
     </div>
 
     <div class="counter" id="recordCounter">Loading tracking database...</div>
@@ -52,8 +75,8 @@
 
     <script>
         let dataset = [];
+        let activityChartInstance = null; // Holds the chart so we can destroy/rebuild it on filter
 
-        // Simple CSV Parser logic to handle quotes and commas natively
         function parseCSV(text) {
             let lines = text.split('\n');
             let result = [];
@@ -69,12 +92,29 @@
             return result;
         }
 
-        // Fetch dataset straight from the repository file
         fetch('test.csv')
             .then(res => res.text())
             .then(csvText => {
                 dataset = parseCSV(csvText);
+                
+                // Chronological Sort
+                dataset.sort((a, b) => {
+                    let yearA = parseInt(a[0]) || 0;
+                    let yearB = parseInt(b[0]) || 0;
+                    if (yearB !== yearA) return yearB - yearA;
+
+                    const monthMap = { "January": 1, "February": 2, "March": 3, "April": 4, "May": 5, "June": 6, "July": 7, "August": 8, "September": 9, "October": 10, "November": 11, "December": 12, "Uncertain": 0 };
+                    let monthA = monthMap[a[1]] || 0;
+                    let monthB = monthMap[b[1]] || 0;
+                    if (monthB !== monthA) return monthB - monthA;
+
+                    let dateA = parseInt(a[2] ? a[2].split(/[&-]/)[0] : "0") || 0;
+                    let dateB = parseInt(b[2] ? b[2].split(/[&-]/)[0] : "0") || 0;
+                    return dateB - dateA;
+                });
+
                 renderDatabase(dataset);
+                renderChart(dataset);
             });
 
         function renderDatabase(rows) {
@@ -82,7 +122,7 @@
             const counter = document.getElementById('recordCounter');
             tbody.innerHTML = '';
             
-            counter.innerText = `${rows.length} flight trials matched standard parameters.`;
+            counter.innerText = `${rows.length} flight trials matched.`;
 
             rows.forEach(row => {
                 let dateStr = row[2] ? `${row[2]} ${row[1]}` : `${row[1]}`;
@@ -99,6 +139,50 @@
             });
         }
 
+        // --- NEW: Chart Rendering Logic ---
+        function renderChart(rows) {
+            const ctx = document.getElementById('activityChart').getContext('2d');
+            
+            // Count tests per year dynamically based on the filtered data
+            let yearCounts = {};
+            rows.forEach(row => {
+                let year = row[0];
+                yearCounts[year] = (yearCounts[year] || 0) + 1;
+            });
+
+            // Sort years chronologically for the X-axis
+            const labels = Object.keys(yearCounts).sort();
+            const data = labels.map(year => yearCounts[year]);
+
+            // If a chart already exists, destroy it before drawing a new one
+            if (activityChartInstance) {
+                activityChartInstance.destroy();
+            }
+
+            activityChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Recorded Flight Trials',
+                        data: data,
+                        backgroundColor: '#1a8917',
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false },
+                        title: { display: true, text: 'Flight Trials Over Time (Filtered)', font: { size: 16 } }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, ticks: { stepSize: 1 } }
+                    }
+                }
+            });
+        }
+
         function filterData() {
             let search = document.getElementById('searchBox').value.toLowerCase();
             let year = document.getElementById('yearFilter').value;
@@ -108,7 +192,62 @@
                 let matchYear = year === "" || row[0] === year;
                 return matchSearch && matchYear;
             });
+            
             renderDatabase(filtered);
+            renderChart(filtered); // Update the chart when the user searches!
+        }
+
+        // --- NEW: Download & Watermark Logic ---
+        function downloadCSVWithWatermark() {
+            let csvContent = "";
+            
+            // 1. Inject the Text "Watermark" / Branding
+            csvContent += '"DATA CURATED BY:","Shwetabh Singh"\n';
+            csvContent += '"PROJECT:","Indian Missile Test Tracker"\n';
+            csvContent += '"NOTE:","This data is open-source but provided for informational purposes only."\n';
+            csvContent += '\n'; // Blank line before data starts
+
+            // 2. Add the Headers
+            csvContent += '"Year","Month","Date","Missile","Details","Source Link"\n';
+
+            // 3. Append the currently filtered dataset
+            // We read the table DOM to only export what the user has currently filtered
+            let tableRows = document.querySelectorAll("#tableBody tr");
+            
+            if(tableRows.length === 0) {
+                alert("No data to download based on current filters.");
+                return;
+            }
+
+            tableRows.forEach(row => {
+                let cells = row.querySelectorAll("td");
+                // Extracting text back out of the HTML formatting
+                let timelineText = cells[0].innerText.split('\n');
+                let year = timelineText[0].trim();
+                let monthDay = timelineText[1] ? timelineText[1].trim() : "";
+                
+                // Split "2 June" into "June" and "2"
+                let dateParts = monthDay.split(" ");
+                let date = dateParts[0] || "";
+                let month = dateParts[1] || "";
+                if(dateParts.length === 1) { month = dateParts[0]; date = ""; } // Handle "Uncertain"
+
+                let missileName = cells[1].innerText.trim().replace(/"/g, '""'); // escape quotes
+                let details = cells[2].innerText.trim().replace(/"/g, '""');
+                let sourceUrl = cells[3].querySelector("a") ? cells[3].querySelector("a").href : "";
+
+                csvContent += `"${year}","${month}","${date}","${missileName}","${details}","${sourceUrl}"\n`;
+            });
+
+            // 4. Trigger the browser download
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.setAttribute("href", url);
+            link.setAttribute("download", "INDRA_Missile_Tracker_Export.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
 
         document.getElementById('searchBox').addEventListener('input', filterData);
