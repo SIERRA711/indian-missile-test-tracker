@@ -1,974 +1,801 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Indian Missile Test Tracker | @singhshwetabh71</title>
-
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-
-    <style>
-        :root {
-            --primary: #8B0000;
-            --primary-dark: #5C0000;
-            --primary-light: #B22222;
-            --bg: #f5f5f0;
-            --surface: #ffffff;
-            --surface-hover: #faf8f5;
-            --border: #d4d0c8;
-            --text: #1a1a1a;
-            --text-secondary: #4a4a4a;
-            --text-muted: #7a7a7a;
-            --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
-            --shadow: 0 4px 16px rgba(0,0,0,0.06);
-            --shadow-lg: 0 8px 32px rgba(0,0,0,0.1);
-            --radius-sm: 4px;
-            --radius: 8px;
-            --radius-lg: 12px;
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-
-        body {
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            line-height: 1.6;
-            -webkit-font-smoothing: antialiased;
-        }
-
-        .header {
-            background: linear-gradient(180deg, #f0eeea 0%, var(--bg) 100%);
-            border-bottom: 2px solid var(--primary);
-            padding: 0;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .header-inner {
-            max-width: 1440px;
-            margin: 0 auto;
-            padding: 1.25rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-        }
-
-        .brand-text h1 {
-            font-size: 1.375rem;
-            font-weight: 700;
-            color: var(--primary);
-            letter-spacing: 0.02em;
-            line-height: 1.2;
-            text-transform: uppercase;
-        }
-
-        .brand-text p {
-            font-size: 0.8125rem;
-            color: var(--text-muted);
-            font-weight: 400;
-            margin-top: 4px;
-            font-style: italic;
-        }
-
-        .header-actions {
-            display: flex;
-            gap: 0.75rem;
-        }
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem 1rem;
-            border-radius: var(--radius-sm);
-            font-size: 0.8125rem;
-            font-weight: 600;
-            border: none;
-            cursor: pointer;
-            transition: all 0.15s ease;
-            font-family: inherit;
-            letter-spacing: 0.01em;
-        }
-
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: var(--primary-dark);
-        }
-
-        .btn-ghost {
-            background: transparent;
-            color: var(--text-secondary);
-            border: 1px solid var(--border);
-        }
-
-        .btn-ghost:hover {
-            background: var(--surface);
-            color: var(--primary);
-            border-color: var(--primary-light);
-        }
-
-        .controls-bar {
-            background: var(--surface);
-            border-bottom: 1px solid var(--border);
-            padding: 0.875rem 0;
-            position: sticky;
-            top: 73px;
-            z-index: 99;
-            box-shadow: var(--shadow-sm);
-        }
-
-        .controls-inner {
-            max-width: 1440px;
-            margin: 0 auto;
-            padding: 0 2rem;
-            display: flex;
-            gap: 0.625rem;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-
-        .search-box {
-            position: relative;
-            flex: 1;
-            min-width: 260px;
-        }
-
-        .search-box input {
-            width: 100%;
-            padding: 0.5rem 1rem 0.5rem 2.25rem;
-            border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
-            font-size: 0.8125rem;
-            font-family: inherit;
-            background: var(--bg);
-            transition: all 0.15s;
-        }
-
-        .search-box::before {
-            content: "";
-            position: absolute;
-            left: 0.75rem;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 14px;
-            height: 14px;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%237a7a7a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E");
-            background-size: contain;
-            opacity: 0.7;
-        }
-
-        .search-box input:focus {
-            outline: none;
-            border-color: var(--primary-light);
-            background: var(--surface);
-            box-shadow: 0 0 0 2px rgba(139,0,0,0.06);
-        }
-
-        .filter-select {
-            padding: 0.5rem 2rem 0.5rem 0.875rem;
-            border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
-            font-size: 0.8125rem;
-            font-family: inherit;
-            background: var(--bg);
-            cursor: pointer;
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 12 12'%3E%3Cpath fill='%237a7a7a' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 0.625rem center;
-            min-width: 130px;
-            transition: all 0.15s;
-            color: var(--text-secondary);
-        }
-
-        .filter-select:focus {
-            outline: none;
-            border-color: var(--primary-light);
-            box-shadow: 0 0 0 2px rgba(139,0,0,0.06);
-        }
-
-        .main {
-            max-width: 1440px;
-            margin: 0 auto;
-            padding: 1.5rem 2rem 3rem;
-        }
-
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 1.25rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .panel {
-            background: var(--surface);
-            border-radius: var(--radius);
-            border: 1px solid var(--border);
-            box-shadow: var(--shadow-sm);
-            overflow: hidden;
-        }
-
-        .panel-header {
-            padding: 1rem 1.25rem;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: linear-gradient(180deg, #fafafa 0%, var(--surface) 100%);
-        }
-
-        .panel-title {
-            font-size: 0.6875rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            color: var(--text-muted);
-        }
-
-        .panel-badge {
-            font-size: 0.625rem;
-            font-weight: 700;
-            padding: 0.125rem 0.5rem;
-            border-radius: 100px;
-            background: #e8e4dc;
-            color: var(--primary);
-            letter-spacing: 0.05em;
-        }
-
-        .panel-body {
-            padding: 0.75rem;
-            height: 300px;
-        }
-
-        #map {
-            width: 100%;
-            height: 100%;
-            border-radius: var(--radius-sm);
-        }
-
-        .stats-bar {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .stat-card {
-            background: var(--surface);
-            border-radius: var(--radius);
-            padding: 1rem 1.25rem;
-            border: 1px solid var(--border);
-            box-shadow: var(--shadow-sm);
-            border-left: 3px solid var(--primary);
-        }
-
-        .stat-label {
-            font-size: 0.625rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            color: var(--text-muted);
-            margin-bottom: 0.375rem;
-        }
-
-        .stat-value {
-            font-size: 1.75rem;
-            font-weight: 700;
-            color: var(--text);
-            line-height: 1;
-            font-family: 'JetBrains Mono', monospace;
-        }
-
-        .stat-value.primary { color: var(--primary); }
-
-        .table-wrap {
-            background: var(--surface);
-            border-radius: var(--radius);
-            border: 1px solid var(--border);
-            box-shadow: var(--shadow-sm);
-            overflow: hidden;
-        }
-
-        .table-header {
-            padding: 1rem 1.25rem;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            background: linear-gradient(180deg, #fafafa 0%, var(--surface) 100%);
-        }
-
-        .table-title {
-            font-size: 0.875rem;
-            font-weight: 700;
-            color: var(--text);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .counter {
-            font-size: 0.8125rem;
-            color: var(--text-muted);
-            font-weight: 400;
-        }
-
-        .counter strong {
-            color: var(--primary);
-            font-weight: 700;
-            font-family: 'JetBrains Mono', monospace;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-            font-size: 0.8125rem;
-        }
-
-        thead {
-            background: #f0eeea;
-        }
-
-        th {
-            padding: 0.75rem 1.25rem;
-            font-size: 0.625rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            color: var(--text-muted);
-            text-align: left;
-            border-bottom: 2px solid var(--border);
-            white-space: nowrap;
-        }
-
-        td {
-            padding: 0.875rem 1.25rem;
-            border-bottom: 1px solid #e8e4dc;
-            vertical-align: top;
-        }
-
-        tbody tr {
-            transition: background 0.1s ease;
-        }
-
-        tbody tr:hover {
-            background: var(--surface-hover);
-        }
-
-        tbody tr:last-child td {
-            border-bottom: none;
-        }
-
-        .cell-date {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.8125rem;
-            font-weight: 600;
-            color: var(--text);
-        }
-
-        .cell-id {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.625rem;
-            color: var(--text-muted);
-            margin-top: 0.25rem;
-        }
-
-        .cell-family {
-            font-size: 0.9375rem;
-            font-weight: 700;
-            color: var(--primary);
-            letter-spacing: -0.01em;
-        }
-
-        .cell-variant {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            margin-top: 0.25rem;
-            font-style: italic;
-        }
-
-        .cell-location {
-            font-weight: 600;
-            color: var(--text);
-            font-size: 0.8125rem;
-        }
-
-        .cell-location small {
-            display: block;
-            font-weight: 400;
-            color: var(--text-muted);
-            margin-top: 0.125rem;
-            font-size: 0.75rem;
-        }
-
-        .cell-notes {
-            color: var(--text-secondary);
-            line-height: 1.5;
-            max-width: 420px;
-            font-size: 0.8125rem;
-        }
-
-        .badge-group {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.25rem;
-            margin-bottom: 0.375rem;
-        }
-
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            padding: 0.125rem 0.5rem;
-            border-radius: 3px;
-            font-size: 0.625rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            white-space: nowrap;
-        }
-
-        .badge-success { background: #d4e8d4; color: #2d5a2d; }
-        .badge-iaf { background: #d4dde8; color: #1e3a5f; }
-        .badge-navy { background: #d4e8e8; color: #1e4a4a; }
-        .badge-army { background: #e0e8d4; color: #3a5a1e; }
-        .badge-drdo { background: #e8d4d4; color: #5a1e1e; }
-        .badge-sfc { background: #e8ddd4; color: #5a3a1e; }
-
-        .meta-line {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            margin-top: 0.125rem;
-        }
-
-        .meta-line strong {
-            color: var(--text);
-            font-weight: 600;
-        }
-
-        .btn-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.25rem;
-            color: var(--primary);
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 0.75rem;
-            padding: 0.25rem 0.5rem;
-            border-radius: var(--radius-sm);
-            transition: all 0.15s;
-        }
-
-        .btn-link:hover {
-            background: var(--surface-hover);
-            text-decoration: underline;
-            text-underline-offset: 2px;
-        }
-
-        .btn-link.muted {
-            color: var(--text-muted);
-            font-weight: 500;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 3rem 2rem;
-            color: var(--text-muted);
-        }
-
-        .empty-state-icon {
-            font-size: 2rem;
-            margin-bottom: 0.75rem;
-            opacity: 0.4;
-        }
-
-        @media (max-width: 1024px) {
-            .dashboard-grid { grid-template-columns: 1fr; }
-            .panel-body { height: 260px; }
-            .stats-bar { grid-template-columns: repeat(2, 1fr); }
-        }
-
-        @media (max-width: 768px) {
-            .header-inner { padding: 1rem; flex-direction: column; gap: 0.75rem; align-items: flex-start; }
-            .controls-inner { padding: 0 1rem; }
-            .main { padding: 1rem; }
-            th, td { padding: 0.625rem; }
-            .table-wrap { border-radius: var(--radius); }
-            .stats-bar { grid-template-columns: repeat(2, 1fr); }
-        }
-
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #c4c0b8; border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: #a4a098; }
-    </style>
-<base target="_blank">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Indian Missile Test Tracker | @singhshwetabh71</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --red: #cc0000;
+    --red-dark: #8b0000;
+    --red-dim: rgba(204,0,0,0.08);
+    --ink: #111111;
+    --mid: #555555;
+    --rule: #e0e0e0;
+    --bg: #ffffff;
+    --bg2: #fafafa;
+    --mono: 'Courier New', monospace;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  /* ── MASTHEAD ── */
+  .masthead {
+    border-bottom: 3px solid var(--red);
+    padding: 1.25rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 1rem;
+  }
+  .masthead-left h1 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--red);
+  }
+  .masthead-left p {
+    color: var(--mid);
+    font-size: 12px;
+    margin-top: 2px;
+    letter-spacing: 0.03em;
+  }
+  .masthead-right {
+    display: flex;
+    gap: 0.6rem;
+    flex-shrink: 0;
+  }
+  .btn {
+    background: var(--red);
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .btn:hover { background: var(--red-dark); }
+  .btn-ghost {
+    background: transparent;
+    color: var(--red);
+    border: 1.5px solid var(--red);
+  }
+  .btn-ghost:hover { background: var(--red-dim); }
+
+  /* ── MAIN LAYOUT ── */
+  .page { max-width: 1400px; margin: 0 auto; padding: 1.5rem 2rem 3rem; }
+
+  /* ── KPI STRIP ── */
+  .kpi-strip {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 0;
+    border: 1px solid var(--rule);
+    margin-bottom: 1.75rem;
+  }
+  .kpi {
+    padding: 1rem 1.25rem;
+    border-right: 1px solid var(--rule);
+    background: var(--bg2);
+  }
+  .kpi:last-child { border-right: none; }
+  .kpi-value {
+    font-size: 1.9rem;
+    font-weight: 800;
+    color: var(--red);
+    line-height: 1;
+    font-family: var(--mono);
+  }
+  .kpi-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--mid);
+    margin-top: 4px;
+  }
+
+  /* ── ANALYTICS GRID ── */
+  .analytics-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1.75rem;
+  }
+  .analytics-grid-bottom {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1.75rem;
+  }
+  .panel {
+    border: 1px solid var(--rule);
+    background: var(--bg);
+    padding: 1rem 1.25rem;
+  }
+  .panel-title {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--mid);
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--rule);
+  }
+  .chart-wrap { position: relative; width: 100%; }
+  .chart-wrap canvas { display: block; }
+
+  /* ── MOST-TESTED TABLE ── */
+  .mini-table { width: 100%; border-collapse: collapse; }
+  .mini-table tr + tr { border-top: 1px solid var(--rule); }
+  .mini-table td { padding: 6px 4px; font-size: 12px; }
+  .mini-table td:first-child { color: var(--mid); font-family: var(--mono); width: 28px; }
+  .mini-table td:last-child { text-align: right; font-weight: 700; color: var(--red); font-family: var(--mono); }
+  .bar-bg { background: var(--red-dim); height: 4px; border-radius: 2px; margin-top: 3px; }
+  .bar-fill { background: var(--red); height: 4px; border-radius: 2px; }
+
+  /* ── HEATMAP ── */
+  .heatmap-wrap { overflow-x: auto; }
+  .heatmap-grid {
+    display: grid;
+    grid-template-columns: 60px repeat(6, 1fr);
+    gap: 2px;
+    font-size: 10px;
+    min-width: 420px;
+  }
+  .hm-cell {
+    padding: 6px 4px;
+    text-align: center;
+    font-weight: 700;
+    font-family: var(--mono);
+    border-radius: 2px;
+    min-height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .hm-header { font-size: 10px; font-weight: 700; color: var(--mid); text-transform: uppercase; }
+  .hm-row-label { font-size: 10px; color: var(--mid); font-weight: 600; justify-content: flex-start; font-family: system-ui; }
+
+  /* ── CONTROLS ── */
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-bottom: 1rem;
+    align-items: center;
+  }
+  .controls input, .controls select {
+    padding: 8px 10px;
+    border: 1px solid var(--rule);
+    background: var(--bg2);
+    font-size: 13px;
+    color: var(--ink);
+    flex: 1;
+    min-width: 140px;
+    outline: none;
+  }
+  .controls input:focus, .controls select:focus { border-color: var(--red); }
+  .counter {
+    margin-left: auto;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--mid);
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+  }
+
+  /* ── TABLE ── */
+  .table-wrap { overflow-x: auto; border: 1px solid var(--rule); }
+  table { width: 100%; border-collapse: collapse; }
+  thead th {
+    background: var(--bg2);
+    padding: 10px 12px;
+    text-align: left;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--mid);
+    border-bottom: 2px solid var(--rule);
+    white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+  }
+  thead th:hover { color: var(--red); }
+  thead th.sort-asc::after { content: ' ↑'; color: var(--red); }
+  thead th.sort-desc::after { content: ' ↓'; color: var(--red); }
+
+  tbody tr { border-bottom: 1px solid var(--rule); transition: background 0.1s; }
+  tbody tr:hover { background: var(--red-dim); }
+  tbody td { padding: 10px 12px; vertical-align: top; }
+
+  .missile-name {
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--red);
+    font-family: var(--mono);
+  }
+  .cat-badge {
+    display: inline-block;
+    padding: 2px 6px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-radius: 2px;
+    margin-top: 3px;
+  }
+  .agency-badges { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 4px; }
+  .ag-badge {
+    padding: 2px 6px;
+    font-size: 10px;
+    font-weight: 700;
+    border-radius: 2px;
+  }
+  .date-cell { font-family: var(--mono); font-size: 12px; white-space: nowrap; }
+  .notes-cell { color: #333; font-size: 12px; line-height: 1.4; max-width: 340px; }
+  .src-link { color: var(--red); text-decoration: none; font-weight: 700; font-size: 12px; }
+  .src-link:hover { text-decoration: underline; }
+  .no-src { color: #bbb; font-size: 11px; }
+
+  /* Category colors */
+  .cat-SAM { background: #e3f2fd; color: #1565c0; }
+  .cat-ASCM { background: #fce4ec; color: #880e4f; }
+  .cat-BM { background: #fff3e0; color: #bf360c; }
+  .cat-ATGM { background: #e8f5e9; color: #1b5e20; }
+  .cat-RA { background: #f3e5f5; color: #4a148c; }
+  .cat-ALCM { background: #e0f7fa; color: #006064; }
+  .cat-BMD { background: #fff8e1; color: #f57f17; }
+  .cat-GB { background: #efebe9; color: #3e2723; }
+  .cat-AAM { background: #e8eaf6; color: #1a237e; }
+  .cat-HYP { background: #fafafa; color: #212121; border: 1px solid #ccc; }
+  .cat-SLBM { background: #e0f2f1; color: #004d40; }
+  .cat-TORP { background: #f9fbe7; color: #558b2f; }
+  .cat-UNK { background: #f5f5f5; color: #757575; }
+
+  /* Agency colors */
+  .ag-DRDO { background: #fce4ec; color: #c2185b; }
+  .ag-IAF { background: #e3f2fd; color: #1565c0; }
+  .ag-Navy { background: #e0f7fa; color: #00838f; }
+  .ag-Army { background: #e8f5e9; color: #2e7d32; }
+  .ag-SFC { background: #fff3e0; color: #e65100; }
+  .ag-ISRO { background: #f3e5f5; color: #7b1fa2; }
+  .ag-BDL { background: #fafafa; color: #424242; border: 1px solid #ddd; }
+  .ag-ANC { background: #e8eaf6; color: #1a237e; }
+  .ag-other { background: #f5f5f5; color: #555; }
+
+  footer {
+    text-align: center;
+    font-size: 11px;
+    color: #bbb;
+    padding: 2rem 0 1rem;
+    border-top: 1px solid var(--rule);
+    margin-top: 2rem;
+  }
+
+  @media (max-width: 900px) {
+    .kpi-strip { grid-template-columns: repeat(3, 1fr); }
+    .analytics-grid { grid-template-columns: 1fr; }
+    .analytics-grid-bottom { grid-template-columns: 1fr; }
+    .masthead { flex-direction: column; align-items: flex-start; }
+    .page { padding: 1rem; }
+  }
+</style>
 </head>
 <body>
 
-    <header class="header">
-        <div class="header-inner">
-            <div class="brand-text">
-                <h1>Indian Missile Test Tracker</h1>
-                <p>Compiled and maintained by Shwetabh Singh — open source military flight test data</p>
-            </div>
-            <div class="header-actions">
-                <button class="btn btn-ghost" onclick="window.open('https://github.com/singhshwetabh71', '_blank')">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
-                    GitHub
-                </button>
-                <button class="btn btn-primary" onclick="downloadExport()">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                    Export CSV
-                </button>
-            </div>
-        </div>
-    </header>
+<header class="masthead">
+  <div class="masthead-left">
+    <h1>Indian Missile Test Tracker</h1>
+    <p>Open-source flight trial database · 2021–2026 · curated by <strong>@singhshwetabh71</strong></p>
+  </div>
+  <div class="masthead-right">
+    <button class="btn btn-ghost" onclick="exportCSV()">↓ Export CSV</button>
+    <button class="btn" onclick="scrollToTable()">View Database ↓</button>
+  </div>
+</header>
 
-    <div class="controls-bar">
-        <div class="controls-inner">
-            <div class="search-box">
-                <input type="text" id="searchBox" placeholder="Search family, variant, or platform...">
-            </div>
-            <select id="serviceFilter" class="filter-select">
-                <option value="">All Services</option>
-                <option value="IAF">Indian Air Force</option>
-                <option value="Indian Navy">Indian Navy</option>
-                <option value="Indian Army">Indian Army</option>
-                <option value="SFC">Strategic Forces Command</option>
-                <option value="DRDO">DRDO</option>
-            </select>
-            <select id="typeFilter" class="filter-select">
-                <option value="">All Event Types</option>
-                <option value="Development Test">Development Test</option>
-                <option value="User Trial">User Trial</option>
-                <option value="Operational Launch">Operational Launch</option>
-                <option value="Training Launch">Training Launch</option>
-            </select>
-            <select id="yearFilter" class="filter-select">
-                <option value="">All Years</option>
-                <option value="2026">2026</option>
-                <option value="2025">2025</option>
-                <option value="2024">2024</option>
-                <option value="2023">2023</option>
-                <option value="2022">2022</option>
-                <option value="2021">2021</option>
-            </select>
-        </div>
+<div class="page">
+
+  <!-- KPI STRIP -->
+  <div class="kpi-strip" id="kpiStrip">
+    <div class="kpi"><div class="kpi-value" id="kpiTotal">—</div><div class="kpi-label">Total Events</div></div>
+    <div class="kpi"><div class="kpi-value" id="kpiSystems">—</div><div class="kpi-label">Unique Systems</div></div>
+    <div class="kpi"><div class="kpi-value" id="kpiYears">6</div><div class="kpi-label">Years Covered</div></div>
+    <div class="kpi"><div class="kpi-value" id="kpiTopYear">—</div><div class="kpi-label">Peak Year</div></div>
+    <div class="kpi"><div class="kpi-value" id="kpiDRDO">—</div><div class="kpi-label">DRDO-Led Tests</div></div>
+    <div class="kpi"><div class="kpi-value" id="kpiStrategic">—</div><div class="kpi-label">Strategic (SFC)</div></div>
+  </div>
+
+  <!-- ANALYTICS ROW 1 -->
+  <div class="analytics-grid">
+    <div class="panel">
+      <div class="panel-title">Tests per Year</div>
+      <div class="chart-wrap" style="height:180px"><canvas id="chartYear"></canvas></div>
+    </div>
+    <div class="panel">
+      <div class="panel-title">Category Breakdown</div>
+      <div class="chart-wrap" style="height:180px"><canvas id="chartCat"></canvas></div>
+    </div>
+    <div class="panel">
+      <div class="panel-title">Agency Activity</div>
+      <div class="chart-wrap" style="height:180px"><canvas id="chartAgency"></canvas></div>
+    </div>
+  </div>
+
+  <!-- ANALYTICS ROW 2 -->
+  <div class="analytics-grid-bottom">
+    <div class="panel">
+      <div class="panel-title">Category × Year Heatmap (test count)</div>
+      <div class="heatmap-wrap" id="heatmapWrap"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-title">Most-Tested Systems</div>
+      <div id="topSystemsTable"></div>
+    </div>
+  </div>
+
+  <!-- CONTROLS + TABLE -->
+  <div id="tableSection">
+    <div class="controls">
+      <input type="text" id="searchBox" placeholder="Search missile, agency, location, notes…">
+      <select id="catFilter">
+        <option value="">All Categories</option>
+        <option>Surface-to-Air</option>
+        <option>Anti-Ship/Cruise</option>
+        <option>Ballistic</option>
+        <option>Anti-Tank</option>
+        <option>Rocket/Artillery</option>
+        <option>Air-Launched Cruise</option>
+        <option>Ballistic Missile Defence</option>
+        <option>Glide Bomb</option>
+        <option>Air-to-Air</option>
+        <option>Hypersonic</option>
+        <option>Sub-Launched Ballistic</option>
+        <option>Torpedo</option>
+      </select>
+      <select id="agencyFilter">
+        <option value="">All Agencies</option>
+        <option>DRDO</option>
+        <option>IAF</option>
+        <option>Indian Navy</option>
+        <option>Indian Army</option>
+        <option>SFC</option>
+        <option>ISRO</option>
+      </select>
+      <select id="yearFilter">
+        <option value="">All Years</option>
+        <option>2026</option><option>2025</option><option>2024</option>
+        <option>2023</option><option>2022</option><option>2021</option>
+      </select>
+      <span class="counter" id="rowCounter">— events</span>
     </div>
 
-    <main class="main">
-        <div class="stats-bar" id="statsBar">
-            <div class="stat-card">
-                <div class="stat-label">Total Events</div>
-                <div class="stat-value primary" id="statTotal">—</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Success Rate</div>
-                <div class="stat-value" id="statSuccess">—</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Unique Systems</div>
-                <div class="stat-value" id="statSystems">—</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Test Ranges</div>
-                <div class="stat-value" id="statRanges">—</div>
-            </div>
-        </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th onclick="sortTable('Date')" id="th-Date">Date</th>
+            <th onclick="sortTable('Missile')" id="th-Missile">System</th>
+            <th onclick="sortTable('Category')" id="th-Category">Category</th>
+            <th onclick="sortTable('Agency')" id="th-Agency">Agency</th>
+            <th>Location</th>
+            <th>Notes</th>
+            <th>Source</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+  </div>
 
-        <div class="dashboard-grid">
-            <div class="panel">
-                <div class="panel-header">
-                    <span class="panel-title">Geospatial Launch Density</span>
-                    <span class="panel-badge" id="mapBadge">Live</span>
-                </div>
-                <div class="panel-body">
-                    <div id="map"></div>
-                </div>
-            </div>
-            <div class="panel">
-                <div class="panel-header">
-                    <span class="panel-title">Launch Activity by Service</span>
-                </div>
-                <div class="panel-body" style="position: relative;">
-                    <canvas id="activityChart"></canvas>
-                </div>
-            </div>
-        </div>
+</div>
 
-        <div class="table-wrap">
-            <div class="table-header">
-                <span class="table-title">Flight Trial Records</span>
-                <span class="counter" id="recordCounter">Loading records...</span>
-            </div>
-            <div style="overflow-x: auto;">
-                <table id="trackerTable">
-                    <thead>
-                        <tr>
-                            <th style="width: 10%;">Date / ID</th>
-                            <th style="width: 15%;">System</th>
-                            <th style="width: 20%;">Deployment & Event</th>
-                            <th style="width: 14%;">Launch Location</th>
-                            <th>Engineering Notes</th>
-                            <th style="width: 8%;">Source</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tableBody">
-                        <tr>
-                            <td colspan="6">
-                                <div class="empty-state">
-                                    <div class="empty-state-icon">⏳</div>
-                                    <p>Loading records...</p>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </main>
+<footer>
+  Data compiled from PIB, MoD Year End Reviews, official DRDO/IAF/Navy releases, and open-source reporting.
+  All entries individually sourced. Last updated June 2026. · <strong>@singhshwetabh71</strong>
+</footer>
 
-    <script>
-        let eventData = [];
-        let locationMap = {};
-        let activityChartInstance = null;
-        let geoMap = null;
-        let mapMarkers = [];
+<script>
+// ──────────────────────────────────────────────
+// DATA
+// ──────────────────────────────────────────────
+const DB = [{"Missile":"Akash NG","Date":"","Month_Year":"Uncertain 2023","Location":"Chandipur, Odisha","Agency":"DRDO","Notes":"Banshee target. Revealed in MoD Year End Review.","Category":"Surface-to-Air","Source_URL":"https://pib.gov.in/PressReleaseIframePage.aspx?PRID=1989502"},{"Missile":"NGCCM","Date":"","Month_Year":"Uncertain 2023","Location":"","Agency":"DRDO","Notes":"First fired 2023. Date not clear. Revealed in MoD Year End Review.","Category":"Anti-Tank","Source_URL":"https://pib.gov.in/PressReleaseIframePage.aspx?PRID=1989502"},{"Missile":"MPATGM","Date":"","Month_Year":"Uncertain 2023","Location":"NOAR, Kurnool, Andhra Pradesh","Agency":"DRDO","Notes":"Flight test at 2.5 km range. Cooled IIR seeker.","Category":"Anti-Tank","Source_URL":"https://pib.gov.in/PressReleaseIframePage.aspx?PRID=1989502"},{"Missile":"VL-SRSAM","Date":"","Month_Year":"Uncertain 2023","Location":"Chandipur, Odisha","Agency":"DRDO","Notes":"Flight Tested at ITR Chandipur.","Category":"Surface-to-Air","Source_URL":"https://pib.gov.in/PressReleaseIframePage.aspx?PRID=1989502"},{"Missile":"SFDR","Date":"","Month_Year":"Uncertain 2023","Location":"Chandipur, Odisha","Agency":"DRDO","Notes":"Fifth Test.","Category":"Surface-to-Air","Source_URL":"https://pib.gov.in/PressReleaseIframePage.aspx?PRID=1989502"},{"Missile":"QRSAM","Date":"","Month_Year":"Uncertain 2023","Location":"","Agency":"DRDO/Indian Army","Notes":"User trials.","Category":"Surface-to-Air","Source_URL":"https://x.com/DRDO_India/status/1742551039977427129"},{"Missile":"SAMHO","Date":"","Month_Year":"Uncertain 2023","Location":"KK Ranges, Ahmednagar, Maharashtra","Agency":"DRDO/Indian Army","Notes":"Fired at KK Ranges.","Category":"Anti-Tank","Source_URL":"https://x.com/DRDO_India/status/1742551039977427129"},{"Missile":"LR-AShM","Date":"","Month_Year":"Uncertain 2023","Location":"Chandipur, Odisha","Agency":"DRDO","Notes":"First test flight.","Category":"Anti-Ship/Cruise","Source_URL":"https://pib.gov.in/PressReleaseIframePage.aspx?PRID=1989502"},{"Missile":"Astra Mk2","Date":"","Month_Year":"Uncertain 2022","Location":"","Agency":"IAF/DRDO","Notes":"Tested in 2022. Date not officially disclosed. Confirmed via IAF promotional video.","Category":"Air-to-Air","Source_URL":"https://youtu.be/fIGIy0mxaAg?t=266"},{"Missile":"RudraM 2","Date":"2026-06-02","Month_Year":"June 2026","Location":"","Agency":"IAF","Notes":"Extreme release conditions test from a Su-30MKI.","Category":"Air-Launched Cruise","Source_URL":"https://www.pib.gov.in/PressReleasePage.aspx?PRID=2268099"},{"Missile":"AD1","Date":"2026-06-10","Month_Year":"June 2026","Location":"","Agency":"DRDO","Notes":"DRDO demo multi-layered defence against long range ballistic missiles. 3 test flights.","Category":"Ballistic Missile Defence","Source_URL":"https://www.pib.gov.in/PressReleasePage.aspx?PRID=2272374"},{"Missile":"AD2","Date":"2026-06-11","Month_Year":"June 2026","Location":"","Agency":"DRDO","Notes":"DRDO demo multi-layered defence against long range ballistic missiles. 3 test flights.","Category":"Ballistic Missile Defence","Source_URL":"https://www.pib.gov.in/PressReleasePage.aspx?PRID=2272374"},{"Missile":"NASM-MR","Date":"2026-06-13","Month_Year":"June 2026","Location":"","Agency":"DRDO/Indian Navy","Notes":"Maiden flight test. Ground based launcher.","Category":"Anti-Ship/Cruise","Source_URL":"https://www.pib.gov.in/PressReleasePage.aspx?PRID=2272374"},{"Missile":"Agni V MIRV","Date":"2026-05-09","Month_Year":"May 2026","Location":"Dr APJ Abdul Kalam Island, Odisha","Agency":"SFC/DRDO","Notes":"Successful flight-tests.","Category":"Ballistic","Source_URL":"https://www.pib.gov.in/PressReleasePage.aspx?PRID=2259380"},{"Missile":"ULPGM V3","Date":"2026-05-19","Month_Year":"May 2026","Location":"DRDO Test Range, Kurnool, Andhra Pradesh","Agency":"DRDO","Notes":"Final deliverable configuration, Air-to-Ground and Air-to-Air modes.","Category":"Air-Launched Cruise","Source_URL":"https://www.pib.gov.in/PressReleasePage.aspx?PRID=2263045"},{"Missile":"Agni 1","Date":"2026-05-22","Month_Year":"May 2026","Location":"Chandipur, Odisha","Agency":"SFC","Notes":"Test-fired from ITR Chandipur. Under aegis of SFC.","Category":"Ballistic","Source_URL":"https://www.pib.gov.in/PressReleasePage.aspx?PRID=2264317"},{"Missile":"NASM-SR","Date":"2026-04-29","Month_Year":"April 2026","Location":"Bay of Bengal, Odisha","Agency":"Indian Navy/DRDO","Notes":"Salvo launch of 2 missiles from Naval Sea King helicopter.","Category":"Anti-Ship/Cruise","Source_URL":"https://www.pib.gov.in/PressReleasePage.aspx?PRID=2256722"},{"Missile":"SFDR","Date":"2026-02-03","Month_Year":"February 2026","Location":"Chandipur, Odisha","Agency":"DRDO","Notes":"Successfully test-fired from ITR Chandipur.","Category":"Surface-to-Air","Source_URL":"https://www.pib.gov.in/PressReleasePage.aspx?PRID=2222635"},{"Missile":"Agni 3","Date":"2026-02-06","Month_Year":"February 2026","Location":"Chandipur, Odisha","Agency":"SFC","Notes":"Test-fired from ITR Chandipur. Under aegis of SFC.","Category":"Ballistic","Source_URL":"https://www.pib.gov.in/PressReleasePage.aspx?PRID=2224636"},{"Missile":"VSHORADS","Date":"2026-02-27","Month_Year":"February 2026","Location":"Chandipur, Odisha","Agency":"DRDO","Notes":"3 successive flight-trials. Final deployment configuration.","Category":"Surface-to-Air","Source_URL":"https://www.pib.gov.in/PressReleasePage.aspx?PRID=2233776"},{"Missile":"MPATGM","Date":"2026-01-11","Month_Year":"January 2026","Location":"KK Ranges, Ahilya Nagar, Maharashtra","Agency":"DRDO/Indian Army","Notes":"Tested against a moving target.","Category":"Anti-Tank","Source_URL":"https://www.pib.gov.in/PressReleasePage.aspx?PRID=2213690"},{"Missile":"Akash NG","Date":"2025-12-23","Month_Year":"December 2025","Location":"","Agency":"DRDO/IAF","Notes":"User evaluation trials successful. Paving way for induction.","Category":"Surface-to-Air","Source_URL":"https://www.pib.gov.in/PressReleasePage.aspx?PRID=2207971"},{"Missile":"Pinaka LRGR 120","Date":"2025-12-29","Month_Year":"December 2025","Location":"Chandipur, Odisha","Agency":"DRDO","Notes":"Maiden flight test. Max range 120 km.","Category":"Rocket/Artillery","Source_URL":"https://www.pib.gov.in/PressReleasePage.aspx?PRID=2209588"},{"Missile":"Pralay","Date":"2025-12-31","Month_Year":"December 2025","Location":"","Agency":"DRDO/SFC","Notes":"Salvo launch of two Pralay missiles. User evaluation trials.","Category":"Ballistic","Source_URL":"https://www.pib.gov.in/PressReleasePage.aspx?PRID=2210128"},{"Missile":"Agni Prime","Date":"2025-09-24","Month_Year":"September 2025","Location":"","Agency":"SFC","Notes":"Successful launch from Rail based Mobile launcher. Full operational scenario.","Category":"Ballistic","Source_URL":"https://www.pib.gov.in/PressReleasePage.aspx?PRID=2170979"},{"Missile":"Agni V","Date":"2025-08-20","Month_Year":"August 2025","Location":"Chandipur, Odisha","Agency":"SFC","Notes":"Test-fired from ITR Chandipur. Under aegis of SFC.","Category":"Ballistic","Source_URL":"https://www.pib.gov.in/PressReleasePage.aspx?PRID=2158574"},{"Missile":"IADWS","Date":"2025-08-24","Month_Year":"August 2025","Location":"","Agency":"DRDO","Notes":"Maiden flight-tests comprising QRSAM, VSHORADS, and high-power laser DEW.","Category":"Surface-to-Air","Source_URL":"https://www.pib.gov.in/PressReleasePage.aspx?PRID=2160257"},{"Missile":"Astra Mk1","Date":"2025-07-11","Month_Year":"July 2025","Location":"Off coast of Odisha","Agency":"DRDO/IAF","Notes":"Flight test from Su-30MKI. Local RF seeker upgrade.","Category":"Air-to-Air","Source_URL":"https://www.pib.gov.in/PressReleasePage.aspx?PRID=2144118"},{"Missile":"ET LDHCM","Date":"2025-07-14","Month_Year":"July 2025","Location":"","Agency":"DRDO","Notes":"First flight test reported in unofficial sources.","Category":"Hypersonic","Source_URL":"https://zeenews.india.com/india/meet-india-s-mach-8-missile-et-ldhcm-hits-karachi-in-10-minutes-evades-all-defence-systems-2999131.html"},{"Missile":"Prithvi-II and Agni-I","Date":"2025-07-17","Month_Year":"July 2025","Location":"Chandipur, Odisha","Agency":"SFC","Notes":"Test-fired from ITR Chandipur. Possibly a cover for sensitive test.","Category":"Ballistic","Source_URL":"https://www.pib.gov.in/PressReleasePage.aspx?PRID=2145662"},{"Missile":"ULPGM V3","Date":"2025-07-25","Month_Year":"July 2025","Location":"NOAR, Kurnool, Andhra Pradesh","Agency":"DRDO","Notes":"Successful flight-trials. Fired from NRT Beluga UAV.","Category":"Air-Launched Cruise","Source_URL":"https://www.pib.gov.in/PressReleasePage.aspx?PRID=2148320"},{"Missile":"Pralay","Date":"2025-07-28","Month_Year":"July 2025","Location":"Dr APJ Abdul Kalam Island, Odisha","Agency":"DRDO/SFC","Notes":"Two consecutive successful flight-tests.","Category":"Ballistic","Source_URL":"https://www.pib.gov.in/PressReleasePage.aspx?PRID=2149610"},{"Missile":"MRSAM","Date":"2025-04-03","Month_Year":"April 2025","Location":"Dr APJ Abdul Kalam Island","Agency":"DRDO/Indian Army","Notes":"Four successful flight-tests, Army version against high-speed aerial targets.","Category":"Surface-to-Air","Source_URL":"https://www.pib.gov.in/PressReleasePage.aspx?PRID=2118918"},{"Missile":"BrahMos","Date":"2025-04-25","Month_Year":"April 2025","Location":"","Agency":"Indian Navy","Notes":"INS Surat test fired.","Category":"Anti-Ship/Cruise","Source_URL":""},{"Missile":"Astra Mk1","Date":"2025-03-12","Month_Year":"March 2025","Location":"","Agency":"DRDO/IAF","Notes":"Successful test firing from LCA Mk1 against aerial target.","Category":"Air-to-Air","Source_URL":"https://www.pib.gov.in/PressReleasePage.aspx?PRID=2111068"},{"Missile":"VL SRSAM","Date":"2025-03-26","Month_Year":"March 2025","Location":"Chandipur, Odisha","Agency":"DRDO","Notes":"Land-based vertical launcher against high-speed aerial target at very close range and low altitude.","Category":"Surface-to-Air","Source_URL":"https://www.pib.gov.in/PressReleasePage.aspx?PRID=2115509"},{"Missile":"VSHORADS","Date":"2025-02-01","Month_Year":"February 2025","Location":"Chandipur, Odisha","Agency":"DRDO","Notes":"Three successive flight-trials against high-speed targets at very low altitude.","Category":"Surface-to-Air","Source_URL":"https://www.pib.gov.in/PressReleasePage.aspx?PRID=2098784"},{"Missile":"NASM SR","Date":"2025-02-25","Month_Year":"February 2025","Location":"Chandipur, Odisha","Agency":"DRDO/Indian Navy","Notes":"Successful flight-trials from ITR Chandipur. Indian Navy Seaking IN529.","Category":"Anti-Ship/Cruise","Source_URL":"https://www.pib.gov.in/PressReleasePage.aspx?PRID=2106482"},{"Missile":"Nag Mk2","Date":"2025-01-13","Month_Year":"January 2025","Location":"Pokhran","Agency":"DRDO/Indian Army","Notes":"Field Evaluation Trials successful. Missile ready for induction.","Category":"Uncategorized","Source_URL":"https://www.pib.gov.in/PressReleasePage.aspx?PRID=2092585"},{"Missile":"BrahMos","Date":"2025-01-15","Month_Year":"January 2025","Location":"Andaman and Nicobar Islands","Agency":"Indian Army","Notes":"Salvo launch by Kharga Corps, Western Command.","Category":"Anti-Ship/Cruise","Source_URL":""},{"Missile":"SFDR","Date":"2024-12-13","Month_Year":"December 2024","Location":"","Agency":"DRDO","Notes":"Test fired.","Category":"Surface-to-Air","Source_URL":""},{"Missile":"LR-LACM","Date":"2024-11-12","Month_Year":"November 2024","Location":"","Agency":"DRDO","Notes":"Maiden LR-LACM test.","Category":"Air-Launched Cruise","Source_URL":""},{"Missile":"Pinaka","Date":"2024-11-14","Month_Year":"November 2024","Location":"","Agency":"DRDO","Notes":"Guided Pinaka final tests.","Category":"Rocket/Artillery","Source_URL":""},{"Missile":"LR-AShM","Date":"2024-11-16","Month_Year":"November 2024","Location":"","Agency":"DRDO","Notes":"First reveal of the missile, Second Flight test.","Category":"Anti-Ship/Cruise","Source_URL":""},{"Missile":"K4","Date":"2024-11-27","Month_Year":"November 2024","Location":"","Agency":"Indian Navy","Notes":"First operational launch from INS Arighaat.","Category":"Sub-Launched Ballistic","Source_URL":""},{"Missile":"VSHORADS","Date":"2024-10-03","Month_Year":"October 2024","Location":"","Agency":"DRDO","Notes":"3 Successful flight tests of miniaturized version.","Category":"Surface-to-Air","Source_URL":""},{"Missile":"VL-SRSAM","Date":"2024-09-12","Month_Year":"September 2024","Location":"","Agency":"Indian Navy","Notes":"Indian Navy flight tests.","Category":"Surface-to-Air","Source_URL":""},{"Missile":"AD1","Date":"2024-07-24","Month_Year":"July 2024","Location":"","Agency":"DRDO","Notes":"Phase 2 BMD interceptor test.","Category":"Ballistic Missile Defence","Source_URL":""},{"Missile":"SMART","Date":"2024-05-01","Month_Year":"May 2024","Location":"","Agency":"DRDO","Notes":"Third flight test.","Category":"Torpedo","Source_URL":""},{"Missile":"Agni P","Date":"2024-04-03","Month_Year":"April 2024","Location":"","Agency":"SFC","Notes":"Night trial with SFC.","Category":"Ballistic","Source_URL":""},{"Missile":"MPATGM","Date":"2024-04-13","Month_Year":"April 2024","Location":"","Agency":"DRDO/Indian Army","Notes":"Warhead Flight Trials.","Category":"Anti-Tank","Source_URL":""},{"Missile":"Agni V","Date":"2024-03-11","Month_Year":"March 2024","Location":"","Agency":"SFC/DRDO","Notes":"First MIRV test.","Category":"Ballistic","Source_URL":""},{"Missile":"VSHORADS","Date":"2024-02-28","Month_Year":"February 2024","Location":"Chandipur, Odisha","Agency":"DRDO","Notes":"Flight tests from a ground based portable launcher.","Category":"Surface-to-Air","Source_URL":"https://pib.gov.in/PressReleasePage.aspx?PRID=2010345"},{"Missile":"Akash NG","Date":"2024-01-12","Month_Year":"January 2024","Location":"Chandipur, Odisha","Agency":"DRDO","Notes":"High speed Low altitude flight test against a target.","Category":"Surface-to-Air","Source_URL":"https://pib.gov.in/PressReleasePage.aspx?PRID=1995445"},{"Missile":"Akash","Date":"2023-12-29","Month_Year":"December 2023","Location":"Gopalpur Seaward Firing Range, Odisha","Agency":"Indian Army","Notes":"User training launch.","Category":"Surface-to-Air","Source_URL":"https://x.com/SWComd_IA/status/1740739358658101592"},{"Missile":"Akash","Date":"2023-12-17","Month_Year":"December 2023","Location":"","Agency":"IAF/DRDO","Notes":"User test against 4 targets simultaneously using command guidance.","Category":"Surface-to-Air","Source_URL":"https://x.com/DRDO_India/status/1736349594362278140"},{"Missile":"Agni 1","Date":"2023-12-07","Month_Year":"December 2023","Location":"Dr APJ Abdul Kalam Island, Odisha","Agency":"SFC","Notes":"User training launch.","Category":"Ballistic","Source_URL":"https://pib.gov.in/PressReleasePage.aspx?PRID=1983750"},{"Missile":"Pralay","Date":"2023-11-08","Month_Year":"November 2023","Location":"Dr APJ Abdul Kalam Island, Odisha","Agency":"DRDO","Notes":"Third launch test.","Category":"Ballistic","Source_URL":"https://www.thehindu.com/news/national/india-successfully-test-fires-pralay-missile-off-odisha-coast/article67507783.ece"},{"Missile":"NASM-SR","Date":"2023-11-21","Month_Year":"November 2023","Location":"Chandipur, Odisha","Agency":"DRDO/Indian Navy","Notes":"Range of 35 km, indigenous IR Seeker, Lock-on after Launch mode. Sea King 42B IN529.","Category":"Anti-Ship/Cruise","Source_URL":"https://twitter.com/indiannavy/status/1726869839657255406"},{"Missile":"Brahmos ER","Date":"2023-11-22","Month_Year":"November 2023","Location":"Arabian Sea","Agency":"Indian Navy","Notes":"First firing from INS Imphal.","Category":"Anti-Ship/Cruise","Source_URL":"https://x.com/IN_WNC/status/1727180987065585679"},{"Missile":"Brahmos ER ALCM","Date":"2023-10-18","Month_Year":"October 2023","Location":"Bay of Bengal","Agency":"IAF","Notes":"ER version of ALCM.","Category":"Anti-Ship/Cruise","Source_URL":""},{"Missile":"Brahmos","Date":"2023-10-01","Month_Year":"October 2023","Location":"Andaman and Nicobar Islands","Agency":"Indian Army","Notes":"","Category":"Anti-Ship/Cruise","Source_URL":""},{"Missile":"Brahmos","Date":"2023-10-10","Month_Year":"October 2023","Location":"Andaman and Nicobar Islands","Agency":"IAF/ANC","Notes":"Surface to surface version.","Category":"Anti-Ship/Cruise","Source_URL":""},{"Missile":"Brahmos ER","Date":"2023-10-10","Month_Year":"October 2023","Location":"Andaman and Nicobar Islands","Agency":"Indian Army","Notes":"ER version.","Category":"Anti-Ship/Cruise","Source_URL":""},{"Missile":"LR-AShM","Date":"2023-10-06","Month_Year":"October 2023","Location":"Chandipur, Odisha","Agency":"DRDO","Notes":"First test flight.","Category":"Anti-Ship/Cruise","Source_URL":"https://pib.gov.in/PressReleaseIframePage.aspx?PRID=1989502"},{"Missile":"Astra Mk1","Date":"2023-08-23","Month_Year":"August 2023","Location":"","Agency":"DRDO/IAF","Notes":"First test flight from LCA platform. Fired off LSP-7.","Category":"Air-to-Air","Source_URL":"https://indianexpress.com/article/india/indigenous-astra-missile-tested-from-tejas-8906435/"},{"Missile":"K 15","Date":"2023-07-01","Month_Year":"July 2023","Location":"Dr APJ Abdul Kalam Island, Odisha","Agency":"Indian Navy/SFC","Notes":"Training launch.","Category":"Sub-Launched Ballistic","Source_URL":""},{"Missile":"Agni 1","Date":"2023-06-01","Month_Year":"June 2023","Location":"Dr APJ Abdul Kalam Island, Odisha","Agency":"SFC","Notes":"Training launch.","Category":"Ballistic","Source_URL":"https://pib.gov.in/PressReleseDetail.aspx?PRID=1929176"},{"Missile":"Agni-P","Date":"2023-06-08","Month_Year":"June 2023","Location":"Dr APJ Abdul Kalam Island, Odisha","Agency":"SFC","Notes":"First pre-induction night flight test.","Category":"Ballistic","Source_URL":"https://pib.gov.in/PressReleasePage.aspx?PRID=1930689"},{"Missile":"BrahMos","Date":"2023-05-14","Month_Year":"May 2023","Location":"Arabian Sea","Agency":"Indian Navy","Notes":"Anti-ship variant from INS Mormugao.","Category":"Anti-Ship/Cruise","Source_URL":"https://twitter.com/IN_WNC/status/1657593651134881792"},{"Missile":"Sea-Based Endo-Atmospheric Interceptor","Date":"2023-04-21","Month_Year":"April 2023","Location":"Off coast of Odisha","Agency":"DRDO/Indian Navy","Notes":"Maiden flight test of Naval BMD capability.","Category":"Ballistic Missile Defence","Source_URL":"https://pib.gov.in/PressReleasePage.aspx?PRID=1918799"},{"Missile":"BrahMos","Date":"2023-03-05","Month_Year":"March 2023","Location":"Arabian Sea","Agency":"Indian Navy","Notes":"Flight test of variant with local booster and seeker. Fired from Kolkata class destroyer.","Category":"Anti-Ship/Cruise","Source_URL":"https://twitter.com/indiannavy/status/1632356640233254913"},{"Missile":"MRSAM","Date":"2023-03-06","Month_Year":"March 2023","Location":"","Agency":"Indian Navy","Notes":"Operational validation flight test. From INS Visakhapatnam.","Category":"Surface-to-Air","Source_URL":"https://twitter.com/indiannavy/status/1632945232882077697"},{"Missile":"VSHORAD","Date":"2023-03-14","Month_Year":"March 2023","Location":"Chandipur, Odisha","Agency":"DRDO","Notes":"Two successful development flight tests.","Category":"Surface-to-Air","Source_URL":"https://www.pib.gov.in/PressReleseDetail.aspx?PRID=1906915"},{"Missile":"AMOGHA III","Date":"2023-03-26","Month_Year":"March 2023","Location":"","Agency":"BDL","Notes":"Successful test firing.","Category":"Anti-Tank","Source_URL":"https://twitter.com/bharat_dynamics/status/1640669737872142337"},{"Missile":"ITCM","Date":"2023-02-21","Month_Year":"February 2023","Location":"Off coast of Odisha","Agency":"DRDO","Notes":"Developmental flight test with new seeker and local Manik engine.","Category":"Air-Launched Cruise","Source_URL":"https://twitter.com/TheHemantRout/status/1627933038255702017"},{"Missile":"SLCM","Date":"2023-02-01","Month_Year":"February 2023","Location":"","Agency":"DRDO","Notes":"Successful first developmental flight test.","Category":"Air-Launched Cruise","Source_URL":"https://x.com/ANI/status/1725894448092197332"},{"Missile":"Prithvi II","Date":"2023-01-10","Month_Year":"January 2023","Location":"Chandipur, Odisha","Agency":"SFC","Notes":"Training launch.","Category":"Ballistic","Source_URL":"https://pib.gov.in/PressReleasePage.aspx?PRID=1890129"},{"Missile":"Akash","Date":"2023-01-25","Month_Year":"January 2023","Location":"Gopalpur Seaward Ranges","Agency":"Indian Army (Western Command)","Notes":"Training launch.","Category":"Surface-to-Air","Source_URL":"https://twitter.com/westerncomd_IA/status/1618431446783524865"},{"Missile":"HSTDV","Date":"2023-01-27","Month_Year":"January 2023","Location":"Dr APJ Abdul Kalam Island, Odisha","Agency":"DRDO/ISRO","Notes":"Second flight test.","Category":"Hypersonic","Source_URL":"https://twitter.com/livefist/status/1618906728715919360"},{"Missile":"Pinaka","Date":"2022-12-07","Month_Year":"December 2022","Location":"Pokhran, Jaisalmer, Rajasthan","Agency":"DRDO/Indian Army","Notes":"Mk 1 EPRS tested.","Category":"Rocket/Artillery","Source_URL":"https://m.timesofindia.com/city/jaipur/drdo-army-conduct-trials-of-upgraded-pinaka-rockets/amp_articleshow/96123859.cms"},{"Missile":"Hypersonic Vehicle","Date":"2022-12-09","Month_Year":"December 2022","Location":"","Agency":"ISRO/IDS","Notes":"ISRO and HQ Integrated Defence Staff conducted trials.","Category":"Hypersonic","Source_URL":"https://twitter.com/isro/status/1601162953264230400"},{"Missile":"Agni 5","Date":"2022-12-15","Month_Year":"December 2022","Location":"Dr APJ Abdul Kalam Island, Odisha","Agency":"SFC/DRDO","Notes":"Full range flight test with new incorporated technologies.","Category":"Ballistic","Source_URL":"https://twitter.com/ANI/status/1603381778198450181"},{"Missile":"BrahMos ALCM","Date":"2022-12-29","Month_Year":"December 2022","Location":"Bay of Bengal","Agency":"IAF","Notes":"Extended Range variant against a ship target. From Su-30MKI.","Category":"Anti-Ship/Cruise","Source_URL":"https://pib.gov.in/PressReleasePage.aspx?PRID=1887335"},{"Missile":"AD-1","Date":"2022-11-02","Month_Year":"November 2022","Location":"Dr APJ Abdul Kalam Island, Odisha","Agency":"DRDO","Notes":"Maiden flight test of BMD Phase II interceptor. All BMD weapon system elements.","Category":"Ballistic Missile Defence","Source_URL":"https://pib.gov.in/PressReleseDetailm.aspx?PRID=1873179"},{"Missile":"Agni 3","Date":"2022-11-23","Month_Year":"November 2022","Location":"Dr APJ Abdul Kalam Island, Odisha","Agency":"SFC","Notes":"Training launch.","Category":"Ballistic","Source_URL":"https://pib.gov.in/PressReleseDetailm.aspx?PRID=1878370"},{"Missile":"BrahMos","Date":"2022-11-29","Month_Year":"November 2022","Location":"Andaman and Nicobar Islands","Agency":"Indian Army (Western Command)/ANC","Notes":"Surface to surface ER version. User validation.","Category":"Anti-Ship/Cruise","Source_URL":"https://twitter.com/AN_Command/status/1597571925747724288"},{"Missile":"K-15 SLBM","Date":"2022-10-14","Month_Year":"October 2022","Location":"Bay of Bengal","Agency":"Indian Navy/SFC","Notes":"Training launch from INS Arihant.","Category":"Sub-Launched Ballistic","Source_URL":"https://pib.gov.in/PressReleasePage.aspx?PRID=1867778"},{"Missile":"Pinaka Mk1 Enhanced","Date":"2022-10-18","Month_Year":"October 2022","Location":"KNF Firing Ranges, Dras, Ladakh","Agency":"DRDO/Indian Army","Notes":"High Altitude Area PSQR Validation Trials.","Category":"Rocket/Artillery","Source_URL":"https://twitter.com/GmOfaj/status/1582706162004549634"},{"Missile":"Agni-P","Date":"2022-10-21","Month_Year":"October 2022","Location":"Chandipur, Odisha","Agency":"DRDO/SFC","Notes":"Third flight test at maximum range. MIRV technology demonstrated.","Category":"Ballistic","Source_URL":"https://twitter.com/ANI/status/1583380106034049024"},{"Missile":"ITCM","Date":"2022-10-28","Month_Year":"October 2022","Location":"Off coast of Odisha","Agency":"DRDO","Notes":"Flight test UNSUCCESSFUL after indigenous STFE failed to start.","Category":"Air-Launched Cruise","Source_URL":"https://www.newindianexpress.com/states/odisha/2022/oct/29/homegrown-cruise-missile-system-hit-by-technical-snag-2512880.html"},{"Missile":"QRSAM","Date":"2022-09-08","Month_Year":"September 2022","Location":"Chandipur, Odisha","Agency":"DRDO/Indian Army","Notes":"Evaluation trials. Six flight tests in final deployment configuration.","Category":"Surface-to-Air","Source_URL":"https://pib.gov.in/PressReleasePage.aspx?PRID=1857724"},{"Missile":"VSHORAD","Date":"2022-09-27","Month_Year":"September 2022","Location":"Chandipur, Odisha","Agency":"DRDO","Notes":"Maiden flight tests. Two from a ground based portable launcher.","Category":"Surface-to-Air","Source_URL":"https://pib.gov.in/PressReleasePage.aspx?PRID=1862617"},{"Missile":"SAMHO","Date":"2022-08-04","Month_Year":"August 2022","Location":"KK Ranges, Ahmednagar, Maharashtra","Agency":"DRDO/Indian Army","Notes":"Flight tested at two ranges. From Arjun MBT.","Category":"Anti-Tank","Source_URL":"https://pib.gov.in/PressReleasePage.aspx?PRID=1848497"},{"Missile":"VL-SRSAM","Date":"2022-08-23","Month_Year":"August 2022","Location":"Chandipur, Odisha","Agency":"DRDO/Indian Navy","Notes":"Flight test from INS Rana. Demonstration of vertical launch capability.","Category":"Surface-to-Air","Source_URL":"https://pib.gov.in/PressReleasePage.aspx?PRID=1853841"},{"Missile":"Agni 4","Date":"2022-06-06","Month_Year":"June 2022","Location":"Dr APJ Abdul Kalam Island, Odisha","Agency":"SFC","Notes":"Training launch.","Category":"Ballistic","Source_URL":"https://pib.gov.in/PressReleasePage.aspx?PRID=1831654"},{"Missile":"Prithvi II","Date":"2022-06-15","Month_Year":"June 2022","Location":"Dr APJ Abdul Kalam Island, Odisha","Agency":"SFC","Notes":"Training launch.","Category":"Ballistic","Source_URL":"https://pib.gov.in/PressReleasePage.aspx?PRID=1834376"},{"Missile":"VL-SRSAM","Date":"2022-06-24","Month_Year":"June 2022","Location":"Chandipur, Odisha","Agency":"DRDO/Indian Navy","Notes":"Flight test from INS Rana.","Category":"Surface-to-Air","Source_URL":"https://pib.gov.in/PressReleasePage.aspx?PRID=1836721"},{"Missile":"SAMHO","Date":"2022-06-28","Month_Year":"June 2022","Location":"KK Ranges, Ahmednagar, Maharashtra","Agency":"DRDO/Indian Army","Notes":"Minimum range flight test. From Arjun MBT.","Category":"Anti-Tank","Source_URL":"https://pib.gov.in/PressReleasePage.aspx?PRID=1837753"},{"Missile":"BrahMos ALCM","Date":"2022-05-12","Month_Year":"May 2022","Location":"Bay of Bengal","Agency":"IAF","Notes":"Extended Range variant from Su-30MKI.","Category":"Anti-Ship/Cruise","Source_URL":"https://pib.gov.in/PressReleasePage.aspx?PRID=1824795"},{"Missile":"NASM-SR","Date":"2022-05-18","Month_Year":"May 2022","Location":"Chandipur, Odisha","Agency":"DRDO/Indian Navy","Notes":"Fired from modified Sea King helicopter IN529. Maiden Flight Test.","Category":"Anti-Ship/Cruise","Source_URL":"https://pib.gov.in/PressReleasePage.aspx?PRID=1826257"},{"Missile":"SFDR","Date":"2022-04-08","Month_Year":"April 2022","Location":"Chandipur, Odisha","Agency":"DRDO","Notes":"Fourth test. Booster tested.","Category":"Surface-to-Air","Source_URL":"https://pib.gov.in/PressReleasePage.aspx?PRID=1814813"},{"Missile":"Pinaka","Date":"2022-04-09","Month_Year":"April 2022","Location":"Pokhran, Jaisalmer, Rajasthan","Agency":"DRDO/Indian Army","Notes":"Mk1 EPRS and Area Denial Munition.","Category":"Rocket/Artillery","Source_URL":"https://pib.gov.in/PressReleasePage.aspx?PRID=1815236"},{"Missile":"HELINA","Date":"2022-04-11","Month_Year":"April 2022","Location":"Ladakh","Agency":"DRDO/Indian Army","Notes":"High Altitude trials for User Validation.","Category":"Anti-Tank","Source_URL":"https://pib.gov.in/PressReleasePage.aspx?PRID=1815644"},{"Missile":"BrahMos ALCM","Date":"2022-04-19","Month_Year":"April 2022","Location":"Eastern seaboard","Agency":"IAF","Notes":"Live firing from Su-30MKI on decommissioned INS ship.","Category":"Anti-Ship/Cruise","Source_URL":"https://twitter.com/IAF_MCC/status/1516404584784138241"},{"Missile":"BrahMos","Date":"2022-04-19","Month_Year":"April 2022","Location":"","Agency":"Indian Navy","Notes":"Fired from INS Delhi after MLU from Upgraded Modular Launcher.","Category":"Anti-Ship/Cruise","Source_URL":"https://twitter.com/indiannavy/status/1516450775941414912"},{"Missile":"BrahMos","Date":"2022-04-27","Month_Year":"April 2022","Location":"Andaman and Nicobar Islands","Agency":"Indian Army/ANC","Notes":"Anti-Ship version. User validation.","Category":"Anti-Ship/Cruise","Source_URL":"https://twitter.com/AN_Command/status/1519680674248155138"},{"Missile":"Akash Prime","Date":"2022-04-27","Month_Year":"April 2022","Location":"Pokhran, Jaisalmer, Rajasthan","Agency":"DRDO/Indian Army","Notes":"Joint Indian Army and DRDO flight test.","Category":"Surface-to-Air","Source_URL":"https://twitter.com/dd_vaishnav/status/1519556059240697856"},{"Missile":"Akash Mk1","Date":"2022-04-30","Month_Year":"April 2022","Location":"Pokhran, Jaisalmer, Rajasthan","Agency":"Indian Army","Notes":"Live firing for user validation.","Category":"Surface-to-Air","Source_URL":"https://twitter.com/SWComd_IA/status/1520339936662024192"},{"Missile":"BrahMos","Date":"2022-03-05","Month_Year":"March 2022","Location":"Andaman Sea","Agency":"Indian Navy","Notes":"ER variant from INS Chennai by Western Fleet.","Category":"Anti-Ship/Cruise","Source_URL":"https://twitter.com/indiannavy/status/1500015602865680390"},{"Missile":"BrahMos","Date":"2022-03-09","Month_Year":"March 2022","Location":"Pakistan","Agency":"IAF","Notes":"ACCIDENTAL firing.","Category":"Anti-Ship/Cruise","Source_URL":"https://pib.gov.in/PressReleasePage.aspx?PRID=1805148"},{"Missile":"BrahMos","Date":"2022-03-09","Month_Year":"March 2022","Location":"Andaman and Nicobar Islands","Agency":"Indian Navy/ANC","Notes":"Fired from INS Chennai under ANC.","Category":"Anti-Ship/Cruise","Source_URL":"https://twitter.com/AN_Command/status/1501519179245289474"},{"Missile":"BrahMos","Date":"2022-03-23","Month_Year":"March 2022","Location":"Andaman and Nicobar Islands","Agency":"IAF/ANC","Notes":"BrahMos ER under ANC. User validation.","Category":"Anti-Ship/Cruise","Source_URL":"https://twitter.com/AN_Command/status/1506616013411917834"},{"Missile":"MRSAM","Date":"2022-03-27","Month_Year":"March 2022","Location":"Chandipur, Odisha","Agency":"DRDO/Indian Army","Notes":"Indian Army version against two targets.","Category":"Surface-to-Air","Source_URL":"https://pib.gov.in/PressReleasePage.aspx?PRID=1810241"},{"Missile":"BrahMos","Date":"2022-02-02","Month_Year":"February 2022","Location":"Andaman and Nicobar Islands","Agency":"Indian Navy/ANC","Notes":"User validation by ANC.","Category":"Anti-Ship/Cruise","Source_URL":"https://twitter.com/AN_Command/status/1488750640461664256"},{"Missile":"BrahMos","Date":"2022-02-18","Month_Year":"February 2022","Location":"Bay of Bengal","Agency":"Indian Navy","Notes":"ER variant from INS Vishakhapatnam.","Category":"Anti-Ship/Cruise","Source_URL":"https://twitter.com/livefist/status/1494519413030416384"},{"Missile":"MPATGM","Date":"2022-01-11","Month_Year":"January 2022","Location":"","Agency":"DRDO/Indian Army","Notes":"Flight tested in final deliverable configuration.","Category":"Anti-Tank","Source_URL":"https://pib.gov.in/PressReleasePage.aspx?PRID=1789153"},{"Missile":"BrahMos","Date":"2022-01-11","Month_Year":"January 2022","Location":"","Agency":"Indian Navy","Notes":"ER variant from INS Vishakhapatnam.","Category":"Anti-Ship/Cruise","Source_URL":"https://twitter.com/DRDO_India/status/1480812866940784643"},{"Missile":"BrahMos","Date":"2022-01-20","Month_Year":"January 2022","Location":"Chandipur, Odisha","Agency":"DRDO/Indian Navy","Notes":"Enhanced Capability and increased local content.","Category":"Anti-Ship/Cruise","Source_URL":"https://pib.gov.in/PressReleasePage.aspx?PRID=1791199"},{"Missile":"VL-SRSAM","Date":"2021-12-07","Month_Year":"December 2021","Location":"Chandipur, Odisha","Agency":"DRDO","Notes":"Flight tested against electronic target at very low altitude.","Category":"Surface-to-Air","Source_URL":"https://pib.gov.in/PressReleasePage.aspx?PRID=1778966"},{"Missile":"BrahMos ALCM","Date":"2021-12-08","Month_Year":"December 2021","Location":"Chandipur, Odisha","Agency":"DRDO/IAF","Notes":"Cleared for serial production.","Category":"Anti-Ship/Cruise","Source_URL":"https://pib.gov.in/PressReleasePage.aspx?PRID=1779134"},{"Missile":"Pinaka","Date":"2021-12-11","Month_Year":"December 2021","Location":"Pokhran, Jaisalmer, Rajasthan","Agency":"DRDO/Indian Army","Notes":"Mk1ER and ADM. Indigenously developed fuses.","Category":"Rocket/Artillery","Source_URL":"https://pib.gov.in/PressReleasePage.aspx?PRID=1780412"},{"Missile":"SANT","Date":"2021-12-11","Month_Year":"December 2021","Location":"Pokhran, Jaisalmer, Rajasthan","Agency":"DRDO","Notes":"Flight test.","Category":"Glide Bomb","Source_URL":"https://pib.gov.in/PressReleasePage.aspx?PRID=1780481"},{"Missile":"SMART","Date":"2021-12-13","Month_Year":"December 2021","Location":"Dr APJ Abdul Kalam Island, Odisha","Agency":"DRDO","Notes":"Full range flight test.","Category":"Torpedo","Source_URL":"https://pib.gov.in/PressReleasePage.aspx?PRID=1780944"},{"Missile":"Agni-P","Date":"2021-12-18","Month_Year":"December 2021","Location":"Dr APJ Abdul Kalam Island, Odisha","Agency":"DRDO/SFC","Notes":"Second Flight test.","Category":"Ballistic","Source_URL":"https://pib.gov.in/PressReleasePage.aspx?PRID=1782960"},{"Missile":"Pralay","Date":"2021-12-22","Month_Year":"December 2021","Location":"Dr APJ Abdul Kalam Island, Odisha","Agency":"DRDO","Notes":"Two flight tests.","Category":"Ballistic","Source_URL":"https://pib.gov.in/PressReleasePage.aspx?PRID=1784515"},{"Missile":"SAAW","Date":"2021-11-03","Month_Year":"November 2021","Location":"Chandan Ranges, Jaisalmer, Rajasthan","Agency":"DRDO","Notes":"Two flight tests of SatNav and EO versions.","Category":"Glide Bomb","Source_URL":"https://pib.gov.in/PressReleasePage.aspx?PRID=1769241"},{"Missile":"Agni 5","Date":"2021-10-27","Month_Year":"October 2021","Location":"Dr APJ Abdul Kalam Island, Odisha","Agency":"SFC/DRDO","Notes":"Test fired.","Category":"Ballistic","Source_URL":"https://pib.gov.in/PressReleasePage.aspx?PRID=1767034"},{"Missile":"SAAW","Date":"2021-10-28","Month_Year":"October 2021","Location":"Chandan Ranges, Jaisalmer, Rajasthan","Agency":"DRDO","Notes":"Two flight tests of SatNav and EO versions.","Category":"Glide Bomb","Source_URL":"https://pib.gov.in/PressReleasePage.aspx?PRID=1769241"},{"Missile":"Long Range Bomb","Date":"2021-10-29","Month_Year":"October 2021","Location":"Chandipur, Odisha","Agency":"DRDO","Notes":"Test.","Category":"Glide Bomb","Source_URL":"https://pib.gov.in/PressReleasePage.aspx?PRID=1767567"},{"Missile":"Akash Prime","Date":"2021-09-27","Month_Year":"September 2021","Location":"Chandipur, Odisha","Agency":"DRDO/IAF","Notes":"Maiden Flight Test.","Category":"Surface-to-Air","Source_URL":"https://pib.gov.in/PressReleasePage.aspx?PRID=1758711"},{"Missile":"MPATGM","Date":"2021-07-21","Month_Year":"July 2021","Location":"","Agency":"DRDO/Indian Army","Notes":"Minimum range flight test.","Category":"Anti-Tank","Source_URL":"https://pib.gov.in/PressReleasePage.aspx?PRID=1737529"},{"Missile":"Akash NG","Date":"2021-07-21","Month_Year":"July 2021","Location":"Chandipur, Odisha","Agency":"DRDO","Notes":"Second flight test.","Category":"Surface-to-Air","Source_URL":"https://pib.gov.in/PressReleasePage.aspx?PRID=1737532"},{"Missile":"Akash NG","Date":"2021-07-23","Month_Year":"July 2021","Location":"Chandipur, Odisha","Agency":"DRDO","Notes":"Flight test to prove all weather capability.","Category":"Surface-to-Air","Source_URL":""},{"Missile":"122mm Rocket","Date":"2021-06-25","Month_Year":"June 2021","Location":"Chandipur, Odisha","Agency":"DRDO","Notes":"Flight test of enhanced range 122mm rockets.","Category":"Rocket/Artillery","Source_URL":"https://pib.gov.in/PressReleasePage.aspx?PRID=1730350"},{"Missile":"Pinaka","Date":"2021-06-25","Month_Year":"June 2021","Location":"Chandipur, Odisha","Agency":"DRDO","Notes":"Enhanced Pinaka tested.","Category":"Rocket/Artillery","Source_URL":"https://pib.gov.in/PressReleasePage.aspx?PRID=1730354"},{"Missile":"Agni P","Date":"2021-06-28","Month_Year":"June 2021","Location":"Dr APJ Abdul Kalam Island, Odisha","Agency":"DRDO/SFC","Notes":"Maiden flight test.","Category":"Ballistic","Source_URL":"https://pib.gov.in/PressReleasePage.aspx?PRID=1730828"},{"Missile":"SFDR","Date":"2021-03-05","Month_Year":"March 2021","Location":"Chandipur, Odisha","Agency":"DRDO","Notes":"Third Flight test.","Category":"Surface-to-Air","Source_URL":"https://pib.gov.in/PressReleasePage.aspx?PRID=1702670"},{"Missile":"HELINA","Date":"2021-02-19","Month_Year":"February 2021","Location":"","Agency":"DRDO/Indian Army","Notes":"User trials. Five mission launches. Ready for induction.","Category":"Anti-Tank","Source_URL":"https://pib.gov.in/PressReleasePage.aspx?PRID=1699376"},{"Missile":"Dhruvastra","Date":"2021-02-19","Month_Year":"February 2021","Location":"","Agency":"DRDO/IAF","Notes":"User trials. Five mission launches. Ready for induction.","Category":"Anti-Tank","Source_URL":"https://pib.gov.in/PressReleasePage.aspx?PRID=1699376"},{"Missile":"VL-SRSAM","Date":"2021-02-22","Month_Year":"February 2021","Location":"Chandipur, Odisha","Agency":"DRDO","Notes":"Two flight tests for minimum and maximum range.","Category":"Surface-to-Air","Source_URL":"https://pib.gov.in/PressReleasePage.aspx?PRID=1700039"},{"Missile":"SAAW","Date":"2021-01-22","Month_Year":"January 2021","Location":"Off coast of Odisha","Agency":"DRDO/IAF","Notes":"Captive and release trial from a Hawk-I.","Category":"Glide Bomb","Source_URL":"https://pib.gov.in/PressReleasePage.aspx?PRID=1691176"},{"Missile":"Akash NG","Date":"2021-01-25","Month_Year":"January 2021","Location":"Chandipur, Odisha","Agency":"DRDO","Notes":"Maiden flight test.","Category":"Surface-to-Air","Source_URL":"https://pib.gov.in/PressReleasePage.aspx?PRID=1692258"}];
 
-        function parseCSVToObjects(csv) {
-            const lines = csv.split("\n").filter(l => l.trim().length > 0);
-            if (lines.length === 0) return [];
+// ──────────────────────────────────────────────
+// HELPERS
+// ──────────────────────────────────────────────
+const CAT_CLASS = {
+  'Surface-to-Air':'cat-SAM','Anti-Ship/Cruise':'cat-ASCM','Ballistic':'cat-BM',
+  'Anti-Tank':'cat-ATGM','Rocket/Artillery':'cat-RA','Air-Launched Cruise':'cat-ALCM',
+  'Ballistic Missile Defence':'cat-BMD','Glide Bomb':'cat-GB','Air-to-Air':'cat-AAM',
+  'Hypersonic':'cat-HYP','Sub-Launched Ballistic':'cat-SLBM','Torpedo':'cat-TORP',
+  'Uncategorized':'cat-UNK'
+};
+const CAT_SHORT = {
+  'Surface-to-Air':'SAM','Anti-Ship/Cruise':'AShM / Cruise','Ballistic':'Ballistic',
+  'Anti-Tank':'ATGM','Rocket/Artillery':'Rocket/Arty','Air-Launched Cruise':'ALCM',
+  'Ballistic Missile Defence':'BMD','Glide Bomb':'Glide Bomb','Air-to-Air':'AAM',
+  'Hypersonic':'Hypersonic','Sub-Launched Ballistic':'SLBM','Torpedo':'Torpedo',
+  'Uncategorized':'Other'
+};
+const YEARS = ['2021','2022','2023','2024','2025','2026'];
+const CATS_ORDER = [
+  'Surface-to-Air','Anti-Ship/Cruise','Ballistic','Anti-Tank',
+  'Rocket/Artillery','Air-Launched Cruise','Ballistic Missile Defence',
+  'Glide Bomb','Air-to-Air','Hypersonic','Sub-Launched Ballistic','Torpedo'
+];
 
-            const headers = lines[0].split(",").map(h => h.trim().replace(/^"|"$/g, ""));
-            const result = [];
+function getYear(row) {
+  if (row.Date && row.Date.length >= 4) return row.Date.slice(0,4);
+  const m = row.Month_Year && row.Month_Year.match(/\d{4}/);
+  return m ? m[0] : null;
+}
 
-            for (let i = 1; i < lines.length; i++) {
-                const row = {};
-                let current = "";
-                let inQuotes = false;
-                let colIndex = 0;
-                const chars = lines[i].split("");
+function agencyBadges(agStr) {
+  if (!agStr) return '';
+  return agStr.split('/').map(a => {
+    a = a.trim();
+    let cls = 'ag-other';
+    if (a === 'DRDO') cls = 'ag-DRDO';
+    else if (a === 'IAF' || a.includes('IAF')) cls = 'ag-IAF';
+    else if (a.includes('Navy') || a === 'ANC') cls = 'ag-Navy';
+    else if (a.includes('Army')) cls = 'ag-Army';
+    else if (a === 'SFC') cls = 'ag-SFC';
+    else if (a === 'ISRO') cls = 'ag-ISRO';
+    else if (a === 'BDL') cls = 'ag-BDL';
+    return `<span class="ag-badge ${cls}">${a}</span>`;
+  }).join('');
+}
 
-                for (let j = 0; j < chars.length; j++) {
-                    const char = chars[j];
-                    const nextChar = chars[j + 1];
+function formatDate(row) {
+  if (row.Date) return row.Date;
+  if (row.Month_Year && row.Month_Year.startsWith('Uncertain')) return `<span style="color:#aaa">~${row.Month_Year}</span>`;
+  return row.Month_Year || '—';
+}
 
-                    if (!inQuotes && char === '"') {
-                        inQuotes = true;
-                    } else if (inQuotes && char === '"' && nextChar === '"') {
-                        current += '"';
-                        j++;
-                    } else if (inQuotes && char === '"') {
-                        inQuotes = false;
-                    } else if (!inQuotes && char === ",") {
-                        row[headers[colIndex]] = current.trim();
-                        current = "";
-                        colIndex++;
-                    } else {
-                        current += char;
-                    }
-                }
-                if (colIndex < headers.length) {
-                    row[headers[colIndex]] = current.trim();
-                }
-                result.push(row);
-            }
-            return result;
-        }
+// ──────────────────────────────────────────────
+// SORT STATE
+// ──────────────────────────────────────────────
+let sortCol = 'Date', sortDir = -1; // -1 = desc (newest first)
 
-        function initMap() {
-            geoMap = L.map("map", {
-                zoomControl: false,
-                attributionControl: false
-            }).setView([21.0, 82.0], 5);
+function sortTable(col) {
+  if (sortCol === col) sortDir *= -1;
+  else { sortCol = col; sortDir = -1; }
+  document.querySelectorAll('thead th').forEach(th => {
+    th.classList.remove('sort-asc','sort-desc');
+  });
+  const th = document.getElementById('th-' + col);
+  if (th) th.classList.add(sortDir === 1 ? 'sort-asc' : 'sort-desc');
+  applyFilters();
+}
 
-            L.control.zoom({ position: "bottomright" }).addTo(geoMap);
-            L.control.attribution({ position: "bottomleft" }).addTo(geoMap);
+// ──────────────────────────────────────────────
+// FILTER + RENDER TABLE
+// ──────────────────────────────────────────────
+let currentFiltered = [];
 
-            L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
-                attribution: "&copy; <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors &copy; <a href='https://carto.com/attributions'>CARTO</a>",
-                subdomains: "abcd",
-                maxZoom: 19
-            }).addTo(geoMap);
-        }
+function applyFilters() {
+  const q = document.getElementById('searchBox').value.toLowerCase();
+  const cat = document.getElementById('catFilter').value;
+  const ag = document.getElementById('agencyFilter').value;
+  const yr = document.getElementById('yearFilter').value;
 
-        Promise.all([
-            fetch("./locations.csv").then(res => {
-                if (!res.ok) throw new Error("HTTP " + res.status + " for locations.csv");
-                return res.text();
-            }),
-            fetch("./normalized_missiles.csv").then(res => {
-                if (!res.ok) throw new Error("HTTP " + res.status + " for normalized_missiles.csv");
-                return res.text();
-            })
-        ]).then(([locText, dataText]) => {
-            let locArray = parseCSVToObjects(locText);
-            locArray.forEach(loc => {
-                locationMap[loc.location_id] = loc;
-            });
+  currentFiltered = DB.filter(r => {
+    const srch = [r.Missile, r.Agency, r.Location, r.Notes, r.Category].join(' ').toLowerCase();
+    return (!q || srch.includes(q))
+      && (!cat || r.Category === cat)
+      && (!ag  || r.Agency.includes(ag))
+      && (!yr  || getYear(r) === yr);
+  });
 
-            eventData = parseCSVToObjects(dataText);
-            eventData.sort((a, b) => {
-                if (a.date === "Unknown") return 1;
-                if (b.date === "Unknown") return -1;
-                return new Date(b.date) - new Date(a.date);
-            });
+  // Sort
+  currentFiltered.sort((a, b) => {
+    let va = a[sortCol] || '', vb = b[sortCol] || '';
+    if (sortCol === 'Date') {
+      va = a.Date || '0000';
+      vb = b.Date || '0000';
+    }
+    return va < vb ? -sortDir : va > vb ? sortDir : 0;
+  });
 
-            initMap();
-            applyFilters();
-            setTimeout(() => { if(geoMap) geoMap.invalidateSize(); }, 100);
-        }).catch(err => {
-            console.error(err);
-            document.getElementById("recordCounter").innerHTML = 
-                '<span style="color: var(--primary)">Error:</span> ' + err.message;
-            document.getElementById("tableBody").innerHTML = 
-                '<tr><td colspan="6">' +
-                '<div class="empty-state">' +
-                '<div class="empty-state-icon">⚠️</div>' +
-                '<p style="color: var(--primary); font-weight: 600;">Failed to load data</p>' +
-                '<p style="font-size: 0.8125rem; margin-top: 0.5rem;">' + err.message + "</p>" +
-                "</div></td></tr>";
-        });
+  document.getElementById('rowCounter').textContent = `${currentFiltered.length} events`;
+  renderTable(currentFiltered);
+}
 
-        function getServiceBadge(service) {
-            const classes = {
-                "IAF": "badge-iaf",
-                "Indian Navy": "badge-navy",
-                "Indian Army": "badge-army",
-                "SFC": "badge-sfc",
-                "DRDO": "badge-drdo"
-            };
-            return '<span class="badge ' + (classes[service] || "") + '">' + service + "</span>";
-        }
+function renderTable(rows) {
+  const tbody = document.getElementById('tableBody');
+  tbody.innerHTML = '';
+  rows.forEach(r => {
+    const catCls = CAT_CLASS[r.Category] || 'cat-UNK';
+    const catLabel = CAT_SHORT[r.Category] || r.Category;
+    const srcHTML = r.Source_URL
+      ? `<a class="src-link" href="${r.Source_URL}" target="_blank" rel="noopener">↗ Source</a>`
+      : `<span class="no-src">—</span>`;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="date-cell">${formatDate(r)}</td>
+      <td><span class="missile-name">${r.Missile}</span></td>
+      <td><span class="cat-badge ${catCls}">${catLabel}</span></td>
+      <td><div class="agency-badges">${agencyBadges(r.Agency)}</div></td>
+      <td style="font-size:12px;color:var(--mid)">${r.Location || '—'}</td>
+      <td class="notes-cell">${r.Notes || '—'}</td>
+      <td>${srcHTML}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
 
-        function updateStats(rows) {
-            const total = rows.length;
-            const success = rows.filter(r => r.result === "Success").length;
-            const systems = new Set(rows.map(r => r.family)).size;
-            const ranges = new Set(rows.map(r => r.location_id)).size;
+// ──────────────────────────────────────────────
+// KPIs
+// ──────────────────────────────────────────────
+function buildKPIs() {
+  const total = DB.length;
+  const unique = new Set(DB.map(r => r.Missile)).size;
+  const yearCounts = {};
+  let drdo = 0, sfc = 0;
+  DB.forEach(r => {
+    const y = getYear(r);
+    if (y && YEARS.includes(y)) yearCounts[y] = (yearCounts[y]||0)+1;
+    if (r.Agency.includes('DRDO')) drdo++;
+    if (r.Agency.includes('SFC')) sfc++;
+  });
+  const peakYear = Object.entries(yearCounts).sort((a,b)=>b[1]-a[1])[0][0];
+  document.getElementById('kpiTotal').textContent = total;
+  document.getElementById('kpiSystems').textContent = unique;
+  document.getElementById('kpiTopYear').textContent = peakYear;
+  document.getElementById('kpiDRDO').textContent = drdo;
+  document.getElementById('kpiStrategic').textContent = sfc;
+}
 
-            document.getElementById("statTotal").textContent = total;
-            document.getElementById("statSuccess").textContent = total ? Math.round((success/total)*100) + "%" : "—";
-            document.getElementById("statSystems").textContent = systems;
-            document.getElementById("statRanges").textContent = ranges;
-        }
+// ──────────────────────────────────────────────
+// CHARTS
+// ──────────────────────────────────────────────
+const RED = '#cc0000';
+const PALETTE = [
+  '#cc0000','#1565c0','#2e7d32','#e65100','#006064','#7b1fa2',
+  '#4a148c','#880e4f','#f57f17','#3e2723','#1a237e','#004d40'
+];
 
-        function renderDatabase(rows) {
-            const tbody = document.getElementById("tableBody");
-            document.getElementById("recordCounter").innerHTML = 
-                "<strong>" + rows.length + "</strong> flight trials matching query";
-            tbody.innerHTML = "";
+Chart.defaults.font.family = 'system-ui, -apple-system, sans-serif';
+Chart.defaults.font.size = 11;
+Chart.defaults.color = '#555';
 
-            if (rows.length === 0) {
-                tbody.innerHTML = 
-                    '<tr><td colspan="6">' +
-                    '<div class="empty-state">' +
-                    '<div class="empty-state-icon">🔍</div>' +
-                    "<p>No records match your filters</p>" +
-                    "</div></td></tr>";
-                return;
-            }
+function buildYearChart() {
+  const counts = {};
+  YEARS.forEach(y => counts[y] = 0);
+  DB.forEach(r => {
+    const y = getYear(r);
+    if (y && counts[y] !== undefined) counts[y]++;
+  });
+  new Chart(document.getElementById('chartYear'), {
+    type: 'bar',
+    data: {
+      labels: YEARS,
+      datasets: [{
+        data: YEARS.map(y => counts[y]),
+        backgroundColor: YEARS.map(y => y === '2022' ? RED : 'rgba(204,0,0,0.25)'),
+        borderWidth: 0
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: { callbacks: {
+        label: ctx => ` ${ctx.raw} tests`
+      }}},
+      scales: {
+        x: { grid: { display: false } },
+        y: { grid: { color: '#f0f0f0' }, ticks: { stepSize: 5 } }
+      }
+    }
+  });
+}
 
-            rows.forEach(row => {
-                let loc = locationMap[row.location_id] || { location_name: "Unknown Range", state: "" };
-                let linkOutput = row.source_url 
-                    ? '<a href="' + row.source_url + '" target="_blank" class="btn-link">' + row.source_type + " ↗</a>" 
-                    : '<span class="btn-link muted">' + (row.source_type || "N/A") + "</span>";
+function buildCatChart() {
+  const counts = {};
+  DB.forEach(r => { counts[r.Category] = (counts[r.Category]||0)+1; });
+  const sorted = Object.entries(counts).sort((a,b)=>b[1]-a[1]);
+  new Chart(document.getElementById('chartCat'), {
+    type: 'doughnut',
+    data: {
+      labels: sorted.map(([k]) => CAT_SHORT[k]||k),
+      datasets: [{ data: sorted.map(([,v])=>v), backgroundColor: PALETTE, borderWidth: 2, borderColor: '#fff' }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      cutout: '55%',
+      plugins: {
+        legend: { position: 'right', labels: { boxWidth: 10, padding: 6, font:{size:10} } },
+        tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.raw}` }}
+      }
+    }
+  });
+}
 
-                let tr = document.createElement("tr");
-                tr.innerHTML = 
-                    '<td>' +
-                    '<div class="cell-date">' + row.date + "</div>" +
-                    '<div class="cell-id">' + row.event_id + "</div>" +
-                    "</td>" +
-                    '<td>' +
-                    '<div class="cell-family">' + row.family + "</div>" +
-                    '<div class="cell-variant">' + row.variant + "</div>" +
-                    "</td>" +
-                    '<td>' +
-                    '<div class="badge-group">' +
-                    getServiceBadge(row.service) +
-                    '<span class="badge badge-success">' + row.result + "</span>" +
-                    "</div>" +
-                    '<div class="meta-line"><strong>Type:</strong> ' + row.event_type + "</div>" +
-                    '<div class="meta-line"><strong>Platform:</strong> ' + row.platform + "</div>" +
-                    "</td>" +
-                    '<td>' +
-                    '<div class="cell-location">' + loc.location_name + "<small>" + loc.state + "</small></div>" +
-                    "</td>" +
-                    '<td>' +
-                    '<div class="cell-notes">' + row.notes + "</div>" +
-                    "</td>" +
-                    "<td>" + linkOutput + "</td>";
-                tbody.appendChild(tr);
-            });
-        }
+function buildAgencyChart() {
+  const agCount = {};
+  DB.forEach(r => {
+    r.Agency.split('/').forEach(a => {
+      a = a.trim();
+      // Normalise
+      if (a.includes('Army')) a = 'Indian Army';
+      if (a === 'ANC') a = 'Indian Navy';
+      agCount[a] = (agCount[a]||0)+1;
+    });
+  });
+  const top = Object.entries(agCount).sort((a,b)=>b[1]-a[1]).slice(0,6);
+  const agColors = { DRDO:'#c2185b', IAF:'#1565c0', 'Indian Navy':'#00838f',
+    'Indian Army':'#2e7d32', SFC:'#e65100', ISRO:'#7b1fa2', BDL:'#757575' };
+  new Chart(document.getElementById('chartAgency'), {
+    type: 'bar',
+    data: {
+      labels: top.map(([k])=>k),
+      datasets: [{
+        data: top.map(([,v])=>v),
+        backgroundColor: top.map(([k])=>agColors[k]||'#999'),
+        borderWidth: 0
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { color: '#f0f0f0' } },
+        y: { grid: { display: false }, ticks: { font:{size:11} } }
+      }
+    }
+  });
+}
 
-        function renderVisualizations(rows) {
-            const ctx = document.getElementById("activityChart").getContext("2d");
-            let serviceCounts = {};
-            rows.forEach(row => {
-                let svc = row.service || "Unknown";
-                serviceCounts[svc] = (serviceCounts[svc] || 0) + 1;
-            });
+// ── HEATMAP ──
+function buildHeatmap() {
+  // Count [category][year]
+  const grid = {};
+  CATS_ORDER.forEach(c => { grid[c] = {}; YEARS.forEach(y => grid[c][y] = 0); });
+  DB.forEach(r => {
+    const y = getYear(r);
+    if (y && YEARS.includes(y) && grid[r.Category]) grid[r.Category][y]++;
+  });
 
-            const labels = Object.keys(serviceCounts);
-            const data = labels.map(svc => serviceCounts[svc]);
-            const colors = ["#1e3a5f", "#1e4a4a", "#3a5a1e", "#8B4513", "#5a1e1e", "#666666"];
+  // Find max for color scale
+  let maxVal = 0;
+  CATS_ORDER.forEach(c => YEARS.forEach(y => { if(grid[c][y] > maxVal) maxVal = grid[c][y]; }));
 
-            if (activityChartInstance) activityChartInstance.destroy();
+  const wrap = document.getElementById('heatmapWrap');
+  const g = document.createElement('div');
+  g.className = 'heatmap-grid';
 
-            activityChartInstance = new Chart(ctx, {
-                type: "doughnut",
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        data: data,
-                        backgroundColor: colors,
-                        borderWidth: 2,
-                        borderColor: "#ffffff",
-                        hoverOffset: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    cutout: "65%",
-                    plugins: {
-                        legend: {
-                            position: "right",
-                            labels: {
-                                boxWidth: 10,
-                                padding: 12,
-                                font: { size: 11, family: "Inter", weight: "500" },
-                                usePointStyle: true,
-                                pointStyle: "circle"
-                            }
-                        },
-                        tooltip: {
-                            backgroundColor: "rgba(0,0,0,0.85)",
-                            padding: 10,
-                            cornerRadius: 6,
-                            titleFont: { family: "Inter", weight: "600" },
-                            bodyFont: { family: "Inter" }
-                        }
-                    },
-                    animation: {
-                        animateRotate: true,
-                        duration: 600
-                    }
-                }
-            });
+  // Header row
+  const corner = document.createElement('div');
+  corner.className = 'hm-cell';
+  g.appendChild(corner);
+  YEARS.forEach(y => {
+    const h = document.createElement('div');
+    h.className = 'hm-cell hm-header'; h.textContent = y; g.appendChild(h);
+  });
 
-            mapMarkers.forEach(m => geoMap.removeLayer(m));
-            mapMarkers = [];
+  // Data rows
+  CATS_ORDER.forEach(cat => {
+    const label = document.createElement('div');
+    label.className = 'hm-cell hm-row-label';
+    label.textContent = CAT_SHORT[cat] || cat;
+    label.title = cat;
+    g.appendChild(label);
 
-            let locationDensity = {};
-            rows.forEach(row => {
-                let loc = locationMap[row.location_id];
-                if(loc && loc.latitude) {
-                    locationDensity[row.location_id] = (locationDensity[row.location_id] || 0) + 1;
-                }
-            });
+    YEARS.forEach(y => {
+      const v = grid[cat][y];
+      const cell = document.createElement('div');
+      cell.className = 'hm-cell';
+      const intensity = maxVal > 0 ? v / maxVal : 0;
+      if (v === 0) {
+        cell.style.background = '#f5f5f5';
+        cell.style.color = '#ddd';
+        cell.textContent = '·';
+      } else {
+        // Deep red for high, light rose for low
+        const r = 204, gChan = Math.round(255*(1-intensity)*0.4), b = Math.round(255*(1-intensity)*0.4);
+        cell.style.background = `rgba(${r},${gChan},${b},${0.15+intensity*0.85})`;
+        cell.style.color = intensity > 0.5 ? '#fff' : '#8b0000';
+        cell.textContent = v;
+      }
+      cell.title = `${CAT_SHORT[cat]} | ${y}: ${v} test${v!==1?'s':''}`;
+      g.appendChild(cell);
+    });
+  });
 
-            Object.keys(locationDensity).forEach(locId => {
-                let loc = locationMap[locId];
-                let count = locationDensity[locId];
+  wrap.appendChild(g);
+}
 
-                let marker = L.circleMarker([loc.latitude, loc.longitude], {
-                    radius: Math.min(Math.max(count * 2.5, 10), 28),
-                    fillColor: "#8B0000",
-                    color: "#ffffff",
-                    weight: 2.5,
-                    opacity: 1,
-                    fillOpacity: 0.75
-                }).addTo(geoMap);
+// ── TOP SYSTEMS ──
+function buildTopSystems() {
+  const counts = {};
+  DB.forEach(r => { counts[r.Missile] = (counts[r.Missile]||0)+1; });
+  const top = Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,12);
+  const maxV = top[0][1];
+  const container = document.getElementById('topSystemsTable');
+  const tbl = document.createElement('table');
+  tbl.className = 'mini-table';
+  top.forEach(([name, count], i) => {
+    const tr = document.createElement('tr');
+    const pct = Math.round(count/maxV*100);
+    tr.innerHTML = `
+      <td>${String(i+1).padStart(2,'0')}</td>
+      <td>
+        <span style="font-weight:600;font-size:12px;font-family:var(--mono)">${name}</span>
+        <div class="bar-bg"><div class="bar-fill" style="width:${pct}%"></div></div>
+      </td>
+      <td>${count}</td>
+    `;
+    tbl.appendChild(tr);
+  });
+  container.appendChild(tbl);
+}
 
-                marker.bindPopup(
-                    "<div style='font-family: Inter, sans-serif; padding: 4px;'>" +
-                    "<strong style='font-size: 13px; color: #8B0000;'>" + loc.location_name + "</strong><br>" +
-                    "<span style='font-size: 11px; color: #666;'>Recorded Events: <strong>" + count + "</strong></span>" +
-                    "</div>", {
-                    closeButton: false,
-                    className: "custom-popup"
-                });
-                mapMarkers.push(marker);
-            });
-        }
+// ──────────────────────────────────────────────
+// EXPORT
+// ──────────────────────────────────────────────
+function exportCSV() {
+  const rows = currentFiltered.length > 0 ? currentFiltered : DB;
+  let csv = '"Missile","Date","Month_Year","Category","Agency","Location","Notes","Source_URL"\n';
+  rows.forEach(r => {
+    csv += [r.Missile,r.Date,r.Month_Year,r.Category,r.Agency,r.Location,r.Notes,r.Source_URL]
+      .map(v => `"${(v||'').replace(/"/g,'""')}"`)
+      .join(',') + '\n';
+  });
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'IndianMissileTracker_singhshwetabh71.csv';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+}
 
-        function applyFilters() {
-            let search = document.getElementById("searchBox").value.toLowerCase();
-            let svcFilter = document.getElementById("serviceFilter").value;
-            let typeFilter = document.getElementById("typeFilter").value;
-            let yearFilter = document.getElementById("yearFilter").value;
+function scrollToTable() {
+  document.getElementById('tableSection').scrollIntoView({behavior:'smooth'});
+}
 
-            let filtered = eventData.filter(row => {
-                let matchSearch = !search || 
-                    (row.family && row.family.toLowerCase().includes(search)) || 
-                    (row.variant && row.variant.toLowerCase().includes(search)) || 
-                    (row.platform && row.platform.toLowerCase().includes(search));
-                let matchSvc = svcFilter === "" || row.service === svcFilter;
-                let matchType = typeFilter === "" || row.event_type === typeFilter;
-                let matchYear = yearFilter === "" || (row.date && row.date.startsWith(yearFilter));
+// ──────────────────────────────────────────────
+// INIT
+// ──────────────────────────────────────────────
+// Sort DB newest-first on load
+DB.sort((a, b) => {
+  const da = a.Date || '0000', db = b.Date || '0000';
+  return da < db ? 1 : da > db ? -1 : 0;
+});
+currentFiltered = [...DB];
 
-                return matchSearch && matchSvc && matchType && matchYear;
-            });
+buildKPIs();
+buildYearChart();
+buildCatChart();
+buildAgencyChart();
+buildHeatmap();
+buildTopSystems();
+renderTable(DB);
+document.getElementById('rowCounter').textContent = `${DB.length} events`;
 
-            renderDatabase(filtered);
-            renderVisualizations(filtered);
-            updateStats(filtered);
-        }
+document.getElementById('searchBox').addEventListener('input', applyFilters);
+document.getElementById('catFilter').addEventListener('change', applyFilters);
+document.getElementById('agencyFilter').addEventListener('change', applyFilters);
+document.getElementById('yearFilter').addEventListener('change', applyFilters);
 
-        function downloadExport() {
-            let csvContent = '"DATA CURATED BY:","Shwetabh Singh"\n"PROJECT:","Indian Missile Test Tracker"\n\n';
-            csvContent += '"Event ID","Date","Family","Variant","Service","Platform","Location","Event Type","Result","Source Type","Source URL","Notes"\n';
-
-            let search = document.getElementById("searchBox").value.toLowerCase();
-            let svcFilter = document.getElementById("serviceFilter").value;
-            let typeFilter = document.getElementById("typeFilter").value;
-            let yearFilter = document.getElementById("yearFilter").value;
-
-            let filteredForExport = eventData.filter(row => {
-                let matchSearch = !search || 
-                    (row.family && row.family.toLowerCase().includes(search)) || 
-                    (row.variant && row.variant.toLowerCase().includes(search)) || 
-                    (row.platform && row.platform.toLowerCase().includes(search));
-                let matchSvc = svcFilter === "" || row.service === svcFilter;
-                let matchType = typeFilter === "" || row.event_type === typeFilter;
-                let matchYear = yearFilter === "" || (row.date && row.date.startsWith(yearFilter));
-                return matchSearch && matchSvc && matchType && matchYear;
-            });
-
-            filteredForExport.forEach(row => {
-                let loc = locationMap[row.location_id] ? locationMap[row.location_id].location_name : "Unknown";
-                csvContent += '"' + (row.event_id || "") + '","' + (row.date || "") + '","' + (row.family || "") + '","' + (row.variant || "") + '","' + (row.service || "") + '","' + (row.platform || "") + '","' + loc + '","' + (row.event_type || "") + '","' + (row.result || "") + '","' + (row.source_type || "") + '","' + (row.source_url || "") + '","' + (row.notes || "").replace(/"/g, '""') + '"\n';
-            });
-
-            const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.download = "Missile_Tracker_Export_Shwetabh_Singh.csv";
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
-
-        document.getElementById("searchBox").addEventListener("input", applyFilters);
-        document.getElementById("serviceFilter").addEventListener("change", applyFilters);
-        document.getElementById("typeFilter").addEventListener("change", applyFilters);
-        document.getElementById("yearFilter").addEventListener("change", applyFilters);
-    </script>
+// Set initial sort indicator
+document.getElementById('th-Date').classList.add('sort-desc');
+</script>
 </body>
 </html>
