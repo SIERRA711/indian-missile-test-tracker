@@ -41,7 +41,6 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        /* Header */
         .header {
             background: linear-gradient(180deg, #f0eeea 0%, var(--bg) 100%);
             border-bottom: 2px solid var(--primary);
@@ -82,7 +81,6 @@
             gap: 0.75rem;
         }
 
-        /* Buttons */
         .btn {
             display: inline-flex;
             align-items: center;
@@ -119,7 +117,6 @@
             border-color: var(--primary-light);
         }
 
-        /* Controls Bar */
         .controls-bar {
             background: var(--surface);
             border-bottom: 1px solid var(--border);
@@ -200,14 +197,12 @@
             box-shadow: 0 0 0 2px rgba(139,0,0,0.06);
         }
 
-        /* Main Content */
         .main {
             max-width: 1440px;
             margin: 0 auto;
             padding: 1.5rem 2rem 3rem;
         }
 
-        /* Dashboard Grid */
         .dashboard-grid {
             display: grid;
             grid-template-columns: 2fr 1fr;
@@ -261,7 +256,6 @@
             border-radius: var(--radius-sm);
         }
 
-        /* Stats Bar */
         .stats-bar {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -297,7 +291,6 @@
 
         .stat-value.primary { color: var(--primary); }
 
-        /* Table */
         .table-wrap {
             background: var(--surface);
             border-radius: var(--radius);
@@ -378,7 +371,6 @@
             border-bottom: none;
         }
 
-        /* Cell Content */
         .cell-date {
             font-family: 'JetBrains Mono', monospace;
             font-size: 0.8125rem;
@@ -428,7 +420,6 @@
             font-size: 0.8125rem;
         }
 
-        /* Badges */
         .badge-group {
             display: flex;
             flex-wrap: wrap;
@@ -466,7 +457,6 @@
             font-weight: 600;
         }
 
-        /* Links */
         .btn-link {
             display: inline-flex;
             align-items: center;
@@ -491,7 +481,6 @@
             font-weight: 500;
         }
 
-        /* Empty State */
         .empty-state {
             text-align: center;
             padding: 3rem 2rem;
@@ -504,7 +493,6 @@
             opacity: 0.4;
         }
 
-        /* Responsive */
         @media (max-width: 1024px) {
             .dashboard-grid { grid-template-columns: 1fr; }
             .panel-body { height: 260px; }
@@ -520,7 +508,6 @@
             .stats-bar { grid-template-columns: repeat(2, 1fr); }
         }
 
-        /* Scrollbar */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #c4c0b8; border-radius: 3px; }
@@ -582,7 +569,6 @@
     </div>
 
     <main class="main">
-        <!-- Stats -->
         <div class="stats-bar" id="statsBar">
             <div class="stat-card">
                 <div class="stat-label">Total Events</div>
@@ -602,7 +588,6 @@
             </div>
         </div>
 
-        <!-- Dashboard -->
         <div class="dashboard-grid">
             <div class="panel">
                 <div class="panel-header">
@@ -623,11 +608,10 @@
             </div>
         </div>
 
-        <!-- Table -->
         <div class="table-wrap">
             <div class="table-header">
                 <span class="table-title">Flight Trial Records</span>
-                <span class="counter" id="recordCounter">Loading data...</span>
+                <span class="counter" id="recordCounter">Loading records...</span>
             </div>
             <div style="overflow-x: auto;">
                 <table id="trackerTable">
@@ -663,12 +647,11 @@
         let geoMap = null;
         let mapMarkers = [];
 
-        // Proper CSV Parser
         function parseCSVToObjects(csv) {
-            const lines = csv.split('').filter(l => l.trim().length > 0);
+            const lines = csv.split("\n").filter(l => l.trim().length > 0);
             if (lines.length === 0) return [];
 
-            const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
+            const headers = lines[0].split(",").map(h => h.trim().replace(/^"|"$/g, ""));
             const result = [];
 
             for (let i = 1; i < lines.length; i++) {
@@ -676,7 +659,7 @@
                 let current = "";
                 let inQuotes = false;
                 let colIndex = 0;
-                const chars = lines[i].split('');
+                const chars = lines[i].split("");
 
                 for (let j = 0; j < chars.length; j++) {
                     const char = chars[j];
@@ -689,7 +672,7 @@
                         j++;
                     } else if (inQuotes && char === '"') {
                         inQuotes = false;
-                    } else if (!inQuotes && char === ',') {
+                    } else if (!inQuotes && char === ",") {
                         row[headers[colIndex]] = current.trim();
                         current = "";
                         colIndex++;
@@ -706,28 +689,28 @@
         }
 
         function initMap() {
-            geoMap = L.map('map', {
+            geoMap = L.map("map", {
                 zoomControl: false,
                 attributionControl: false
             }).setView([21.0, 82.0], 5);
 
-            L.control.zoom({ position: 'bottomright' }).addTo(geoMap);
-            L.control.attribution({ position: 'bottomleft' }).addTo(geoMap);
+            L.control.zoom({ position: "bottomright" }).addTo(geoMap);
+            L.control.attribution({ position: "bottomleft" }).addTo(geoMap);
 
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-                subdomains: 'abcd',
+            L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
+                attribution: "&copy; <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors &copy; <a href='https://carto.com/attributions'>CARTO</a>",
+                subdomains: "abcd",
                 maxZoom: 19
             }).addTo(geoMap);
         }
 
         Promise.all([
-            fetch('./locations.csv').then(res => {
-                if (!res.ok) throw new Error(`HTTP ${res.status} for locations.csv`);
+            fetch("./locations.csv").then(res => {
+                if (!res.ok) throw new Error("HTTP " + res.status + " for locations.csv");
                 return res.text();
             }),
-            fetch('./normalized_missiles.csv').then(res => {
-                if (!res.ok) throw new Error(`HTTP ${res.status} for normalized_missiles.csv`);
+            fetch("./normalized_missiles.csv").then(res => {
+                if (!res.ok) throw new Error("HTTP " + res.status + " for normalized_missiles.csv");
                 return res.text();
             })
         ]).then(([locText, dataText]) => {
@@ -748,97 +731,93 @@
             setTimeout(() => { if(geoMap) geoMap.invalidateSize(); }, 100);
         }).catch(err => {
             console.error(err);
-            document.getElementById('recordCounter').innerHTML = 
-                `<span style="color: var(--primary)">Error:</span> ${err.message}`;
-            document.getElementById('tableBody').innerHTML = `
-                <tr><td colspan="6">
-                    <div class="empty-state">
-                        <div class="empty-state-icon">⚠️</div>
-                        <p style="color: var(--primary); font-weight: 600;">Failed to load data</p>
-                        <p style="font-size: 0.8125rem; margin-top: 0.5rem;">${err.message}</p>
-                    </div>
-                </td></tr>`;
+            document.getElementById("recordCounter").innerHTML = 
+                '<span style="color: var(--primary)">Error:</span> ' + err.message;
+            document.getElementById("tableBody").innerHTML = 
+                '<tr><td colspan="6">' +
+                '<div class="empty-state">' +
+                '<div class="empty-state-icon">⚠️</div>' +
+                '<p style="color: var(--primary); font-weight: 600;">Failed to load data</p>' +
+                '<p style="font-size: 0.8125rem; margin-top: 0.5rem;">' + err.message + "</p>" +
+                "</div></td></tr>";
         });
 
         function getServiceBadge(service) {
             const classes = {
-                'IAF': 'badge-iaf',
-                'Indian Navy': 'badge-navy',
-                'Indian Army': 'badge-army',
-                'SFC': 'badge-sfc',
-                'DRDO': 'badge-drdo'
+                "IAF": "badge-iaf",
+                "Indian Navy": "badge-navy",
+                "Indian Army": "badge-army",
+                "SFC": "badge-sfc",
+                "DRDO": "badge-drdo"
             };
-            return `<span class="badge ${classes[service] || ''}">${service}</span>`;
+            return '<span class="badge ' + (classes[service] || "") + '">' + service + "</span>";
         }
 
         function updateStats(rows) {
             const total = rows.length;
-            const success = rows.filter(r => r.result === 'Success').length;
+            const success = rows.filter(r => r.result === "Success").length;
             const systems = new Set(rows.map(r => r.family)).size;
             const ranges = new Set(rows.map(r => r.location_id)).size;
 
-            document.getElementById('statTotal').textContent = total;
-            document.getElementById('statSuccess').textContent = total ? Math.round((success/total)*100) + '%' : '—';
-            document.getElementById('statSystems').textContent = systems;
-            document.getElementById('statRanges').textContent = ranges;
+            document.getElementById("statTotal").textContent = total;
+            document.getElementById("statSuccess").textContent = total ? Math.round((success/total)*100) + "%" : "—";
+            document.getElementById("statSystems").textContent = systems;
+            document.getElementById("statRanges").textContent = ranges;
         }
 
         function renderDatabase(rows) {
-            const tbody = document.getElementById('tableBody');
-            document.getElementById('recordCounter').innerHTML = 
-                `<strong>${rows.length}</strong> flight trials matching query`;
-            tbody.innerHTML = '';
+            const tbody = document.getElementById("tableBody");
+            document.getElementById("recordCounter").innerHTML = 
+                "<strong>" + rows.length + "</strong> flight trials matching query";
+            tbody.innerHTML = "";
 
             if (rows.length === 0) {
-                tbody.innerHTML = `
-                    <tr><td colspan="6">
-                        <div class="empty-state">
-                            <div class="empty-state-icon">🔍</div>
-                            <p>No records match your filters</p>
-                        </div>
-                    </td></tr>`;
+                tbody.innerHTML = 
+                    '<tr><td colspan="6">' +
+                    '<div class="empty-state">' +
+                    '<div class="empty-state-icon">🔍</div>' +
+                    "<p>No records match your filters</p>" +
+                    "</div></td></tr>";
                 return;
             }
 
             rows.forEach(row => {
                 let loc = locationMap[row.location_id] || { location_name: "Unknown Range", state: "" };
                 let linkOutput = row.source_url 
-                    ? `<a href="${row.source_url}" target="_blank" class="btn-link">${row.source_type} ↗</a>` 
-                    : `<span class="btn-link muted">${row.source_type || 'N/A'}</span>`;
+                    ? '<a href="' + row.source_url + '" target="_blank" class="btn-link">' + row.source_type + " ↗</a>" 
+                    : '<span class="btn-link muted">' + (row.source_type || "N/A") + "</span>";
 
-                let tr = document.createElement('tr');
-                // CHANGED: Removed "Variant:" label - display variant as-is from CSV
-                tr.innerHTML = `
-                    <td>
-                        <div class="cell-date">${row.date}</div>
-                        <div class="cell-id">${row.event_id}</div>
-                    </td>
-                    <td>
-                        <div class="cell-family">${row.family}</div>
-                        <div class="cell-variant">${row.variant}</div>
-                    </td>
-                    <td>
-                        <div class="badge-group">
-                            ${getServiceBadge(row.service)}
-                            <span class="badge badge-success">${row.result}</span>
-                        </div>
-                        <div class="meta-line"><strong>Type:</strong> ${row.event_type}</div>
-                        <div class="meta-line"><strong>Platform:</strong> ${row.platform}</div>
-                    </td>
-                    <td>
-                        <div class="cell-location">${loc.location_name}<small>${loc.state}</small></div>
-                    </td>
-                    <td>
-                        <div class="cell-notes">${row.notes}</div>
-                    </td>
-                    <td>${linkOutput}</td>
-                `;
+                let tr = document.createElement("tr");
+                tr.innerHTML = 
+                    '<td>' +
+                    '<div class="cell-date">' + row.date + "</div>" +
+                    '<div class="cell-id">' + row.event_id + "</div>" +
+                    "</td>" +
+                    '<td>' +
+                    '<div class="cell-family">' + row.family + "</div>" +
+                    '<div class="cell-variant">' + row.variant + "</div>" +
+                    "</td>" +
+                    '<td>' +
+                    '<div class="badge-group">' +
+                    getServiceBadge(row.service) +
+                    '<span class="badge badge-success">' + row.result + "</span>" +
+                    "</div>" +
+                    '<div class="meta-line"><strong>Type:</strong> ' + row.event_type + "</div>" +
+                    '<div class="meta-line"><strong>Platform:</strong> ' + row.platform + "</div>" +
+                    "</td>" +
+                    '<td>' +
+                    '<div class="cell-location">' + loc.location_name + "<small>" + loc.state + "</small></div>" +
+                    "</td>" +
+                    '<td>' +
+                    '<div class="cell-notes">' + row.notes + "</div>" +
+                    "</td>" +
+                    "<td>" + linkOutput + "</td>";
                 tbody.appendChild(tr);
             });
         }
 
         function renderVisualizations(rows) {
-            const ctx = document.getElementById('activityChart').getContext('2d');
+            const ctx = document.getElementById("activityChart").getContext("2d");
             let serviceCounts = {};
             rows.forEach(row => {
                 let svc = row.service || "Unknown";
@@ -847,43 +826,43 @@
 
             const labels = Object.keys(serviceCounts);
             const data = labels.map(svc => serviceCounts[svc]);
-            const colors = ['#1e3a5f', '#1e4a4a', '#3a5a1e', '#8B4513', '#5a1e1e', '#666666'];
+            const colors = ["#1e3a5f", "#1e4a4a", "#3a5a1e", "#8B4513", "#5a1e1e", "#666666"];
 
             if (activityChartInstance) activityChartInstance.destroy();
 
             activityChartInstance = new Chart(ctx, {
-                type: 'doughnut',
+                type: "doughnut",
                 data: {
                     labels: labels,
                     datasets: [{
                         data: data,
                         backgroundColor: colors,
                         borderWidth: 2,
-                        borderColor: '#ffffff',
+                        borderColor: "#ffffff",
                         hoverOffset: 4
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    cutout: '65%',
+                    cutout: "65%",
                     plugins: {
                         legend: {
-                            position: 'right',
+                            position: "right",
                             labels: {
                                 boxWidth: 10,
                                 padding: 12,
-                                font: { size: 11, family: 'Inter', weight: '500' },
+                                font: { size: 11, family: "Inter", weight: "500" },
                                 usePointStyle: true,
-                                pointStyle: 'circle'
+                                pointStyle: "circle"
                             }
                         },
                         tooltip: {
-                            backgroundColor: 'rgba(0,0,0,0.85)',
+                            backgroundColor: "rgba(0,0,0,0.85)",
                             padding: 10,
                             cornerRadius: 6,
-                            titleFont: { family: 'Inter', weight: '600' },
-                            bodyFont: { family: 'Inter' }
+                            titleFont: { family: "Inter", weight: "600" },
+                            bodyFont: { family: "Inter" }
                         }
                     },
                     animation: {
@@ -917,24 +896,23 @@
                     fillOpacity: 0.75
                 }).addTo(geoMap);
 
-                marker.bindPopup(`
-                    <div style="font-family: Inter, sans-serif; padding: 4px;">
-                        <strong style="font-size: 13px; color: #8B0000;">${loc.location_name}</strong><br>
-                        <span style="font-size: 11px; color: #666;">Recorded Events: <strong>${count}</strong></span>
-                    </div>
-                `, {
+                marker.bindPopup(
+                    "<div style='font-family: Inter, sans-serif; padding: 4px;'>" +
+                    "<strong style='font-size: 13px; color: #8B0000;'>" + loc.location_name + "</strong><br>" +
+                    "<span style='font-size: 11px; color: #666;'>Recorded Events: <strong>" + count + "</strong></span>" +
+                    "</div>", {
                     closeButton: false,
-                    className: 'custom-popup'
+                    className: "custom-popup"
                 });
                 mapMarkers.push(marker);
             });
         }
 
         function applyFilters() {
-            let search = document.getElementById('searchBox').value.toLowerCase();
-            let svcFilter = document.getElementById('serviceFilter').value;
-            let typeFilter = document.getElementById('typeFilter').value;
-            let yearFilter = document.getElementById('yearFilter').value;
+            let search = document.getElementById("searchBox").value.toLowerCase();
+            let svcFilter = document.getElementById("serviceFilter").value;
+            let typeFilter = document.getElementById("typeFilter").value;
+            let yearFilter = document.getElementById("yearFilter").value;
 
             let filtered = eventData.filter(row => {
                 let matchSearch = !search || 
@@ -954,17 +932,13 @@
         }
 
         function downloadExport() {
-            let csvContent = '"DATA CURATED BY:","Shwetabh Singh"
-"PROJECT:","Indian Missile Test Tracker"
+            let csvContent = '"DATA CURATED BY:","Shwetabh Singh"\n"PROJECT:","Indian Missile Test Tracker"\n\n';
+            csvContent += '"Event ID","Date","Family","Variant","Service","Platform","Location","Event Type","Result","Source Type","Source URL","Notes"\n';
 
-';
-            csvContent += '"Event ID","Date","Family","Variant","Service","Platform","Location","Event Type","Result","Source Type","Source URL","Notes"
-';
-
-            let search = document.getElementById('searchBox').value.toLowerCase();
-            let svcFilter = document.getElementById('serviceFilter').value;
-            let typeFilter = document.getElementById('typeFilter').value;
-            let yearFilter = document.getElementById('yearFilter').value;
+            let search = document.getElementById("searchBox").value.toLowerCase();
+            let svcFilter = document.getElementById("serviceFilter").value;
+            let typeFilter = document.getElementById("typeFilter").value;
+            let yearFilter = document.getElementById("yearFilter").value;
 
             let filteredForExport = eventData.filter(row => {
                 let matchSearch = !search || 
@@ -979,11 +953,10 @@
 
             filteredForExport.forEach(row => {
                 let loc = locationMap[row.location_id] ? locationMap[row.location_id].location_name : "Unknown";
-                csvContent += `"${row.event_id || ''}","${row.date || ''}","${row.family || ''}","${row.variant || ''}","${row.service || ''}","${row.platform || ''}","${loc}","${row.event_type || ''}","${row.result || ''}","${row.source_type || ''}","${row.source_url || ''}","${(row.notes || '').replace(/"/g, '""')}"
-`;
+                csvContent += '"' + (row.event_id || "") + '","' + (row.date || "") + '","' + (row.family || "") + '","' + (row.variant || "") + '","' + (row.service || "") + '","' + (row.platform || "") + '","' + loc + '","' + (row.event_type || "") + '","' + (row.result || "") + '","' + (row.source_type || "") + '","' + (row.source_url || "") + '","' + (row.notes || "").replace(/"/g, '""') + '"\n';
             });
 
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
             const link = document.createElement("a");
             link.href = URL.createObjectURL(blob);
             link.download = "Missile_Tracker_Export_Shwetabh_Singh.csv";
@@ -992,10 +965,10 @@
             document.body.removeChild(link);
         }
 
-        document.getElementById('searchBox').addEventListener('input', applyFilters);
-        document.getElementById('serviceFilter').addEventListener('change', applyFilters);
-        document.getElementById('typeFilter').addEventListener('change', applyFilters);
-        document.getElementById('yearFilter').addEventListener('change', applyFilters);
+        document.getElementById("searchBox").addEventListener("input", applyFilters);
+        document.getElementById("serviceFilter").addEventListener("change", applyFilters);
+        document.getElementById("typeFilter").addEventListener("change", applyFilters);
+        document.getElementById("yearFilter").addEventListener("change", applyFilters);
     </script>
 </body>
 </html>
