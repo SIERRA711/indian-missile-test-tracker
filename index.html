@@ -198,6 +198,7 @@
         }
 
         // --- NEW: Download & Watermark Logic ---
+        // --- NEW: Download & Watermark Logic ---
         function downloadCSVWithWatermark() {
             let csvContent = "";
             
@@ -211,7 +212,6 @@
             csvContent += '"Year","Month","Date","Missile","Details","Source Link"\n';
 
             // 3. Append the currently filtered dataset
-            // We read the table DOM to only export what the user has currently filtered
             let tableRows = document.querySelectorAll("#tableBody tr");
             
             if(tableRows.length === 0) {
@@ -221,18 +221,17 @@
 
             tableRows.forEach(row => {
                 let cells = row.querySelectorAll("td");
-                // Extracting text back out of the HTML formatting
+                
                 let timelineText = cells[0].innerText.split('\n');
                 let year = timelineText[0].trim();
                 let monthDay = timelineText[1] ? timelineText[1].trim() : "";
                 
-                // Split "2 June" into "June" and "2"
                 let dateParts = monthDay.split(" ");
                 let date = dateParts[0] || "";
                 let month = dateParts[1] || "";
-                if(dateParts.length === 1) { month = dateParts[0]; date = ""; } // Handle "Uncertain"
+                if(dateParts.length === 1) { month = dateParts[0]; date = ""; } 
 
-                let missileName = cells[1].innerText.trim().replace(/"/g, '""'); // escape quotes
+                let missileName = cells[1].innerText.trim().replace(/"/g, '""'); 
                 let details = cells[2].innerText.trim().replace(/"/g, '""');
                 let sourceUrl = cells[3].querySelector("a") ? cells[3].querySelector("a").href : "";
 
@@ -244,7 +243,7 @@
             const url = URL.createObjectURL(blob);
             const link = document.createElement("a");
             link.setAttribute("href", url);
-            link.setAttribute("download", "INDRA_Missile_Tracker_Export.csv");
+            link.setAttribute("download", "Missile_Tracker_Export_Shwetabh_Singh.csv");
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
