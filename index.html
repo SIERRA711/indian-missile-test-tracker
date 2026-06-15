@@ -563,8 +563,8 @@ function buildKPIs() {
   DB.forEach(r => {
     const y = getYear(r);
     if (y && YEARS.includes(y)) yearCounts[y] = (yearCounts[y]||0)+1;
-    if (r.Agency.includes('DRDO')) drdo++;
-    if (r.Agency.includes('SFC')) sfc++;
+    if ((r.Agency || '').includes('DRDO')) drdo++;
+    if ((r.Agency || '').includes('SFC')) sfc++;
   });
   const peakYear = Object.entries(yearCounts).sort((a,b)=>b[1]-a[1])[0][0];
   document.getElementById('kpiTotal').textContent = total;
@@ -785,65 +785,61 @@ function scrollToTable() {
 // ──────────────────────────────────────────────
 // Sort DB newest-first on load
 Papa.parse("normalized_missiles.csv", {
-    download: true,
-    header: true,
-    skipEmptyLines: true,
+  download: true,
+  header: true,
+  skipEmptyLines: true,
 
-    complete: function(results) {
+  complete: function(results) {
 
-        DB = results.data.map(r => {
+    DB = results.data.map(r => ({
 
-            const missile =
-                r.variant && r.variant !== "Base"
-                ? `${r.family} ${r.variant}`
-                : r.family;
+      EventID: r.event_id,
 
-            return {
-                EventID: r.event_id,
-                Date: r.date,
+      Date: r.date,
 
-                Missile: missile,
-                Family: r.family,
-                Variant: r.variant,
+      Missile:
+        r.variant && r.variant !== "Base"
+          ? `${r.family} ${r.variant}`
+          : r.family,
 
-                Agency: r.service,
-                Platform: r.platform,
+      Agency: r.service,
 
-                Location: r.location_id,
+      Location: r.location_id,
 
-                Category: r.event_type,
-                Event_Type: r.event_type,
+      Category: r.event_type,
 
-                Result: r.result,
+      Confidence: r.confidence,
 
-                Source_URL: r.source_url,
-                Source_Type: r.source_type,
+      Source_URL: r.source_url,
 
-                Confidence: r.confidence,
+      Source_Type: r.source_type,
 
-                Notes: r.notes
-            };
-        });
+      Notes: r.notes,
 
-        DB.sort((a,b) => b.Date.localeCompare(a.Date));
+      Result: r.result
+    }));
 
-        currentFiltered = [...DB];
+    console.log("Loaded", DB.length, "rows");
 
-        buildKPIs();
-        buildYearChart();
-        buildCatChart();
-        buildAgencyChart();
-        buildHeatmap();
-        buildTopSystems();
-        renderTable(DB);
+    DB.sort((a,b) => b.Date.localeCompare(a.Date));
 
-        document.getElementById('rowCounter').textContent =
-            `${DB.length} events`;
-    },
+    currentFiltered = [...DB];
 
-    error: function(err) {
-        console.error("CSV load failed:", err);
-    }
+    buildKPIs();
+    buildYearChart();
+    buildCatChart();
+    buildAgencyChart();
+    buildHeatmap();
+    buildTopSystems();
+    renderTable(DB);
+
+    document.getElementById('rowCounter').textContent =
+      `${DB.length} events`;
+  },
+
+  error: function(err) {
+    console.error(err);
+  }
 });
 
 document.getElementById('searchBox').addEventListener('input', applyFilters);
