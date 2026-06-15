@@ -427,8 +427,7 @@
 // CSV PARSER
 // ──────────────────────────────────────────────
 function parseCSV(text) {
-  const lines = text.split('
-').filter(l => l.trim());
+  const lines = text.split('\n').filter(l => l.trim());
   if (lines.length < 2) return [];
   const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
   const result = [];
@@ -526,7 +525,48 @@ function mapCSVRow(csvRow) {
     Event_Type: csvRow.event_type || ''
   };
 }
+// ──────────────────────────────────────────────
+// CONFIGURATION CONSTANTS
+// ──────────────────────────────────────────────
+const YEARS = ['2026', '2025', '2024', '2023', '2022', '2021'];
 
+const CAT_CLASS = {
+  'Surface-to-Air': 'cat-SAM',
+  'Anti-Ship/Cruise': 'cat-ASCM',
+  'Ballistic': 'cat-BM',
+  'Anti-Tank': 'cat-ATGM',
+  'Rocket/Artillery': 'cat-RA',
+  'Air-Launched Cruise': 'cat-ALCM',
+  'Ballistic Missile Defence': 'cat-BMD',
+  'Glide Bomb': 'cat-GB',
+  'Air-to-Air': 'cat-AAM',
+  'Hypersonic': 'cat-HYP',
+  'Sub-Launched Ballistic': 'cat-SLBM',
+  'Torpedo': 'cat-TORP',
+  'Uncategorized': 'cat-UNK'
+};
+
+const CAT_SHORT = {
+  'Surface-to-Air': 'SAM',
+  'Anti-Ship/Cruise': 'ASCM',
+  'Ballistic': 'BM',
+  'Anti-Tank': 'ATGM',
+  'Rocket/Artillery': 'Rocket',
+  'Air-Launched Cruise': 'ALCM',
+  'Ballistic Missile Defence': 'BMD',
+  'Glide Bomb': 'Glide',
+  'Air-to-Air': 'AAM',
+  'Hypersonic': 'HYP',
+  'Sub-Launched Ballistic': 'SLBM',
+  'Torpedo': 'TORP',
+  'Uncategorized': 'UNK'
+};
+
+const CATS_ORDER = [
+  'Surface-to-Air', 'Anti-Ship/Cruise', 'Ballistic', 'Sub-Launched Ballistic', 
+  'Anti-Tank', 'Air-to-Air', 'Air-Launched Cruise', 'Ballistic Missile Defence', 
+  'Rocket/Artillery', 'Glide Bomb', 'Hypersonic', 'Torpedo'
+];
 let DB = [];
 let currentFiltered = [];
 
