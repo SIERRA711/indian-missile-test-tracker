@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Indian Missile Test Tracker | @singhshwetabh71</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 <style>
   :root {
     --red: #cc0000;
@@ -303,6 +302,7 @@
     .page { padding: 1rem; }
   }
 </style>
+<base target="_blank">
 </head>
 <body>
 
@@ -423,33 +423,142 @@
 // ──────────────────────────────────────────────
 // DATA
 // ──────────────────────────────────────────────
+// ──────────────────────────────────────────────
+// CSV PARSER
+// ──────────────────────────────────────────────
+function parseCSV(text) {
+  const lines = text.split('
+').filter(l => l.trim());
+  if (lines.length < 2) return [];
+  const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
+  const result = [];
+  for (let i = 1; i < lines.length; i++) {
+    const row = {};
+    let current = '';
+    let inQuotes = false;
+    let colIndex = 0;
+    const chars = lines[i].split('');
+    for (let j = 0; j < chars.length; j++) {
+      const char = chars[j];
+      const nextChar = chars[j + 1];
+      if (!inQuotes && char === '"') {
+        inQuotes = true;
+      } else if (inQuotes && char === '"' && nextChar === '"') {
+        current += '"';
+        j++;
+      } else if (inQuotes && char === '"') {
+        inQuotes = false;
+      } else if (!inQuotes && char === ',') {
+        row[headers[colIndex]] = current.trim();
+        current = '';
+        colIndex++;
+      } else {
+        current += char;
+      }
+    }
+    if (colIndex < headers.length) {
+      row[headers[colIndex]] = current.trim();
+    }
+    result.push(row);
+  }
+  return result;
+}
+
+function mapCSVRow(csvRow) {
+  const date = csvRow.date || '';
+  let monthYear = 'Unknown';
+  if (date.length >= 7) {
+    try {
+      const d = new Date(date.slice(0, 10));
+      monthYear = d.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    } catch(e) { monthYear = date.slice(0, 4); }
+  } else if (date.length === 4) {
+    monthYear = date;
+  }
+
+  const family = csvRow.family || '';
+  const variant = csvRow.variant || '';
+  const missile = (variant && variant !== 'Base') ? family + ' ' + variant : family;
+
+  const locMap = {
+    'LOC-UNK': '', 'LOC-001': 'ITR Chandipur, Odisha',
+    'LOC-002': 'Dr APJ Abdul Kalam Island, Odisha', 'LOC-003': 'Pokhran, Rajasthan',
+    'LOC-004': 'Andaman and Nicobar Islands', 'LOC-005': 'Arabian Sea',
+    'LOC-006': 'Bay of Bengal', 'LOC-007': 'NOAR, Kurnool, Andhra Pradesh',
+    'LOC-008': 'KK Ranges, Ahmednagar, Maharashtra',
+    'LOC-009': 'Gopalpur Seaward Firing Range, Odisha',
+    'LOC-010': 'KNF Firing Ranges, Dras, Ladakh', 'LOC-011': 'MHOW, Madhya Pradesh'
+  };
+  const location = locMap[csvRow.location_id] || csvRow.location_id || '';
+
+  const catMap = {
+    'akash': 'Surface-to-Air', 'qrsam': 'Surface-to-Air', 'vshorad': 'Surface-to-Air',
+    'vshorads': 'Surface-to-Air', 'vl-srsam': 'Surface-to-Air', 'vlsrsam': 'Surface-to-Air',
+    'sfdr': 'Surface-to-Air', 'mrsam': 'Surface-to-Air', 'iadws': 'Surface-to-Air',
+    'samar': 'Surface-to-Air', 'brahmos': 'Anti-Ship/Cruise', 'nasm': 'Anti-Ship/Cruise',
+    'nasm-sr': 'Anti-Ship/Cruise', 'nasm-mr': 'Anti-Ship/Cruise', 'lr-ashm': 'Anti-Ship/Cruise',
+    'lr-lacm': 'Air-Launched Cruise', 'rudram': 'Air-Launched Cruise', 'rudram-ii': 'Air-Launched Cruise',
+    'itcm': 'Air-Launched Cruise', 'slcm': 'Air-Launched Cruise', 'ulpgm': 'Air-Launched Cruise',
+    'agni': 'Ballistic', 'agni-p': 'Ballistic', 'agni-prime': 'Ballistic',
+    'prithvi': 'Ballistic', 'pralay': 'Ballistic', 'k4': 'Sub-Launched Ballistic',
+    'k 15': 'Sub-Launched Ballistic', 'k-15': 'Sub-Launched Ballistic', 'mpatgm': 'Anti-Tank',
+    'nag': 'Anti-Tank', 'samho': 'Anti-Tank', 'amogha': 'Anti-Tank', 'helina': 'Anti-Tank',
+    'dhruvastra': 'Anti-Tank', 'ngccm': 'Anti-Tank', 'milan': 'Anti-Tank', 'atgm': 'Anti-Tank',
+    'pinaka': 'Rocket/Artillery', 'erasr': 'Rocket/Artillery', '122mm': 'Rocket/Artillery',
+    'ad1': 'Ballistic Missile Defence', 'ad2': 'Ballistic Missile Defence',
+    'ad-1': 'Ballistic Missile Defence', 'smart': 'Torpedo', 'hstdv': 'Hypersonic',
+    'hypersonic': 'Hypersonic', 'et': 'Hypersonic', 'et ldhcm': 'Hypersonic',
+    'astra': 'Air-to-Air', 'saaw': 'Glide Bomb', 'sant': 'Glide Bomb',
+    'long range bomb': 'Glide Bomb', 'gaurav': 'Glide Bomb',
+    'sea-based': 'Ballistic Missile Defence'
+  };
+  let category = 'Uncategorized';
+  for (const [key, val] of Object.entries(catMap)) {
+    if (family.toLowerCase().includes(key)) { category = val; break; }
+  }
+
+  return {
+    Missile: missile, Date: date, Month_Year: monthYear,
+    Location: location, Agency: csvRow.service || '',
+    Notes: csvRow.notes || '', Category: category,
+    Source_URL: csvRow.source_url || '', Source_Type: csvRow.source_type || '',
+    Confidence: csvRow.confidence || '', Result: csvRow.result || '',
+    Event_Type: csvRow.event_type || ''
+  };
+}
+
 let DB = [];
 let currentFiltered = [];
-// ──────────────────────────────────────────────
-// HELPERS
-// ──────────────────────────────────────────────
-const CAT_CLASS = {
-  'Surface-to-Air':'cat-SAM','Anti-Ship/Cruise':'cat-ASCM','Ballistic':'cat-BM',
-  'Anti-Tank':'cat-ATGM','Rocket/Artillery':'cat-RA','Air-Launched Cruise':'cat-ALCM',
-  'Ballistic Missile Defence':'cat-BMD','Glide Bomb':'cat-GB','Air-to-Air':'cat-AAM',
-  'Hypersonic':'cat-HYP','Sub-Launched Ballistic':'cat-SLBM','Torpedo':'cat-TORP',
-  'Uncategorized':'cat-UNK'
-};
-const CAT_SHORT = {
-  'Surface-to-Air':'SAM','Anti-Ship/Cruise':'AShM / Cruise','Ballistic':'Ballistic',
-  'Anti-Tank':'ATGM','Rocket/Artillery':'Rocket/Arty','Air-Launched Cruise':'ALCM',
-  'Ballistic Missile Defence':'BMD','Glide Bomb':'Glide Bomb','Air-to-Air':'AAM',
-  'Hypersonic':'Hypersonic','Sub-Launched Ballistic':'SLBM','Torpedo':'Torpedo',
-  'Uncategorized':'Other'
-};
-const YEARS = ['2021','2022','2023','2024','2025','2026'];
-const CATS_ORDER = [
-  'Surface-to-Air','Anti-Ship/Cruise','Ballistic','Anti-Tank',
-  'Rocket/Artillery','Air-Launched Cruise','Ballistic Missile Defence',
-  'Glide Bomb','Air-to-Air','Hypersonic','Sub-Launched Ballistic','Torpedo'
-];
 
-function getYear(row) {
+// ──────────────────────────────────────────────
+// LOAD DATA
+// ──────────────────────────────────────────────
+fetch('./normalized_missiles.csv')
+  .then(res => { if (!res.ok) throw new Error('HTTP ' + res.status); return res.text(); })
+  .then(text => {
+    const csvRows = parseCSV(text);
+    DB = csvRows.map(mapCSVRow);
+    DB.sort((a, b) => { const da = a.Date || '0000', db = b.Date || '0000'; return da < db ? 1 : da > db ? -1 : 0; });
+    currentFiltered = [...DB];
+    initDashboard();
+  })
+  .catch(err => {
+    console.error('Failed to load CSV:', err);
+    document.getElementById('rowCounter').textContent = 'Error loading data';
+    document.getElementById('tableBody').innerHTML = '<tr><td colspan="8" style="text-align:center;padding:2rem;color:#cc0000">Failed to load normalized_missiles.csv. Ensure it is in the same directory as index.html.</td></tr>';
+  });
+
+function initDashboard() {
+  buildKPIs();
+  buildYearChart();
+  buildCatChart();
+  buildAgencyChart();
+  buildHeatmap();
+  buildTopSystems();
+  renderTable(DB);
+  document.getElementById('rowCounter').textContent = DB.length + ' events';
+  document.getElementById('th-Date').classList.add('sort-desc');
+}function getYear(row) {
   if (row.Date && row.Date.length >= 4) return row.Date.slice(0,4);
   const m = row.Month_Year && row.Month_Year.match(/\d{4}/);
   return m ? m[0] : null;
@@ -563,8 +672,8 @@ function buildKPIs() {
   DB.forEach(r => {
     const y = getYear(r);
     if (y && YEARS.includes(y)) yearCounts[y] = (yearCounts[y]||0)+1;
-    if ((r.Agency || '').includes('DRDO')) drdo++;
-    if ((r.Agency || '').includes('SFC')) sfc++;
+    if (r.Agency.includes('DRDO')) drdo++;
+    if (r.Agency.includes('SFC')) sfc++;
   });
   const peakYear = Object.entries(yearCounts).sort((a,b)=>b[1]-a[1])[0][0];
   document.getElementById('kpiTotal').textContent = total;
@@ -780,74 +889,11 @@ function scrollToTable() {
   document.getElementById('tableSection').scrollIntoView({behavior:'smooth'});
 }
 
-// ──────────────────────────────────────────────
-// INIT
-// ──────────────────────────────────────────────
-// Sort DB newest-first on load
-Papa.parse("normalized_missiles.csv", {
-  download: true,
-  header: true,
-  skipEmptyLines: true,
-
-  complete: function(results) {
-
-    DB = results.data.map(r => ({
-
-      EventID: r.event_id,
-
-      Date: r.date,
-
-      Missile:
-        r.variant && r.variant !== "Base"
-          ? `${r.family} ${r.variant}`
-          : r.family,
-
-      Agency: r.service,
-
-      Location: r.location_id,
-
-      Category: r.event_type,
-
-      Confidence: r.confidence,
-
-      Source_URL: r.source_url,
-
-      Source_Type: r.source_type,
-
-      Notes: r.notes,
-
-      Result: r.result
-    }));
-
-    console.log("Loaded", DB.length, "rows");
-
-    DB.sort((a,b) => b.Date.localeCompare(a.Date));
-
-    currentFiltered = [...DB];
-
-    buildKPIs();
-    buildYearChart();
-    buildCatChart();
-    buildAgencyChart();
-    buildHeatmap();
-    buildTopSystems();
-    renderTable(DB);
-
-    document.getElementById('rowCounter').textContent =
-      `${DB.length} events`;
-  },
-
-  error: function(err) {
-    console.error(err);
-  }
-});
-
+// Event listeners
 document.getElementById('searchBox').addEventListener('input', applyFilters);
 document.getElementById('catFilter').addEventListener('change', applyFilters);
 document.getElementById('agencyFilter').addEventListener('change', applyFilters);
 document.getElementById('yearFilter').addEventListener('change', applyFilters);
-
-document.getElementById('th-Date').classList.add('sort-desc');
 </script>
 </body>
 </html>
