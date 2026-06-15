@@ -319,7 +319,6 @@
 
 <div class="page">
 
-  <!-- KPI STRIP -->
   <div class="kpi-strip" id="kpiStrip">
     <div class="kpi"><div class="kpi-value" id="kpiTotal">—</div><div class="kpi-label">Total Events</div></div>
     <div class="kpi"><div class="kpi-value" id="kpiSystems">—</div><div class="kpi-label">Unique Systems</div></div>
@@ -329,7 +328,6 @@
     <div class="kpi"><div class="kpi-value" id="kpiStrategic">—</div><div class="kpi-label">Strategic (SFC)</div></div>
   </div>
 
-  <!-- ANALYTICS ROW 1 -->
   <div class="analytics-grid">
     <div class="panel">
       <div class="panel-title">Tests per Year</div>
@@ -345,7 +343,6 @@
     </div>
   </div>
 
-  <!-- ANALYTICS ROW 2 -->
   <div class="analytics-grid-bottom">
     <div class="panel">
       <div class="panel-title">Category × Year Heatmap (test count)</div>
@@ -357,7 +354,23 @@
     </div>
   </div>
 
-  <!-- CONTROLS + TABLE -->
+  <div class="panel" style="margin-bottom: 1.75rem;">
+    <div class="panel-title" style="display: flex; justify-content: space-between; align-items: center; border-bottom: none; padding-bottom: 0;">
+      <span>Tests by Month</span>
+      <select id="monthChartYearSelect" style="font-size: 11px; padding: 2px 6px; border: 1px solid var(--rule); outline: none; cursor: pointer; background: var(--bg2);">
+        <option value="2026">2026</option>
+        <option value="2025">2025</option>
+        <option value="2024">2024</option>
+        <option value="2023">2023</option>
+        <option value="2022">2022</option>
+        <option value="2021">2021</option>
+      </select>
+    </div>
+    <div class="chart-wrap" style="height: 200px; margin-top: 10px;">
+      <canvas id="chartMonth"></canvas>
+    </div>
+  </div>
+
   <div id="tableSection">
     <div class="controls">
       <input type="text" id="searchBox" placeholder="Search missile, agency, location, notes…">
@@ -595,10 +608,13 @@ function initDashboard() {
   buildAgencyChart();
   buildHeatmap();
   buildTopSystems();
+  buildMonthChart(YEARS[0]); // Render the month chart for the latest year automatically
   renderTable(DB);
   document.getElementById('rowCounter').textContent = DB.length + ' events';
   document.getElementById('th-Date').classList.add('sort-desc');
-}function getYear(row) {
+}
+
+function getYear(row) {
   if (row.Date && row.Date.length >= 4) return row.Date.slice(0,4);
   const m = row.Month_Year && row.Month_Year.match(/\d{4}/);
   return m ? m[0] : null;
@@ -902,6 +918,62 @@ function buildTopSystems() {
   container.appendChild(tbl);
 }
 
+// ── MONTH CHART ──
+let monthChartInstance = null;
+function buildMonthChart(selectedYear) {
+  const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  const shortMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  
+  // Initialize an array of 12 zeros
+  const counts = Array(12).fill(0);
+
+  // Count the tests for the selected year by month
+  DB.forEach(r => {
+    const y = getYear(r);
+    if (y === selectedYear && r.Month_Year) {
+      const mIndex = monthNames.findIndex(m => r.Month_Year.includes(m));
+      if (mIndex !== -1) {
+        counts[mIndex]++;
+      }
+    }
+  });
+
+  const ctx = document.getElementById('chartMonth');
+
+  // If the chart already exists, destroy it before rendering the new one
+  if (monthChartInstance) {
+    monthChartInstance.destroy();
+  }
+
+  monthChartInstance = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: shortMonths,
+      datasets: [{
+        data: counts,
+        backgroundColor: '#1565c0', // Differentiates from the red year chart
+        borderRadius: 2,
+        borderWidth: 0
+      }]
+    },
+    options: {
+      responsive: true, 
+      maintainAspectRatio: false,
+      plugins: { 
+        legend: { display: false }, 
+        tooltip: { callbacks: { label: ctx => ` ${ctx.raw} tests` } }
+      },
+      scales: {
+        x: { grid: { display: false } },
+        y: { 
+          grid: { color: '#f0f0f0' }, 
+          ticks: { stepSize: 1, precision: 0 } 
+        }
+      }
+    }
+  });
+}
+
 // ──────────────────────────────────────────────
 // EXPORT
 // ──────────────────────────────────────────────
@@ -929,6 +1001,9 @@ document.getElementById('searchBox').addEventListener('input', applyFilters);
 document.getElementById('catFilter').addEventListener('change', applyFilters);
 document.getElementById('agencyFilter').addEventListener('change', applyFilters);
 document.getElementById('yearFilter').addEventListener('change', applyFilters);
+document.getElementById('monthChartYearSelect').addEventListener('change', (e) => {
+  buildMonthChart(e.target.value);
+});
 </script>
 </body>
 </html>
