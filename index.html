@@ -951,7 +951,7 @@ function buildMonthChart(selectedYear) {
       labels: shortMonths,
       datasets: [{
         data: counts,
-        backgroundColor: '#1565c0', // Differentiates from the red year chart
+        backgroundColor: RED, // Changed from blue to the RED constant (#cc0000)
         borderRadius: 2,
         borderWidth: 0
       }]
@@ -973,7 +973,6 @@ function buildMonthChart(selectedYear) {
     }
   });
 }
-
 // ──────────────────────────────────────────────
 // EXPORT
 // ──────────────────────────────────────────────
