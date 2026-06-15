@@ -642,11 +642,6 @@ function sortTable(col) {
   applyFilters();
 }
 
-// ──────────────────────────────────────────────
-// FILTER + RENDER TABLE
-// ──────────────────────────────────────────────
-let currentFiltered = [];
-
 function applyFilters() {
   const q = document.getElementById('searchBox').value.toLowerCase();
   const cat = document.getElementById('catFilter').value;
