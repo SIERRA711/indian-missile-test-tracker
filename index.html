@@ -289,7 +289,7 @@
     border-radius: 10px;
   }
   .date-cell { font-family: var(--mono); font-size: 12px; white-space: nowrap; }
-  .notes-cell { color: #333; font-size: 12px; line-height: 1.4; max-width: 340px; }
+  .notes-cell { color: var(--ink); font-size: 12px; line-height: 1.4; max-width: 340px; }
   .src-link { color: var(--red); text-decoration: none; font-weight: 700; font-size: 12px; }
   .src-link:hover { text-decoration: underline; }
   .no-src { color: #bbb; font-size: 11px; }
@@ -318,7 +318,7 @@
   .ag-ISRO { background: #f3e5f5; color: #7b1fa2; }
   .ag-BDL { background: #fafafa; color: #424242; border: 1px solid #ddd; }
   .ag-ANC { background: #e8eaf6; color: #1a237e; }
-  .ag-other { background: #f5f5f5; color: #555; }
+  .ag-other { background: var(--bg2); color: var(--ink); border: 1px solid var(--rule); }
   /* Confidence badges */
   .conf-High { background: #e8f5e9; color: #2e7d32; }
   .conf-Medium { background: #fff3e0; color: #e65100; }
@@ -380,6 +380,7 @@
     border-radius: 4px;
     font-size: 12px;
     background: var(--bg);
+    color: var(--ink);
     cursor: pointer;
     outline: none;
   }
