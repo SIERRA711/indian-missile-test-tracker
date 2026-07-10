@@ -1,0 +1,2 @@
+event_id,date,family,variant,service,platform,location_id,event_type,result,source_type,source_url,confidence,notes
+MTI-2026-0014,2026-07-08,Pinaka,LRGR 120,Indian Army,Ground Launcher,LOC-001,Development Test,Success,Official,https://www.pib.gov.in/PressReleasePage.aspx?PRID=2282572,High,"Defence Research & Development Organisation (DRDO) conducted a successful flight-test of Pinaka Long Range Guided Rocket (LRGR) at the Integrated Test Range (ITR), Chandipur on July 08, 2026."

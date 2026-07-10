@@ -3,7 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Open-source database tracking Indian missile flight tests from 2021 to present. Interactive dashboard with analytics, charts, and detailed test records.">
 <title>Indian Missile Test Tracker | @singhshwetabh71</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
   :root {
@@ -21,7 +25,7 @@
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
-    font-family: system-ui, -apple-system, sans-serif;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
     background: var(--bg);
     color: var(--ink);
     font-size: 14px;
@@ -32,6 +36,7 @@
   .masthead {
     border-bottom: 3px solid var(--red);
     padding: 1.25rem 2rem;
+    background: var(--bg);
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
@@ -65,7 +70,8 @@
     text-transform: uppercase;
     letter-spacing: 0.05em;
     cursor: pointer;
-    transition: background 0.15s;
+    border-radius: 4px;
+    transition: all 0.2s;
   }
   .btn:hover { background: var(--red-dark); }
   .btn-ghost {
@@ -85,13 +91,17 @@
     gap: 0;
     border: 1px solid var(--rule);
     margin-bottom: 1.75rem;
+    border-radius: 6px;
+    overflow: hidden;
   }
   .kpi {
     padding: 1rem 1.25rem;
     border-right: 1px solid var(--rule);
     background: var(--bg2);
+    transition: background 0.2s;
   }
   .kpi:last-child { border-right: none; }
+  .kpi:hover { background: #fff; }
   .kpi-value {
     font-size: 1.9rem;
     font-weight: 800;
@@ -106,6 +116,19 @@
     letter-spacing: 0.06em;
     color: var(--mid);
     margin-top: 4px;
+  }
+
+  /* ── SECTION TITLE ── */
+  .section-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--mid);
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--red);
+    display: inline-block;
   }
 
   /* ── ANALYTICS GRID ── */
@@ -125,7 +148,11 @@
     border: 1px solid var(--rule);
     background: var(--bg);
     padding: 1rem 1.25rem;
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    transition: box-shadow 0.2s;
   }
+  .panel:hover { box-shadow: 0 3px 12px rgba(0,0,0,0.1); }
   .panel-title {
     font-size: 10px;
     font-weight: 700;
@@ -152,7 +179,6 @@
   .heatmap-wrap { overflow-x: auto; }
   .heatmap-grid {
     display: grid;
-    grid-template-columns: 60px repeat(6, 1fr);
     gap: 2px;
     font-size: 10px;
     min-width: 420px;
@@ -188,8 +214,10 @@
     flex: 1;
     min-width: 140px;
     outline: none;
+    border-radius: 4px;
+    transition: border-color 0.2s, box-shadow 0.2s;
   }
-  .controls input:focus, .controls select:focus { border-color: var(--red); }
+  .controls input:focus, .controls select:focus { border-color: var(--red); box-shadow: 0 0 0 3px rgba(204,0,0,0.1); }
   .counter {
     margin-left: auto;
     font-size: 11px;
@@ -201,7 +229,7 @@
   }
 
   /* ── TABLE ── */
-  .table-wrap { overflow-x: auto; border: 1px solid var(--rule); }
+  .table-wrap { overflow-x: auto; border: 1px solid var(--rule); border-radius: 6px 6px 0 0; overflow: hidden; }
   table { width: 100%; border-collapse: collapse; }
   thead th {
     background: var(--bg2);
@@ -238,7 +266,7 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.04em;
-    border-radius: 2px;
+    border-radius: 10px;
     margin-top: 3px;
   }
   .agency-badges { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 4px; }
@@ -246,7 +274,7 @@
     padding: 2px 6px;
     font-size: 10px;
     font-weight: 700;
-    border-radius: 2px;
+    border-radius: 10px;
   }
   .date-cell { font-family: var(--mono); font-size: 12px; white-space: nowrap; }
   .notes-cell { color: #333; font-size: 12px; line-height: 1.4; max-width: 340px; }
@@ -284,6 +312,66 @@
   .conf-Medium { background: #fff3e0; color: #e65100; }
   .conf-Low { background: #ffebee; color: #c62828; }
 
+  /* ── PAGINATION ── */
+  .pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--rule);
+    border-top: none;
+    border-radius: 0 0 6px 6px;
+    background: var(--bg2);
+    font-size: 12px;
+    gap: 1rem;
+  }
+  .pagination-info {
+    color: var(--mid);
+    font-size: 12px;
+  }
+  .pagination-controls {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .page-btn {
+    min-width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--rule);
+    background: var(--bg);
+    color: var(--ink);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.15s;
+  }
+  .page-btn:hover:not(:disabled):not(.page-btn-active) {
+    border-color: var(--red);
+    color: var(--red);
+  }
+  .page-btn-active {
+    background: var(--red);
+    color: #fff;
+    border-color: var(--red);
+  }
+  .page-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+  .page-size-select {
+    padding: 4px 8px;
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    font-size: 12px;
+    background: var(--bg);
+    cursor: pointer;
+    outline: none;
+  }
+  .page-size-select:focus { border-color: var(--red); }
 
   footer {
     text-align: center;
@@ -309,7 +397,7 @@
 <header class="masthead">
   <div class="masthead-left">
     <h1>Indian Missile Test Tracker</h1>
-    <p>Open-source flight trial database · 2021–2026 · curated by <strong>@singhshwetabh71</strong></p>
+    <p>Open-source flight trial database · curated by <strong>@singhshwetabh71</strong></p>
   </div>
   <div class="masthead-right">
     <button class="btn btn-ghost" onclick="exportCSV()">↓ Export CSV</button>
@@ -322,7 +410,7 @@
   <div class="kpi-strip" id="kpiStrip">
     <div class="kpi"><div class="kpi-value" id="kpiTotal">—</div><div class="kpi-label">Total Events</div></div>
     <div class="kpi"><div class="kpi-value" id="kpiSystems">—</div><div class="kpi-label">Unique Systems</div></div>
-    <div class="kpi"><div class="kpi-value" id="kpiYears">6</div><div class="kpi-label">Years Covered</div></div>
+    <div class="kpi"><div class="kpi-value" id="kpiYears">—</div><div class="kpi-label">Years Covered</div></div>
     <div class="kpi"><div class="kpi-value" id="kpiTopYear">—</div><div class="kpi-label">Peak Year</div></div>
     <div class="kpi"><div class="kpi-value" id="kpiDRDO">—</div><div class="kpi-label">DRDO-Led Tests</div></div>
     <div class="kpi"><div class="kpi-value" id="kpiStrategic">—</div><div class="kpi-label">Strategic (SFC)</div></div>
@@ -354,16 +442,21 @@
     </div>
   </div>
 
+  <div class="analytics-grid-bottom">
+    <div class="panel">
+      <div class="panel-title">Tests by Location</div>
+      <div class="chart-wrap" style="height:220px"><canvas id="chartLocation"></canvas></div>
+    </div>
+    <div class="panel">
+      <div class="panel-title">Launch Platform Breakdown</div>
+      <div class="chart-wrap" style="height:220px"><canvas id="chartPlatform"></canvas></div>
+    </div>
+  </div>
+
   <div class="panel" style="margin-bottom: 1.75rem;">
     <div class="panel-title" style="display: flex; justify-content: space-between; align-items: center; border-bottom: none; padding-bottom: 0;">
       <span>Tests by Month</span>
-      <select id="monthChartYearSelect" style="font-size: 11px; padding: 2px 6px; border: 1px solid var(--rule); outline: none; cursor: pointer; background: var(--bg2);">
-        <option value="2026">2026</option>
-        <option value="2025">2025</option>
-        <option value="2024">2024</option>
-        <option value="2023">2023</option>
-        <option value="2022">2022</option>
-        <option value="2021">2021</option>
+      <select id="monthChartYearSelect" style="font-size: 11px; padding: 2px 6px; border: 1px solid var(--rule); outline: none; cursor: pointer; background: var(--bg2); border-radius: 4px;">
       </select>
     </div>
     <div class="chart-wrap" style="height: 200px; margin-top: 10px;">
@@ -375,33 +468,10 @@
     <div class="controls">
       <input type="text" id="searchBox" placeholder="Search missile, agency, location, notes…">
       <select id="catFilter">
-        <option value="">All Categories</option>
-        <option>Surface-to-Air</option>
-        <option>Anti-Ship/Cruise</option>
-        <option>Ballistic</option>
-        <option>Anti-Tank</option>
-        <option>Rocket/Artillery</option>
-        <option>Air-Launched Cruise</option>
-        <option>Ballistic Missile Defence</option>
-        <option>Glide Bomb</option>
-        <option>Air-to-Air</option>
-        <option>Hypersonic</option>
-        <option>Sub-Launched Ballistic</option>
-        <option>Torpedo</option>
       </select>
       <select id="agencyFilter">
-        <option value="">All Agencies</option>
-        <option>DRDO</option>
-        <option>IAF</option>
-        <option>Indian Navy</option>
-        <option>Indian Army</option>
-        <option>SFC</option>
-        <option>ISRO</option>
       </select>
       <select id="yearFilter">
-        <option value="">All Years</option>
-        <option>2026</option><option>2025</option><option>2024</option>
-        <option>2023</option><option>2022</option><option>2021</option>
       </select>
       <span class="counter" id="rowCounter">— events</span>
     </div>
@@ -423,13 +493,28 @@
         <tbody id="tableBody"></tbody>
       </table>
     </div>
+    <div class="pagination" id="pagination">
+      <div class="pagination-info" id="paginationInfo">Showing 1–25 of 0</div>
+      <div style="display:flex;align-items:center;gap:0.75rem;">
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span style="color:var(--mid);font-size:11px;">Rows:</span>
+          <select class="page-size-select" id="pageSizeSelect">
+            <option value="25" selected>25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+            <option value="all">All</option>
+          </select>
+        </div>
+        <div class="pagination-controls" id="paginationControls"></div>
+      </div>
+    </div>
   </div>
 
 </div>
 
 <footer>
   Data compiled from PIB, MoD Year End Reviews, official DRDO/IAF/Navy releases, and open-source reporting.
-  All entries individually sourced. Last updated June 2026. · <strong>@singhshwetabh71</strong>
+  All entries individually sourced. · <strong>@singhshwetabh71</strong>
 </footer>
 
 <script>
@@ -535,13 +620,14 @@ function mapCSVRow(csvRow) {
     Notes: csvRow.notes || '', Category: category,
     Source_URL: csvRow.source_url || '', Source_Type: csvRow.source_type || '',
     Confidence: csvRow.confidence || '', Result: csvRow.result || '',
-    Event_Type: csvRow.event_type || ''
+    Event_Type: csvRow.event_type || '',
+    Platform: csvRow.platform || 'Unknown'
   };
 }
 // ──────────────────────────────────────────────
 // CONFIGURATION CONSTANTS
 // ──────────────────────────────────────────────
-const YEARS = ['2026', '2025', '2024', '2023', '2022', '2021'];
+let YEARS = [];
 
 const CAT_CLASS = {
   'Surface-to-Air': 'cat-SAM',
@@ -582,6 +668,8 @@ const CATS_ORDER = [
 ];
 let DB = [];
 let currentFiltered = [];
+let currentPage = 1;
+let pageSize = 25;
 
 // ──────────────────────────────────────────────
 // LOAD DATA
@@ -592,6 +680,12 @@ fetch('./normalized_missiles.csv')
     const csvRows = parseCSV(text);
     DB = csvRows.map(mapCSVRow);
     DB.sort((a, b) => { const da = a.Date || '0000', db = b.Date || '0000'; return da < db ? 1 : da > db ? -1 : 0; });
+
+    // Compute YEARS dynamically from data
+    const yearSet = new Set();
+    DB.forEach(r => { const y = getYear(r); if (y) yearSet.add(y); });
+    YEARS = Array.from(yearSet).sort((a,b) => b.localeCompare(a));
+
     currentFiltered = [...DB];
     initDashboard();
   })
@@ -602,16 +696,65 @@ fetch('./normalized_missiles.csv')
   });
 
 function initDashboard() {
+  populateYearDropdowns();
+  populateCategoryDropdown();
+  populateAgencyDropdown();
   buildKPIs();
   buildYearChart();
   buildCatChart();
   buildAgencyChart();
   buildHeatmap();
   buildTopSystems();
+  buildLocationChart();
+  buildPlatformChart();
   buildMonthChart(YEARS[0]); // Render the month chart for the latest year automatically
   renderTable(DB);
   document.getElementById('rowCounter').textContent = DB.length + ' events';
   document.getElementById('th-Date').classList.add('sort-desc');
+
+  // Auto-compute footer date
+  const latestDate = DB.reduce((max, r) => r.Date > max ? r.Date : max, '0000');
+  const footerDateStr = latestDate.length >= 7 ? new Date(latestDate).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : 'Unknown';
+  document.querySelector('footer').innerHTML = `Data compiled from PIB, MoD Year End Reviews, official DRDO/IAF/Navy releases, and open-source reporting. All entries individually sourced. Last updated ${footerDateStr}. · <strong>@singhshwetabh71</strong>`;
+}
+
+// ──────────────────────────────────────────────
+// DYNAMIC DROPDOWN POPULATION
+// ──────────────────────────────────────────────
+function populateYearDropdowns() {
+  // Year filter
+  const yearFilter = document.getElementById('yearFilter');
+  yearFilter.innerHTML = '<option value="">All Years</option>';
+  YEARS.forEach(y => {
+    yearFilter.innerHTML += `<option>${y}</option>`;
+  });
+
+  // Month chart year selector
+  const monthSelect = document.getElementById('monthChartYearSelect');
+  monthSelect.innerHTML = '';
+  YEARS.forEach(y => {
+    monthSelect.innerHTML += `<option value="${y}">${y}</option>`;
+  });
+}
+
+function populateCategoryDropdown() {
+  const catFilter = document.getElementById('catFilter');
+  catFilter.innerHTML = '<option value="">All Categories</option>';
+  const cats = new Set();
+  DB.forEach(r => { if (r.Category && r.Category !== 'Uncategorized') cats.add(r.Category); });
+  CATS_ORDER.filter(c => cats.has(c)).forEach(c => {
+    catFilter.innerHTML += `<option>${c}</option>`;
+  });
+}
+
+function populateAgencyDropdown() {
+  const agFilter = document.getElementById('agencyFilter');
+  agFilter.innerHTML = '<option value="">All Agencies</option>';
+  const agencies = new Set();
+  DB.forEach(r => { if (r.Agency) r.Agency.split('/').forEach(a => { a = a.trim(); if (a) agencies.add(a); }); });
+  Array.from(agencies).sort().forEach(a => {
+    agFilter.innerHTML += `<option>${a}</option>`;
+  });
 }
 
 function getYear(row) {
@@ -659,6 +802,7 @@ function sortTable(col) {
 }
 
 function applyFilters() {
+  currentPage = 1;
   const q = document.getElementById('searchBox').value.toLowerCase();
   const cat = document.getElementById('catFilter').value;
   const ag = document.getElementById('agencyFilter').value;
@@ -686,10 +830,25 @@ function applyFilters() {
   renderTable(currentFiltered);
 }
 
+// ──────────────────────────────────────────────
+// TABLE RENDERING WITH PAGINATION
+// ──────────────────────────────────────────────
 function renderTable(rows) {
   const tbody = document.getElementById('tableBody');
   tbody.innerHTML = '';
-  rows.forEach(r => {
+
+  // Pagination logic
+  const totalRows = rows.length;
+  const isAll = pageSize === 'all';
+  const effectivePageSize = isAll ? totalRows : pageSize;
+  const totalPages = isAll ? 1 : Math.ceil(totalRows / effectivePageSize);
+  if (currentPage > totalPages) currentPage = totalPages || 1;
+
+  const startIdx = (currentPage - 1) * effectivePageSize;
+  const endIdx = Math.min(startIdx + effectivePageSize, totalRows);
+  const pageRows = rows.slice(startIdx, endIdx);
+
+  pageRows.forEach(r => {
     const catCls = CAT_CLASS[r.Category] || 'cat-UNK';
     const catLabel = CAT_SHORT[r.Category] || r.Category;
     const confCls = r.Confidence ? 'conf-' + r.Confidence : 'conf-Medium';
@@ -710,6 +869,64 @@ function renderTable(rows) {
     `;
     tbody.appendChild(tr);
   });
+
+  renderPagination(totalRows, totalPages, startIdx, endIdx);
+}
+
+function renderPagination(total, totalPages, startIdx, endIdx) {
+  const info = document.getElementById('paginationInfo');
+  info.textContent = `Showing ${total === 0 ? 0 : startIdx + 1}\u2013${endIdx} of ${total}`;
+
+  const controls = document.getElementById('paginationControls');
+  controls.innerHTML = '';
+
+  if (totalPages <= 1) return;
+
+  // Prev button
+  const prev = document.createElement('button');
+  prev.className = 'page-btn';
+  prev.innerHTML = '&lsaquo;';
+  prev.disabled = currentPage === 1;
+  prev.onclick = () => { currentPage--; renderTable(currentFiltered); };
+  controls.appendChild(prev);
+
+  // Page numbers with ellipsis
+  const pages = getPageNumbers(currentPage, totalPages);
+  pages.forEach(p => {
+    if (p === '...') {
+      const dots = document.createElement('span');
+      dots.textContent = '...';
+      dots.style.cssText = 'padding:0 4px;color:var(--mid);font-size:12px;';
+      controls.appendChild(dots);
+    } else {
+      const btn = document.createElement('button');
+      btn.className = 'page-btn' + (p === currentPage ? ' page-btn-active' : '');
+      btn.textContent = p;
+      btn.onclick = () => { currentPage = p; renderTable(currentFiltered); };
+      controls.appendChild(btn);
+    }
+  });
+
+  // Next button
+  const next = document.createElement('button');
+  next.className = 'page-btn';
+  next.innerHTML = '&rsaquo;';
+  next.disabled = currentPage === totalPages;
+  next.onclick = () => { currentPage++; renderTable(currentFiltered); };
+  controls.appendChild(next);
+}
+
+function getPageNumbers(current, total) {
+  if (total <= 7) return Array.from({length: total}, (_, i) => i + 1);
+  const pages = [];
+  pages.push(1);
+  if (current > 3) pages.push('...');
+  for (let i = Math.max(2, current - 1); i <= Math.min(total - 1, current + 1); i++) {
+    pages.push(i);
+  }
+  if (current < total - 2) pages.push('...');
+  pages.push(total);
+  return pages;
 }
 
 // ──────────────────────────────────────────────
@@ -718,6 +935,7 @@ function renderTable(rows) {
 function buildKPIs() {
   const total = DB.length;
   const unique = new Set(DB.map(r => r.Missile)).size;
+  const yearsCount = YEARS.length;
   const yearCounts = {};
   let drdo = 0, sfc = 0;
   DB.forEach(r => {
@@ -729,6 +947,7 @@ function buildKPIs() {
   const peakYear = Object.entries(yearCounts).sort((a,b)=>b[1]-a[1])[0][0];
   document.getElementById('kpiTotal').textContent = total;
   document.getElementById('kpiSystems').textContent = unique;
+  document.getElementById('kpiYears').textContent = yearsCount;
   document.getElementById('kpiTopYear').textContent = peakYear;
   document.getElementById('kpiDRDO').textContent = drdo;
   document.getElementById('kpiStrategic').textContent = sfc;
@@ -743,7 +962,7 @@ const PALETTE = [
   '#4a148c','#880e4f','#f57f17','#3e2723','#1a237e','#004d40'
 ];
 
-Chart.defaults.font.family = 'system-ui, -apple-system, sans-serif';
+Chart.defaults.font.family = "'Inter', system-ui, -apple-system, sans-serif";
 Chart.defaults.font.size = 11;
 Chart.defaults.color = '#555';
 
@@ -754,13 +973,15 @@ function buildYearChart() {
     const y = getYear(r);
     if (y && counts[y] !== undefined) counts[y]++;
   });
+  // Find peak year for highlighting
+  const peakYear = Object.entries(counts).sort((a,b) => b[1]-a[1])[0]?.[0];
   new Chart(document.getElementById('chartYear'), {
     type: 'bar',
     data: {
       labels: YEARS,
       datasets: [{
         data: YEARS.map(y => counts[y]),
-        backgroundColor: YEARS.map(y => y === '2022' ? RED : 'rgba(204,0,0,0.25)'),
+        backgroundColor: YEARS.map(y => y === peakYear ? RED : 'rgba(204,0,0,0.25)'),
         borderWidth: 0
       }]
     },
@@ -851,6 +1072,7 @@ function buildHeatmap() {
   const wrap = document.getElementById('heatmapWrap');
   const g = document.createElement('div');
   g.className = 'heatmap-grid';
+  g.style.gridTemplateColumns = `60px repeat(${YEARS.length}, 1fr)`;
 
   // Header row
   const corner = document.createElement('div');
@@ -916,6 +1138,67 @@ function buildTopSystems() {
     tbl.appendChild(tr);
   });
   container.appendChild(tbl);
+}
+
+// ── LOCATION CHART ──
+function buildLocationChart() {
+  const locCount = {};
+  DB.forEach(r => {
+    const loc = r.Location || 'Unknown';
+    if (loc && loc !== 'Unknown' && loc !== '') {
+      // Shorten location names for chart
+      const short = loc.split(',')[0].trim();
+      locCount[short] = (locCount[short]||0)+1;
+    }
+  });
+  const sorted = Object.entries(locCount).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  const locColors = ['#cc0000','#1565c0','#2e7d32','#e65100','#006064','#7b1fa2','#4a148c','#880e4f'];
+  new Chart(document.getElementById('chartLocation'), {
+    type: 'bar',
+    data: {
+      labels: sorted.map(([k])=>k),
+      datasets: [{
+        data: sorted.map(([,v])=>v),
+        backgroundColor: locColors,
+        borderWidth: 0,
+        borderRadius: 2
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ` ${ctx.raw} tests` }}},
+      scales: {
+        x: { grid: { color: '#f0f0f0' }, ticks: { stepSize: 5 } },
+        y: { grid: { display: false }, ticks: { font:{size:10} } }
+      }
+    }
+  });
+}
+
+// ── PLATFORM CHART ──
+function buildPlatformChart() {
+  const platCount = {};
+  DB.forEach(r => {
+    const p = r.Platform || 'Unknown';
+    platCount[p] = (platCount[p]||0)+1;
+  });
+  const sorted = Object.entries(platCount).sort((a,b)=>b[1]-a[1]);
+  new Chart(document.getElementById('chartPlatform'), {
+    type: 'doughnut',
+    data: {
+      labels: sorted.map(([k])=>k),
+      datasets: [{ data: sorted.map(([,v])=>v), backgroundColor: PALETTE.slice(0, sorted.length), borderWidth: 2, borderColor: '#fff' }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      cutout: '55%',
+      plugins: {
+        legend: { position: 'right', labels: { boxWidth: 10, padding: 6, font:{size:10} } },
+        tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.raw}` }}
+      }
+    }
+  });
 }
 
 // ── MONTH CHART ──
@@ -1002,6 +1285,12 @@ document.getElementById('agencyFilter').addEventListener('change', applyFilters)
 document.getElementById('yearFilter').addEventListener('change', applyFilters);
 document.getElementById('monthChartYearSelect').addEventListener('change', (e) => {
   buildMonthChart(e.target.value);
+});
+document.getElementById('pageSizeSelect').addEventListener('change', (e) => {
+  const val = e.target.value;
+  pageSize = val === 'all' ? 'all' : parseInt(val);
+  currentPage = 1;
+  renderTable(currentFiltered);
 });
 </script>
 </body>
