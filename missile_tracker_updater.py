@@ -397,7 +397,14 @@ def is_missile_test(title: str, body: str) -> bool:
 def fetch_rss_prids() -> list[dict]:
     """Fetch MoD RSS feed and return list of {prid, title, date} dicts."""
     log(f"Fetching RSS: {PIB_RSS_MOD}")
-    feed = feedparser.parse(PIB_RSS_MOD)
+    try:
+        r = requests.get(PIB_RSS_MOD, headers=HEADERS, timeout=15)
+        r.raise_for_status()
+        feed = feedparser.parse(r.content)
+    except Exception as e:
+        log(f"[!] Could not fetch RSS: {e}")
+        return []
+
     if not feed.entries:
         log("[!] RSS returned no entries -- PIB may be blocking or down")
         return []
