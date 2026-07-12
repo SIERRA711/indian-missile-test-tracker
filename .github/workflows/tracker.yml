@@ -2,17 +2,17 @@ name: Missile Tracker Updater
 
 on:
   schedule:
-    # Runs at 00:00 UTC every day (once per 24 hours).
-    - cron: '0 0 * * *'
-  workflow_dispatch: # Allows you to manually click "Run workflow" from the GitHub UI
+    # Runs at 06:00 UTC every Monday
+    - cron: '0 6 * * 1'
+  workflow_dispatch: # Allows manual trigger from GitHub UI
 
 jobs:
   run-scraper:
     runs-on: ubuntu-latest
-    
+
     # Required permission for the bot to push files back to your repo
     permissions:
-      contents: write 
+      contents: write
 
     steps:
       - name: Checkout Repository
@@ -24,7 +24,13 @@ jobs:
           python-version: '3.12'
 
       - name: Install Dependencies
-        run: pip install requests feedparser beautifulsoup4
+        run: pip install requests feedparser beautifulsoup4 lxml
+
+      - name: Ensure candidates.csv exists
+        run: |
+          if [ ! -f candidates.csv ]; then
+            echo "event_id,date,family,variant,service,platform,location_id,event_type,result,source_type,source_url,confidence,notes,_title,_prid" > candidates.csv
+          fi
 
       - name: Run Tracker Script
         run: python missile_tracker_updater.py
