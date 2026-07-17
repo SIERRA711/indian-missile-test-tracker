@@ -730,7 +730,7 @@ function initDashboard() {
   const latestDate = DB.reduce((max, r) => r.Date > max ? r.Date : max, '0000');
   const footerDateStr = latestDate.length >= 7 ? new Date(latestDate).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : 'Unknown';
   document.querySelector('footer').innerHTML = `Data compiled from PIB, MoD Year End Reviews, official DRDO/IAF/Navy releases, and open-source reporting. All entries individually sourced. Last updated ${footerDateStr}. · <a href="https://www.x.com/singhshwetabh71" target="_blank" rel="noopener">@singhshwetabh71</a>`;
-
+}
 
 // ──────────────────────────────────────────────
 // DYNAMIC DROPDOWN POPULATION
