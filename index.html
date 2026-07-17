@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="Open-source database tracking Indian missile flight tests from 2021 to present. Interactive dashboard with analytics, charts, and detailed test records.">
-<title>Indian Missile Test Tracker | @singhshwetabh71</title>
+<title>Indian Missile Test Tracker </title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -410,7 +410,7 @@
 <header class="masthead">
   <div class="masthead-left">
     <h1>Indian Missile Test Tracker</h1>
-    <p>Open-source flight trial database · curated by <strong>@singhshwetabh71</strong></p>
+    <p>Open-source flight trial database  curated by <a href="https://www.x.com/singhshwetabh71" target="_blank" rel="noopener">@singhshwetabh71</a></p>
   </div>
   <div class="masthead-right">
     <button class="btn btn-ghost" id="themeToggle" onclick="toggleTheme()" title="Toggle Dark Mode" style="font-size: 14px; padding: 6px 10px;">🌙</button>
@@ -470,7 +470,7 @@
   <div class="panel" style="margin-bottom: 1.75rem;">
     <div class="panel-title" style="display: flex; justify-content: space-between; align-items: center; border-bottom: none; padding-bottom: 0;">
       <span>Tests by Month</span>
-      <select id="monthChartYearSelect" style="font-size: 11px; padding: 2px 6px; border: 1px solid var(--rule); outline: none; cursor: pointer; background: var(--bg2); border-radius: 4px;">
+      <select id="monthChartYearSelect" style="font-size: 11px; padding: 2px 6px; border: 1px solid var(--rule); outline: none; cursor: pointer; background: #222222; color:#ffffff; border-radius: 4px;">
       </select>
     </div>
     <div class="chart-wrap" style="height: 200px; margin-top: 10px;">
@@ -528,7 +528,7 @@
 
 <footer>
   Data compiled from PIB, MoD Year End Reviews, official DRDO/IAF/Navy releases, and open-source reporting.
-  All entries individually sourced. · <strong>@singhshwetabh71</strong>
+  All entries individually sourced. <a href="https://www.x.com/singhshwetabh71" target="_blank" rel="noopener">@singhshwetabh71</a>
 </footer>
 
 <script>
@@ -729,8 +729,8 @@ function initDashboard() {
   // Auto-compute footer date
   const latestDate = DB.reduce((max, r) => r.Date > max ? r.Date : max, '0000');
   const footerDateStr = latestDate.length >= 7 ? new Date(latestDate).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : 'Unknown';
-  document.querySelector('footer').innerHTML = `Data compiled from PIB, MoD Year End Reviews, official DRDO/IAF/Navy releases, and open-source reporting. All entries individually sourced. Last updated ${footerDateStr}. · <strong>@singhshwetabh71</strong>`;
-}
+  document.querySelector('footer').innerHTML = `Data compiled from PIB, MoD Year End Reviews, official DRDO/IAF/Navy releases, and open-source reporting. All entries individually sourced. Last updated ${footerDateStr}. · <a href="https://www.x.com/singhshwetabh71" target="_blank" rel="noopener">@singhshwetabh71</a>`;
+
 
 // ──────────────────────────────────────────────
 // DYNAMIC DROPDOWN POPULATION
