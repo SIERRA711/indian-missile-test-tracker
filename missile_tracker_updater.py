@@ -200,11 +200,12 @@ EVENT_TYPE_RULES = [
 
 # Keywords that signal a missile test (to filter non-test PIB releases)
 MISSILE_KEYWORDS = [
-    "missile", "rocket", "projectile", "interceptor", "munition",
+    "missile", "rocket", "projectile", "interceptor",
     "drdo", "flight test", "flight trial", "test fired", "test-fired",
-    "successfully fired", "launch", "cruise missile", "ballistic",
-    "anti-tank", "anti-ship", "surface-to-air", "air-to-air",
-    "bmd", "atgm", "aam", "sam", "ashm", "alcm",
+    "successfully fired", "successfully test", "cruise missile", "ballistic missile",
+    "anti-tank guided", "anti-ship", "surface-to-air", "air-to-air",
+    "bmd", "atgm", "aam", "ashm", "alcm",
+    "guided missile", "torpedo", "hypersonic",
 ]
 
 # ─────────────────────────────────────────────────────────────
@@ -736,16 +737,9 @@ def run_scan_range(start: int, end: int, workers: int = 10, delay: float = 0.0):
                     with lock:
                         write_candidate(row)
                         counters["hits"] += 1
-                    print(f"\n  +- HIT ({done}/{len(todo)}) ------------------------------------------")
-                    print(f"  |  Title    : {row['_title'][:65]}")
-                    print(f"  |  ID       : {row['event_id']}")
-                    print(f"  |  Date     : {row['date']}")
-                    print(f"  |  Family   : {row['family']}  Variant: {row['variant']}")
-                    print(f"  |  Service  : {row['service']}  Platform: {row['platform']}")
-                    print(f"  |  Location : {row['location_id']}")
-                    print(f"  |  Type     : {row['event_type']}  Result: {row['result']}")
-                    print(f"  |  Notes    : {row['notes'][:65]}...")
-                    print(f"  +------------------------------------------------------\n")
+                    log(f"HIT ({done}/{len(todo)}) {row['date']} | {row['family']} {row['variant']} | {row['service']} | {row['location_id']}")
+                    log(f"  Title : {row['_title'][:80]}")
+                    log(f"  Notes : {row['notes'][:80]}")
 
                 # Checkpoint state every 100 completions
                 if done % 100 == 0:
