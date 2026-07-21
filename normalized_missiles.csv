@@ -1,4 +1,21 @@
 event_id,date,family,variant,service,platform,location_id,event_type,result,source_type,source_url,confidence,notes
+,2020-09-07,HSTDV,Base,DRDO,Ground Launcher,LOC-002,Technology Demonstration,Success,Official,,High,Successful flight test of the Hypersonic Technology Demonstrator Vehicle from Wheeler Island.
+,2020-09-01,MPATGM,Base,DRDO,Ground Launcher,LOC-UNK,Development Test,Success,Official,,High,Guided flight trials of the Man-Portable Anti-Tank Guided Missile were carried out.
+,2020-09-22,ATGM,MBT Arjun Mk IA,DRDO,Arjun MBT,LOC-008,Development Test,Success,Official,,High,"Firing trials of laser-guided ATGM from MBT Arjun Mk-II gun barrel conducted at KK Ranges, Ahmednagar."
+,2020-10-01,SMART,Base,DRDO,Ground Launcher,LOC-002,Technology Demonstration,Success,Official,,High,"Supersonic Missile Assisted Release of Torpedo successfully flight tested from Wheeler Island, Odisha."
+,2020-10-01,RudraM,1,DRDO,Su-30MKI,LOC-002,Development Test,Success,Official,,High,New Generation Anti-Radiation Missile successfully flight tested from a Su-30MKI onto a radiation target at Wheeler Island.
+,2020-10-01,Nag,Base,Indian Army,Ground Launcher,LOC-003,User Trial,Success,Official,,High,Final User Trials of the Nag Anti-Tank Missile successfully completed by the Indian Army at Pokhran range.
+,2020-10-01,SANT,Base,DRDO,Ground Launcher,LOC-001,Development Test,Success,Official,,High,Control and guidance trials of the Stand-off Anti-Tank missile carried out at ITR Chandipur.
+,2020-10-01,MPATGM,Base,Indian Army,Ground Launcher,LOC-003,User Trial,Success,Official,,High,Final User Trials of the Man-Portable Anti-Tank Guided Missile with warhead carried out at Pokhran.
+,2020-10-01,ATGM,MBT Arjun Mk IA,DRDO,Arjun MBT,LOC-008,Development Test,Success,Official,,High,"Second firing trials of ATGM from MBT Arjun Mk-II gun barrel conducted at KK Ranges, Ahmednagar."
+,2020-10-18,BrahMos,Base,Indian Navy,Ship,LOC-005,Development Test,Success,Official,,High,BrahMos missile in anti-ship mode hit a target in the Arabian Sea.
+,2020-10-30,BrahMos,ALCM,IAF,Su-30MKI,LOC-UNK,User Trial,Success,Official,,High,Successful firing of BrahMos air-launched cruise missile against a sea target from a Su-30MKI aircraft.
+,2020-11-13,QRSAM,Base,DRDO,Ground Launcher,LOC-UNK,Development Test,Success,Official,,High,First developmental trial of the Quick Reaction Surface-to-Air Missile weapon system successfully completed.
+,2020-11-17,QRSAM,Base,DRDO,Ground Launcher,LOC-UNK,Development Test,Success,Official,,High,Second developmental trial of the Quick Reaction Surface-to-Air Missile weapon system successfully completed.
+,2020-11-01,ALWT,Base,DRDO,Ship,LOC-UNK,Development Test,Success,Official,,High,Dynamic trials of the Advanced Lightweight Torpedo successfully conducted.
+,2020-12-01,Astra,Mk1,DRDO,Su-30MKI,LOC-001,Development Test,Success,Official,,High,Astra beyond visual range air-to-air missile successfully flight tested from a Su-30MKI platform at ITR Chandipur.
+,2020-12-01,BrahMos,Base,Indian Navy,Ship,LOC-UNK,User Trial,Success,Official,,High,Test firing of BrahMos missile in anti-ship mode successfully carried out by the Indian Navy.
+,2020-12-01,Pinaka,Mk1 Enhanced,Indian Army,Ground Launcher,LOC-UNK,User Trial,Success,Official,,High,User Evaluation Trials of the Guided Pinaka rocket system successfully concluded.
 MTI-2026-0014,2026-07-08,Pinaka,LRGR 120,DRDO,Ground Launcher,LOC-001,Development Test,Success,Official,https://www.pib.gov.in/PressReleasePage.aspx?PRID=2282572,High,"Defence Research & Development Organisation (DRDO) conducted a successful flight-test of Pinaka Long Range Guided Rocket (LRGR) at the Integrated Test Range (ITR), Chandipur on July 08, 2026."
 MTI-2026-0013,2026-06-15,LR-LACM,Base,DRDO,Ground Launcher,LOC-002,Development Test,Success,Official,https://www.pib.gov.in/PressReleaseDetail.aspx?PRID=2273160&reg=3&lang=1,High,Successful flight-test of indigenously developed LRLACM. All mission objectives met per ITR Chandipur tracking data. All sub-systems developed by DRDO labs and Indian industry; ADE Bengaluru is nodal lab.
 MTI-2026-0012,2026-06-13,NASM-MR,Base,DRDO,Ground Launcher,LOC-UNK,Development Test,Success,Official,https://www.pib.gov.in/PressReleasePage.aspx?PRID=2272374&reg=48&lang=1,High,Maiden flight test. Ground based launcher.

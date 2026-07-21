@@ -26,6 +26,8 @@ import sys
 import time
 import argparse
 import hashlib
+import threading
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, date
 from pathlib import Path
 
@@ -688,14 +690,91 @@ def run_daemon():
 # CLI
 # ─────────────────────────────────────────────────────────────
 
+def run_scan_range(start: int, end: int, workers: int = 10, delay: float = 0.0):
+    """Parallel brute-force scan every PRID in [start, end] for missile tests."""
+    state    = load_state()
+    seen     = set(state.get("seen_prids", []))
+    lock     = threading.Lock()   # guards seen-set, state file, and candidates file
+    counters = {"done": 0, "hits": 0}
+    total    = end - start + 1
+
+    # Filter to only unseen PRIDs
+    todo = [str(p) for p in range(start, end + 1) if str(p) not in seen]
+    skipped = total - len(todo)
+
+    log(f"Scanning PRIDs {start}–{end} ({total} total, {skipped} already seen → {len(todo)} to fetch).")
+    log(f"  Workers={workers}  Delay={delay}s  Ctrl-C to stop cleanly.")
+
+    def fetch_one(prid: str):
+        if delay:
+            time.sleep(delay)
+        return prid, process_prid(prid)
+
+    def flush_state():
+        with lock:
+            state["seen_prids"] = list(seen)
+            state["last_run"]   = datetime.now().isoformat()
+            save_state(state)
+
+    try:
+        with ThreadPoolExecutor(max_workers=workers) as pool:
+            futures = {pool.submit(fetch_one, prid): prid for prid in todo}
+            for future in as_completed(futures):
+                try:
+                    prid, row = future.result()
+                except Exception as e:
+                    prid = futures[future]
+                    log(f"  [!] PRID {prid} error: {e}")
+                    row = None
+
+                with lock:
+                    seen.add(prid)
+                    counters["done"] += 1
+                    done = counters["done"]
+
+                if row:
+                    with lock:
+                        write_candidate(row)
+                        counters["hits"] += 1
+                    print(f"\n  +- HIT ({done}/{len(todo)}) ------------------------------------------")
+                    print(f"  |  Title    : {row['_title'][:65]}")
+                    print(f"  |  ID       : {row['event_id']}")
+                    print(f"  |  Date     : {row['date']}")
+                    print(f"  |  Family   : {row['family']}  Variant: {row['variant']}")
+                    print(f"  |  Service  : {row['service']}  Platform: {row['platform']}")
+                    print(f"  |  Location : {row['location_id']}")
+                    print(f"  |  Type     : {row['event_type']}  Result: {row['result']}")
+                    print(f"  |  Notes    : {row['notes'][:65]}...")
+                    print(f"  +------------------------------------------------------\n")
+
+                # Checkpoint state every 100 completions
+                if done % 100 == 0:
+                    flush_state()
+                    log(f"  Progress: {done}/{len(todo)} fetched, {counters['hits']} hits so far.")
+
+    except KeyboardInterrupt:
+        log("Scan interrupted — saving progress...")
+
+    flush_state()
+    log(f"[OK] Scan complete. {counters['hits']} missile test(s) found across {counters['done']} PRIDs checked.")
+    if counters["hits"]:
+        log(f"  Review candidates.csv, edit if needed, then run:  python {__file__} --merge")
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Indian Missile Test Tracker — local CSV updater"
     )
-    parser.add_argument("--merge",      action="store_true", help="Merge candidates.csv into main CSV")
-    parser.add_argument("--daemon",     action="store_true", help=f"Poll every {POLL_HOURS}h")
-    parser.add_argument("--test-prid",  metavar="PRID",      help="Force-process a specific PIB PRID")
-    parser.add_argument("--csv",        default=str(MAIN_CSV), help="Path to main CSV (default: normalized_missiles.csv)")
+    parser.add_argument("--merge",       action="store_true", help="Merge candidates.csv into main CSV")
+    parser.add_argument("--daemon",      action="store_true", help=f"Poll every {POLL_HOURS}h")
+    parser.add_argument("--test-prid",   metavar="PRID",      help="Force-process a specific PIB PRID")
+    parser.add_argument("--scan-range",   nargs=2, metavar=("START", "END"),
+                        help="Parallel scan PRIDs from START to END (e.g. --scan-range 1640000 1691000)")
+    parser.add_argument("--scan-workers", type=int, default=10, metavar="N",
+                        help="Parallel workers for --scan-range (default: 10)")
+    parser.add_argument("--scan-delay",   type=float, default=0.0, metavar="SECONDS",
+                        help="Per-worker delay between requests (default: 0 — no delay)")
+    parser.add_argument("--csv",         default=str(MAIN_CSV), help="Path to main CSV (default: normalized_missiles.csv)")
     args = parser.parse_args()
 
     MAIN_CSV = Path(args.csv)
@@ -706,5 +785,8 @@ if __name__ == "__main__":
         run_daemon()
     elif args.test_prid:
         run_once(force_prid=args.test_prid)
+    elif args.scan_range:
+        run_scan_range(int(args.scan_range[0]), int(args.scan_range[1]),
+                       workers=args.scan_workers, delay=args.scan_delay)
     else:
         run_once()
