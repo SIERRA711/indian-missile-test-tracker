@@ -1039,7 +1039,7 @@ function buildYearChart() {
       labels: YEARS,
       datasets: [{
         data: YEARS.map(y => counts[y]),
-        backgroundColor: YEARS.map(y => y === peakYear ? RED : 'rgba(204,0,0,0.25)'),
+        backgroundColor: RED,
         borderWidth: 0
       }]
     },
