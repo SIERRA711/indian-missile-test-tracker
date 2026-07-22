@@ -429,8 +429,8 @@ def fetch_rss_prids() -> list[dict]:
     return results
 
 
-def fetch_release_body(prid: str) -> tuple[str, str]:
-    """Fetch a PIB press release and return (title, body_text)."""
+def fetch_release_body(prid: str) -> tuple[str, str, str]:
+    """Fetch a PIB press release and return (title, body_text, ministry)."""
     url = PIB_RELEASE.format(prid=prid)
     try:
         r = requests.get(url, headers=HEADERS, timeout=15)
@@ -463,7 +463,12 @@ def fetch_release_body(prid: str) -> tuple[str, str]:
         # Fallback: grab all <p> tags
         body = " ".join(p.get_text(strip=True) for p in soup.find_all("p"))
 
-    return title, body
+    ministry = ""
+    min_div = soup.find("div", class_="MinistryNameSubhead")
+    if min_div:
+        ministry = min_div.get_text(separator=" ", strip=True)
+
+    return title, body, ministry
 
 
 def parse_date_from_body(body: str, fallback: str) -> str:
@@ -498,13 +503,20 @@ def parse_date_from_body(body: str, fallback: str) -> str:
 # ─────────────────────────────────────────────────────────────
 
 def process_prid(prid: str, rss_title: str = "", rss_date: str = "") -> dict | None:
-    title, body = fetch_release_body(prid)
+    title, body, ministry = fetch_release_body(prid)
     if not title and rss_title:
         title = rss_title
 
     if not body and not title:
         log(f"  [X] PRID {prid}: could not fetch content")
         return None
+
+    if ministry:
+        ministry_lower = ministry.lower()
+        # English or Hindi Ministry of Defence
+        if not re.search(r"ministry of defence|रक्षा मंत्रालय", ministry_lower):
+            log(f"  [-] PRID {prid}: skipping (Ministry: {ministry[:40]})")
+            return None
 
     combined = title + " " + body
 
