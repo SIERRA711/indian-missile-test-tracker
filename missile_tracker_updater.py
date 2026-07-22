@@ -450,11 +450,12 @@ def fetch_release_body(prid: str) -> tuple[str, str]:
         t = soup.find("title")
         title = t.get_text(strip=True) if t else ""
 
-    # Body — PIB uses div.innner-page-content or div#contentDiv
+    # Body — PIB uses different wrapper divs depending on era
     body_div = (
-        soup.find("div", class_="innner-page-content") or
-        soup.find("div", id="contentDiv") or
-        soup.find("div", class_="content-area")
+        soup.find("div", class_="innner-page-content") or           # 2021+ English
+        soup.find("div", id="contentDiv") or                        # alternate
+        soup.find("div", class_="content-area") or                  # alternate
+        soup.find("div", class_="innner-page-main-about-us-content-right-part")  # 2020-era
     )
     if body_div:
         body = body_div.get_text(separator=" ", strip=True)
@@ -691,7 +692,7 @@ def run_daemon():
 # CLI
 # ─────────────────────────────────────────────────────────────
 
-def run_scan_range(start: int, end: int, workers: int = 10, delay: float = 0.0):
+def run_scan_range(start: int, end: int, workers: int = 10, delay: float = 0.0, ignore_seen: bool = False):
     """Parallel brute-force scan every PRID in [start, end] for missile tests."""
     state    = load_state()
     seen     = set(state.get("seen_prids", []))
@@ -699,8 +700,12 @@ def run_scan_range(start: int, end: int, workers: int = 10, delay: float = 0.0):
     counters = {"done": 0, "hits": 0}
     total    = end - start + 1
 
-    # Filter to only unseen PRIDs
-    todo = [str(p) for p in range(start, end + 1) if str(p) not in seen]
+    # Filter to only unseen PRIDs (unless --ignore-seen)
+    if ignore_seen:
+        todo = [str(p) for p in range(start, end + 1)]
+        log(f"--ignore-seen: re-checking all {total} PRIDs in range (ignoring state).")
+    else:
+        todo = [str(p) for p in range(start, end + 1) if str(p) not in seen]
     skipped = total - len(todo)
 
     log(f"Scanning PRIDs {start}–{end} ({total} total, {skipped} already seen → {len(todo)} to fetch).")
@@ -766,9 +771,11 @@ if __name__ == "__main__":
                         help="Parallel scan PRIDs from START to END (e.g. --scan-range 1640000 1691000)")
     parser.add_argument("--scan-workers", type=int, default=10, metavar="N",
                         help="Parallel workers for --scan-range (default: 10)")
+    parser.add_argument("--ignore-seen",  action="store_true",
+                        help="Re-check PRIDs even if already in state (use after rate-limit issues)")
     parser.add_argument("--scan-delay",   type=float, default=0.0, metavar="SECONDS",
                         help="Per-worker delay between requests (default: 0 — no delay)")
-    parser.add_argument("--csv",         default=str(MAIN_CSV), help="Path to main CSV (default: normalized_missiles.csv)")
+    parser.add_argument("--csv",          default=str(MAIN_CSV), help="Path to main CSV (default: normalized_missiles.csv)")
     args = parser.parse_args()
 
     MAIN_CSV = Path(args.csv)
@@ -781,6 +788,7 @@ if __name__ == "__main__":
         run_once(force_prid=args.test_prid)
     elif args.scan_range:
         run_scan_range(int(args.scan_range[0]), int(args.scan_range[1]),
-                       workers=args.scan_workers, delay=args.scan_delay)
+                       workers=args.scan_workers, delay=args.scan_delay,
+                       ignore_seen=args.ignore_seen)
     else:
         run_once()
