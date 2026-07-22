@@ -144,7 +144,7 @@ FAMILY_RULES = [
     ("Pinaka",      "LRGR 120", "Rocket/Artillery",     ["\\blrgr\\b", "long range guided rocket"]),
     ("Pinaka",      "Mk1 Enhanced", "Rocket/Artillery", ["pinaka.*mk.?1.*enh", "pinaka.*enhanced"]),
     ("Pinaka",      "Base",     "Rocket/Artillery",     ["\\bpinaka\\b"]),
-    ("122mm Rocket","Base",     "Rocket/Artillery",     ["122.*mm", "122mm"]),
+    ("122mm Rocket","Base",     "Rocket/Artillery",     ["122\\s*mm"]),
     ("ERASR",       "Base",     "Rocket/Artillery",     ["\\berasr\\b"]),
     # Torpedo
     ("SMART",       "Base",     "Torpedo",              ["\\bsmart\\b", "supersonc missile assisted"]),
@@ -200,12 +200,12 @@ EVENT_TYPE_RULES = [
 
 # Keywords that signal a missile test (to filter non-test PIB releases)
 MISSILE_KEYWORDS = [
-    "missile", "rocket", "projectile", "interceptor",
-    "drdo", "flight test", "flight trial", "test fired", "test-fired",
-    "successfully fired", "successfully test", "cruise missile", "ballistic missile",
-    "anti-tank guided", "anti-ship", "surface-to-air", "air-to-air",
-    "bmd", "atgm", "aam", "ashm", "alcm",
-    "guided missile", "torpedo", "hypersonic",
+    r"\bmissiles?\b", r"\brocket(?:s|ry)?\b", r"\bprojectile\b", r"\binterceptor\b",
+    r"flight test", r"flight trial", r"test fired", r"test-fired",
+    r"successfully fired", r"successfully test", r"cruise missile", r"ballistic missile",
+    r"anti-tank guided", r"anti-ship", r"surface-to-air", r"air-to-air",
+    r"\bbmd\b", r"\batgm\b", r"\baam\b", r"\bashm\b", r"\balcm\b", r"\bsam\b",
+    r"guided missile", r"\btorpedo\b", r"hypersonic",
 ]
 
 # ─────────────────────────────────────────────────────────────
@@ -390,7 +390,7 @@ def extract_notes(text: str, max_chars: int = 220) -> str:
 
 def is_missile_test(title: str, body: str) -> bool:
     combined = (title + ' ' + body).lower()
-    return any(kw in combined for kw in MISSILE_KEYWORDS)
+    return any(re.search(kw, combined) for kw in MISSILE_KEYWORDS)
 
 
 # ─────────────────────────────────────────────────────────────
