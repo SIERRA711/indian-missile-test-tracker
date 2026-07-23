@@ -106,6 +106,7 @@ FAMILY_RULES = [
     ("ULPGM",       "V3",       "Air-Launched Cruise",  ["ulpgm"]),
     ("Gaurav",      "LRGB",     "Glide Bomb",           ["gaurav"]),
     # SAM
+    ("Kusha",       "Base",     "Surface-to-Air",       ["kusha", "xrsam"]),
     ("Akash",       "NG",       "Surface-to-Air",       ["akash.?ng", "akash.*next gen"]),
     ("Akash",       "Prime",    "Surface-to-Air",       ["akash.*prime"]),
     ("Akash",       "Mk1",      "Surface-to-Air",       ["akash.*mk.?1"]),
