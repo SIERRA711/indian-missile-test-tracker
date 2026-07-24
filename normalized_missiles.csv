@@ -1,4 +1,7 @@
 event_id,date,family,variant,service,platform,location_id,event_type,result,source_type,source_url,confidence,notes
+MTI-WIKI-a64ab2e1,2025-03-26,VL-SRSAM,Base,Indian Navy,Ground Launcher,LOC-001,Development Test,Success,OSINT,https://en.wikipedia.org/wiki/VL-SRSAM,Medium,Tested against a high-speed aerial target at low altitude and very close range.
+MTI-WIKI-90437509,2024-09-13,VL-SRSAM,Base,Indian Navy,Ground Launcher,LOC-001,User Trial,Success,OSINT,https://en.wikipedia.org/wiki/VL-SRSAM,Medium,Follow-up user associate trial against a high-speed sea-skimming aerial target.
+MTI-WIKI-3a32bf76,2023-07-01,VL-SRSAM,Base,DRDO,Ground Launcher,LOC-001,Development Test,Success,OSINT,https://en.wikipedia.org/wiki/VL-SRSAM,Medium,Test fired from ITR Chandipur in July 2023.
 MTI-WIKI-54f7dab8,2026-03-18,Pinaka,ER,Indian Army,Ground Launcher,LOC-003,Development Test,Success,OSINT,https://en.wikipedia.org/wiki/Pinaka_multi-barrel_rocket_launcher#cite_note-:51-30,Medium,Maiden proof trials of the Pinaka Extended Range System (24 rockets) at Pokhran.
 MTI-WIKI-c04013b2,2025-08-05,Pinaka,Mk1 Enhanced,Indian Army,Ground Launcher,LOC-UNK,User Trial,Success,OSINT,https://en.wikipedia.org/wiki/Pinaka_multi-barrel_rocket_launcher,Medium,Successful test firing before commissioning and induction.
 MTI-WIKI-b7612ec1,2022-08-31,Pinaka,Enhanced,Indian Army,Ground Launcher,LOC-UNK,User Trial,Success,OSINT,https://en.wikipedia.org/wiki/Pinaka_multi-barrel_rocket_launcher#cite_note-:47-27,Medium,User trials conducted from both Pokhran Range and ITR Balasore in August.
@@ -80,7 +83,7 @@ MTI-2024-0024,2024-11-12,LR-LACM,Base,DRDO,Ground Launcher,LOC-UNK,Development T
 MTI-2024-0023,2024-11,LR-LACM,LRLACM-01,DRDO,,LOC-001,Flight Trial,Success,MoD Annual Report 2024-2025,,High,First live firing trial of indigenously developed Long Range Land Attack Cruise Missile (LR-LACM) was successfully carried out 
 MTI-2024-0022,2024-10-03,VSHORADS,Base,DRDO,Ground Launcher,LOC-UNK,Development Test,Success,None,,Medium,3 Successful flight tests of miniaturized version
 MTI-2024-0021,2024-10,VSHORADS,Base,DRDO,,LOC-003,Flight Trial,Success,MoD Annual Report 2024-2025,,High,Flight trial of Very Short Range Air Defence System (VSHORADS) was carried out successfully 
-MTI-2024-0020,2024-09-12,VLSRSAM,Base,Indian Navy,Ground Launcher,LOC-UNK,Development Test,Success,None,,Medium,Indian Navy flight tests
+MTI-2024-0020,2024-09-12,VL-SRSAM,Base,Indian Navy,Ground Launcher,LOC-UNK,Development Test,Success,None,,Medium,Indian Navy flight tests
 MTI-2024-0019,2024-09,VL-SRSAM,Base,DRDO/Indian Navy,Ship,LOC-001,Flight Trial,Success,MoD Annual Report 2024-2025,,High,The complete chain of VL-SRSAM Weapon system was validated during flight trials meeting all objectives satisfactorily 
 MTI-2024-0018,2024-08,Gaurav,LRGB,DRDO,Su-30 Mk1,LOC-UNK,Release Flight Trial,Success,MoD Annual Report 2024-2025,,High,Release Flight Trial (RFT) of Gaurav-PCB was successfully completed in Aug 2024 after Carriage Flight trials 
 MTI-2024-0017,2024-07-24,AD1,Base,DRDO,Ground Launcher,LOC-UNK,Development Test,Success,None,,Medium,Phase 2 BMD interceptor test
