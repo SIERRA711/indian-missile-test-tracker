@@ -155,7 +155,7 @@ FAMILY_RULES = [
     ("Hypersonic",  "Vehicle",  "Hypersonic",           ["hypersonic.*vehicle", "hypersonic.*missile"]),
     ("LR-AShM",     "Base",     "Anti-Ship/Cruise",     ["long range.*anti.ship"]),
     # Catch-all
-    ("RUDRAM-II",   "Base",     "Air-Launched Cruise",  ["rudram"]),
+    ("RudraM",      "1",        "Air-Launched Cruise",  ["rudram"]),
 ]
 
 # ─────────────────────────────────────────────────────────────
