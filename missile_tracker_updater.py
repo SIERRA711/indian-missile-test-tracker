@@ -130,7 +130,7 @@ FAMILY_RULES = [
     ("SAMHO",       "Base",     "Anti-Tank",            ["\\bsamho\\b"]),
     ("NGCCM",       "Base",     "Anti-Tank",            ["ngccm", "next gen.*close combat"]),
     ("AMOGHA",      "III",      "Anti-Tank",            ["amogha"]),
-    ("Milan-2T",    "ATGM",     "Anti-Tank",            ["milan"]),
+    ("Milan",       "2T",       "Anti-Tank",            ["milan"]),
     ("SAMHO",       "Base",     "Anti-Tank",            ["samho", "laser.*guided.*atgm", "atgm.*arjun", "arjun.*atgm"]),
     # Anti-ship
     ("NASM-MR",     "Base",     "Anti-Ship/Cruise",     ["nasm.?mr", "nasm.*medium"]),
