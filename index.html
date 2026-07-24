@@ -635,7 +635,8 @@ function mapCSVRow(csvRow) {
     Source_URL: csvRow.source_url || '', Source_Type: csvRow.source_type || '',
     Confidence: csvRow.confidence || '', Result: csvRow.result || '',
     Event_Type: csvRow.event_type || '',
-    Platform: csvRow.platform || 'Unknown'
+    Platform: csvRow.platform || 'Unknown',
+    Family: family
   };
 }
 // ──────────────────────────────────────────────
@@ -1176,7 +1177,7 @@ function buildHeatmap() {
 // ── TOP SYSTEMS ──
 function buildTopSystems() {
   const counts = {};
-  DB.forEach(r => { counts[r.Missile] = (counts[r.Missile]||0)+1; });
+  DB.forEach(r => { counts[r.Family] = (counts[r.Family]||0)+1; });
   const top = Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,12);
   const maxV = top[0][1];
   const container = document.getElementById('topSystemsTable');
