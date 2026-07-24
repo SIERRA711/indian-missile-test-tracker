@@ -131,7 +131,7 @@ FAMILY_RULES = [
     ("NGCCM",       "Base",     "Anti-Tank",            ["ngccm", "next gen.*close combat"]),
     ("AMOGHA",      "III",      "Anti-Tank",            ["amogha"]),
     ("Milan-2T",    "ATGM",     "Anti-Tank",            ["milan"]),
-    ("ATGM",        "MBT Arjun Mk IA", "Anti-Tank",    ["atgm.*arjun", "arjun.*atgm"]),
+    ("SAMHO",       "Base",     "Anti-Tank",            ["samho", "laser.*guided.*atgm", "atgm.*arjun", "arjun.*atgm"]),
     # Anti-ship
     ("NASM-MR",     "Base",     "Anti-Ship/Cruise",     ["nasm.?mr", "nasm.*medium"]),
     ("NASM-SR",     "Base",     "Anti-Ship/Cruise",     ["nasm.?sr", "nasm.*short"]),
