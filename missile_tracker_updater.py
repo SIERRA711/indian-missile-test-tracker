@@ -604,9 +604,20 @@ def merge_candidates():
     print(f"\n{'-'*70}")
     print(f"  {'#':<3} {'EVENT_ID':<18} {'DATE':<12} {'FAMILY':<14} {'VARIANT':<16} {'SERVICE'}")
     print(f"{'-'*70}")
+    bad_dates = []
     for i, row in enumerate(candidates):
         print(f"  {i+1:<3} {row['event_id']:<18} {row['date']:<12} {row['family']:<14} {row['variant']:<16} {row['service']}")
+        if not re.match(r"^\d{4}-\d{2}-\d{2}$", row['date']):
+            bad_dates.append((i+1, row['event_id'], row['date']))
     print(f"{'-'*70}")
+    
+    if bad_dates:
+        log("\n[ERROR] Found incomplete or invalid dates (must be YYYY-MM-DD).")
+        for idx, eid, bd in bad_dates:
+            log(f"  Row {idx} ({eid}) has invalid date: '{bd}'")
+        log("Please fix these dates manually in candidates.csv before running --merge again.\n")
+        return
+
     print(f"  {len(candidates)} candidate(s). Review candidates.csv, edit if needed, then re-run --merge.")
     ans = input("\n  Merge all into normalized_missiles.csv? [y/N] ").strip().lower()
     if ans != "y":
