@@ -147,8 +147,11 @@ FAMILY_RULES = [
     ("Pinaka",      "Base",     "Rocket/Artillery",     ["\\bpinaka\\b"]),
     ("122mm Rocket","Base",     "Rocket/Artillery",     ["122\\s*mm"]),
     ("ERASR",       "Base",     "Rocket/Artillery",     ["\\berasr\\b"]),
+    ("MR-MOCR",     "Base",     "Rocket/Artillery",     ["\\bmr-mocr\\b", "microwave obscurant chaff rocket"]),
     # Torpedo
     ("SMART",       "Base",     "Torpedo",              ["\\bsmart\\b", "supersonc missile assisted"]),
+    ("SFD",         "Base",     "Torpedo",              ["\\bsfd\\b", "submarine fired decoy"]),
+    ("EHWT",        "Base",     "Torpedo",              ["\\behwt\\b", "electrical heavy weight torpedo"]),
     # Hypersonic
     ("ET LDHCM",    "Base",     "Hypersonic",           ["ldhcm", "long range.*hypersonic.*cruise", "et.?ldhcm"]),
     ("HSTDV",       "Base",     "Hypersonic",           ["\\bhstdv\\b", "hypersonic tech demo"]),
