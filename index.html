@@ -1162,7 +1162,7 @@ function buildHeatmap() {
         // Deep red for high, light rose for low
         const r = 204, gChan = Math.round(255*(1-intensity)*0.4), b = Math.round(255*(1-intensity)*0.4);
         cell.style.background = `rgba(${r},${gChan},${b},${0.15+intensity*0.85})`;
-        cell.style.color = intensity > 0.5 ? '#fff' : '#8b0000';
+        cell.style.color = '#fff';
         cell.textContent = v;
       }
       cell.title = `${CAT_SHORT[cat]} | ${y}: ${v} test${v!==1?'s':''}`;
