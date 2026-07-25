@@ -1,4 +1,11 @@
 event_id,date,family,variant,service,platform,location_id,event_type,result,source_type,source_url,confidence,notes
+MTI-OSINT-084108da,2025-04-24,MRSAM,Base,Indian Navy,INS Surat,LOC-UNK,User Trial,Success,OSINT,,High,Intercepted a sea-skimming target in the Arabian Sea through precision cooperative engagement.
+MTI-OSINT-36ddf87b,2025-04-04,MRSAM,Base,Indian Army,Ground Launcher,LOC-002,User Trial,Success,OSINT,,High,Operational trial targeting high-speed aerial threats.
+MTI-OSINT-a6afa030,2025-04-04,MRSAM,Base,Indian Army,Ground Launcher,LOC-002,User Trial,Success,OSINT,,High,Operational trial targeting high-speed aerial threats.
+MTI-OSINT-99aa7b71,2025-04-03,MRSAM,Base,Indian Army,Ground Launcher,LOC-002,User Trial,Success,OSINT,,High,Operational trial targeting high-speed aerial threats.
+MTI-OSINT-b4f06651,2022-03-30,MRSAM,Base,Indian Army,Ground Launcher,LOC-001,Development Test,Success,OSINT,,High,Second of two flight tests today. System completed its development trials.
+MTI-OSINT-df8b33f2,2022-03-30,MRSAM,Base,Indian Army,Ground Launcher,LOC-001,Development Test,Success,OSINT,,High,First of two flight tests today establishing accuracy and reliability against targets covering sea skimming and high-altitude functionality.
+MTI-OSINT-f828214b,2022-03-27,MRSAM,Base,Indian Army,Ground Launcher,LOC-001,Development Test,Success,OSINT,,High,Second launch on this date for proving the capability against a low altitude short range target.
 MTI-OSINT-624366b6,2026-03,RudraM,3,DRDO,Su-30MKI,LOC-UNK,Captive Flight Trial,Success,OSINT,,Medium,DRDO successfully tested Rudram-3 in captive flight on Su-30MKI in March 2026.
 MTI-WIKI-02d6f71d,2025-04-08,Gaurav,LRGB,DRDO,Su-30MKI,LOC-001,Release Flight Trial,Success,Official,https://www.pib.gov.in/PressReleasePage.aspx?PRID=2120989&reg=48&lang=2,High,Release trials of LRGB Gaurav from Su-30MKI at ITR. Demonstrated maximum range of 100 km with pinpoint accuracy. Integrated to several stations in various warhead configurations for land targets.
 MTI-WIKI-454651ff,2021-12-23,Pralay,Base,DRDO,Ground Launcher,LOC-002,Development Test,Success,OSINT,https://en.wikipedia.org/wiki/Pralay_(missile),Medium,Second test with heavier payload. Covered max range of 500 km.
