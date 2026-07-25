@@ -90,6 +90,10 @@ FAMILY_RULES = [
     ("K-4",         "Base",     "Sub-Launched Ballistic",["k.?4\\b"]),
     ("K-15",        "Base",     "Sub-Launched Ballistic",["k.?15\\b", "k15", "bo-5"]),
     # BMD
+    ("PAD",         "Base",     "Ballistic Missile Defence", ["\\bpad\\b", "pradyumna", "prithvi air defence"]),
+    ("AAD",         "Base",     "Ballistic Missile Defence", ["\\baad\\b", "ashwin", "advanced air defence"]),
+    ("PDV",         "Mk2",      "Ballistic Missile Defence", ["pdv.*mk.?2", "pdv.*mark.?2", "prithvi defence vehicle.*mk.?2"]),
+    ("PDV",         "Base",     "Ballistic Missile Defence", ["\\bpdv\\b", "prithvi defence vehicle"]),
     ("AD1",         "Base",     "Ballistic Missile Defence", ["\\bad1\\b", "ad-1\\b", "phase.?2.*intercept", "bmd.*phase.?2"]),
     ("AD2",         "Base",     "Ballistic Missile Defence", ["\\bad2\\b", "ad-2\\b"]),
     ("Sea-Based",   "Endo-Atmospheric Interceptor", "Ballistic Missile Defence", ["sea.based.*endo", "naval.*bmd", "endo.atmospheric.*naval"]),
