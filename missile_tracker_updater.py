@@ -111,10 +111,10 @@ FAMILY_RULES = [
     ("Gaurav",      "LRGB",     "Glide Bomb",           ["gaurav"]),
     # SAM
     ("Kusha",       "Base",     "Surface-to-Air",       ["kusha", "xrsam"]),
-    ("Akash",       "NG",       "Surface-to-Air",       ["akash.?ng", "akash.*next gen"]),
+    ("Akash-NG",    "Base",     "Surface-to-Air",       ["akash.?ng", "akash.*new generation"]),
     ("Akash",       "Prime",    "Surface-to-Air",       ["akash.*prime"]),
-    ("Akash",       "Mk1",      "Surface-to-Air",       ["akash.*mk.?1"]),
-    ("Akash",       "Base",     "Surface-to-Air",       ["\\bakash\\b"]),
+    ("Akash",       "Mk1S",     "Surface-to-Air",       ["akash.*mk1s", "akash.*mark.?1.?s"]),
+    ("Akash",       "Base",     "Surface-to-Air",       ["\\bakash\\b", "akash.*mk1\\b", "akash.*mark.?1\\b"]),
     ("VL-SRSAM",    "Base",     "Surface-to-Air",       ["vl.?srsam", "vl srsam"]),
     ("MRSAM",       "Base",     "Surface-to-Air",       ["\\bmrsam\\b", "medium range surface to air"]),
     ("QRSAM",       "Base",     "Surface-to-Air",       ["\\bqrsam\\b", "quick reaction surface", "anant shastra"]),
