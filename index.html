@@ -301,6 +301,7 @@
   .cat-ATGM { background: #e8f5e9; color: #1b5e20; }
   .cat-RA { background: #f3e5f5; color: #4a148c; }
   .cat-ALCM { background: #e0f7fa; color: #006064; }
+  .cat-ARM { background: #f3e5f5; color: #8e24aa; }
   .cat-BMD { background: #fff8e1; color: #f57f17; }
   .cat-GB { background: #efebe9; color: #3e2723; }
   .cat-AAM { background: #e8eaf6; color: #1a237e; }
@@ -756,16 +757,16 @@ function mapCSVRow(csvRow) {
     'mrsam': 'Surface-to-Air', 'iadws': 'Surface-to-Air',
     'samar': 'Surface-to-Air',
     'brahmos': 'Anti-Ship/Cruise', 'nasm-sr': 'Anti-Ship/Cruise', 'nasm-mr': 'Anti-Ship/Cruise', 'lr-ashm': 'Anti-Ship/Cruise',
-    'brahmos alcm': 'Air-Launched Cruise', 'rudram': 'Air-Launched Cruise', 'rudram-ii': 'Air-Launched Cruise',
+    'brahmos alcm': 'Air-Launched Cruise', 'rudram': 'Anti-Radiation', 'rudram-ii': 'Anti-Radiation',
     'lr-lacm': 'Land-Attack Cruise', 'itcm': 'Land-Attack Cruise', 'nirbhay': 'Land-Attack Cruise',
     'slcm': 'Sub-Launched Cruise',
     'ulpgm': 'Precision Guided Munition',
     'astra': 'Air-to-Air', 'ngccm': 'Air-to-Air', 'sfdr': 'Air-to-Air',
-    'agni': 'Ballistic', 'agni-p': 'Ballistic', 'agni-prime': 'Ballistic',
+    'agni': 'Ballistic',
     'prithvi': 'Ballistic', 'pralay': 'Ballistic', 'k4': 'Sub-Launched Ballistic', 'k-4': 'Sub-Launched Ballistic',
     'k 15': 'Sub-Launched Ballistic', 'k-15': 'Sub-Launched Ballistic', 'mpatgm': 'Anti-Tank',
     'nag': 'Anti-Tank', 'samho': 'Anti-Tank', 'amogha': 'Anti-Tank', 'helina': 'Anti-Tank',
-    'dhruvastra': 'Anti-Tank', 'milan': 'Anti-Tank',
+    'dhruvastra': 'Anti-Tank',
     'pinaka': 'Rocket/Artillery', 'erasr': 'Rocket/Artillery', '122mm': 'Rocket/Artillery',
     'ad1': 'Ballistic Missile Defence', 'ad2': 'Ballistic Missile Defence',
     'ad-1': 'Ballistic Missile Defence', 'ad-2': 'Ballistic Missile Defence',
@@ -806,6 +807,7 @@ const CAT_CLASS = {
   'Anti-Tank': 'cat-ATGM',
   'Rocket/Artillery': 'cat-RA',
   'Air-Launched Cruise': 'cat-ALCM',
+  'Anti-Radiation': 'cat-ARM',
   'Ballistic Missile Defence': 'cat-BMD',
   'Glide Bomb': 'cat-GB',
   'Air-to-Air': 'cat-AAM',
@@ -822,6 +824,7 @@ const CAT_SHORT = {
   'Anti-Tank': 'ATGM',
   'Rocket/Artillery': 'Rocket',
   'Air-Launched Cruise': 'ALCM',
+  'Anti-Radiation': 'ARM',
   'Ballistic Missile Defence': 'BMD',
   'Glide Bomb': 'Glide',
   'Air-to-Air': 'AAM',
@@ -833,7 +836,7 @@ const CAT_SHORT = {
 
 const CATS_ORDER = [
   'Surface-to-Air', 'Anti-Ship/Cruise', 'Ballistic', 'Sub-Launched Ballistic', 
-  'Anti-Tank', 'Air-to-Air', 'Air-Launched Cruise', 'Ballistic Missile Defence', 
+  'Anti-Tank', 'Air-to-Air', 'Air-Launched Cruise', 'Anti-Radiation', 'Ballistic Missile Defence', 
   'Rocket/Artillery', 'Glide Bomb', 'Hypersonic', 'Torpedo'
 ];
 let DB = [];

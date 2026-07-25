@@ -81,7 +81,7 @@ FAMILY_RULES = [
     # Ballistic — strategic
     ("Agni",        "5 MIRV",   "Ballistic",            ["agni.*v.*mirv", "mirv.*agni", "agni.*5.*mirv"]),
     ("Agni",        "5",        "Ballistic",            ["agni.?v\\b", "agni.?5\\b"]),
-    ("Agni-P",      "Base",     "Ballistic",            ["agni.?p\\b", "agni.*prime"]),
+    ("Agni",        "P",        "Ballistic",            ["agni.?p\\b", "agni.*prime"]),
     ("Agni",        "4",        "Ballistic",            ["agni.?4\\b"]),
     ("Agni",        "3",        "Ballistic",            ["agni.?3\\b"]),
     ("Agni",        "1",        "Ballistic",            ["agni.?1\\b", "agni.?i\\b"]),
@@ -104,8 +104,8 @@ FAMILY_RULES = [
     ("BrahMos",     "ER",       "Anti-Ship/Cruise",     ["brahmos.*er\\b", "brahmos.*extended"]),
     ("BrahMos",     "Base",     "Anti-Ship/Cruise",     ["brahmos"]),
     ("SLCM",        "Base",     "Sub-Launched Cruise",  ["\\bslcm\\b", "sub.?marine.*cruise", "underwater.*cruise"]),
-    ("RudraM",      "2",        "Air-Launched Cruise",  ["rudram.?2", "rudra.?m.?2"]),
-    ("RudraM",      "1",        "Air-Launched Cruise",  ["rudram.?1", "rudra.?m.?1", "\\rudram\\b"]),
+    ("RudraM",      "2",        "Anti-Radiation",       ["rudram.?2", "rudra.?m.?2"]),
+    ("RudraM",      "1",        "Anti-Radiation",       ["rudram.?1", "rudra.?m.?1", "\\rudram\\b", "ngarm"]),
     ("ULPGM",       "V3",       "Precision Guided Munition", ["ulpgm"]),
     ("Gaurav",      "LRGB",     "Glide Bomb",           ["gaurav"]),
     # SAM
