@@ -141,7 +141,6 @@ FAMILY_RULES = [
     # Anti-ship
     ("NASM-MR",     "Base",     "Cruise / Anti-Ship",     ["nasm.?mr", "nasm.*medium"]),
     ("NASM-SR",     "Base",     "Cruise / Anti-Ship",     ["nasm.?sr", "nasm.*short"]),
-    ("LR-AShM",     "Base",     "Cruise / Anti-Ship",     ["lr.?ashm", "long range.*anti.?ship"]),
     # Glide / precision
     ("SAAW",        "EO-SAAW Mk1", "Glide Bomb",        ["eo.saaw", "saaw.*eo"]),
     ("SAAW",        "Base",     "Glide Bomb",           ["\\bsaaw\\b", "smart anti airfield"]),
@@ -163,7 +162,7 @@ FAMILY_RULES = [
     ("ET-LDHCM",    "Base",     "Hypersonic",           ["ldhcm", "long range.*hypersonic.*cruise", "et.?ldhcm"]),
     ("HSTDV",       "Base",     "Hypersonic",           ["\\bhstdv\\b", "hypersonic tech demo"]),
     ("Hypersonic",  "Vehicle",  "Hypersonic",           ["hypersonic.*vehicle", "hypersonic.*missile"]),
-    ("LR-AShM",     "Base",     "Anti-Ship/Cruise",     ["long range.*anti.ship"]),
+    ("LR-AShM",     "Base",     "Hypersonic",           ["long range.*anti.ship"]),
     # Catch-all
     ("RudraM",      "1",        "Air-Launched Cruise",  ["rudram"]),
 ]
