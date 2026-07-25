@@ -97,13 +97,13 @@ FAMILY_RULES = [
     ("AD1",         "Base",     "Ballistic Missile Defence", ["\\bad1\\b", "ad-1\\b", "phase.?2.*intercept", "bmd.*phase.?2"]),
     ("AD2",         "Base",     "Ballistic Missile Defence", ["\\bad2\\b", "ad-2\\b"]),
     ("Sea-Based",   "Endo-Atmospheric Interceptor", "Ballistic Missile Defence", ["sea.based.*endo", "naval.*bmd", "endo.atmospheric.*naval"]),
-    # Cruise / LACM
-    ("LR-LACM",     "Base",     "Land-Attack Cruise",   ["lr.?lacm", "lrlacm", "long range land attack cruise", "itcm", "indigenous technology cruise", "nirbhay"]),
-    ("LR-LACM",     "LRLACM-01","Land-Attack Cruise",   ["lrlacm.?01"]),
-    ("BrahMos ALCM","Base",     "Air-Launched Cruise",  ["brahmos.*alcm", "alcm.*brahmos"]),
-    ("BrahMos",     "ER",       "Anti-Ship/Cruise",     ["brahmos.*er\\b", "brahmos.*extended"]),
-    ("BrahMos",     "Base",     "Anti-Ship/Cruise",     ["brahmos"]),
-    ("SLCM",        "Base",     "Sub-Launched Cruise",  ["\\bslcm\\b", "sub.?marine.*cruise", "underwater.*cruise"]),
+    # Cruise / Anti-Ship
+    ("LR-LACM",     "Base",     "Cruise / Anti-Ship",   ["lr.?lacm", "lrlacm", "long range land attack cruise", "itcm", "indigenous technology cruise", "nirbhay"]),
+    ("LR-LACM",     "LRLACM-01","Cruise / Anti-Ship",   ["lrlacm.?01"]),
+    ("BrahMos",     "ALCM",     "Cruise / Anti-Ship",   ["brahmos.*alcm", "alcm.*brahmos"]),
+    ("BrahMos",     "ER",       "Cruise / Anti-Ship",   ["brahmos.*er\\b", "brahmos.*extended"]),
+    ("BrahMos",     "Base",     "Cruise / Anti-Ship",   ["brahmos"]),
+    ("SLCM",        "Base",     "Cruise / Anti-Ship",   ["\\bslcm\\b", "sub.?marine.*cruise", "underwater.*cruise"]),
     ("RudraM",      "3",        "Anti-Radiation",       ["rudram.?3", "rudra.?m.?3"]),
     ("RudraM",      "2",        "Anti-Radiation",       ["rudram.?2", "rudra.?m.?2"]),
     ("RudraM",      "1",        "Anti-Radiation",       ["rudram.?1", "rudra.?m.?1", "\\rudram\\b", "ngarm"]),
@@ -136,9 +136,9 @@ FAMILY_RULES = [
     ("SAMHO",       "Base",     "Anti-Tank",            ["\\bsamho\\b", "laser.*guided.*atgm", "atgm.*arjun", "arjun.*atgm"]),
     ("NGCCM",       "Base",     "Air-to-Air",           ["ngccm", "next gen.*close combat"]),
     # Anti-ship
-    ("NASM-MR",     "Base",     "Anti-Ship/Cruise",     ["nasm.?mr", "nasm.*medium"]),
-    ("NASM-SR",     "Base",     "Anti-Ship/Cruise",     ["nasm.?sr", "nasm.*short"]),
-    ("LR-AShM",     "Base",     "Anti-Ship/Cruise",     ["lr.?ashm", "long range.*anti.?ship"]),
+    ("NASM-MR",     "Base",     "Cruise / Anti-Ship",     ["nasm.?mr", "nasm.*medium"]),
+    ("NASM-SR",     "Base",     "Cruise / Anti-Ship",     ["nasm.?sr", "nasm.*short"]),
+    ("LR-AShM",     "Base",     "Cruise / Anti-Ship",     ["lr.?ashm", "long range.*anti.?ship"]),
     # Glide / precision
     ("SAAW",        "EO-SAAW Mk1", "Glide Bomb",        ["eo.saaw", "saaw.*eo"]),
     ("SAAW",        "Base",     "Glide Bomb",           ["\\bsaaw\\b", "smart anti airfield"]),
