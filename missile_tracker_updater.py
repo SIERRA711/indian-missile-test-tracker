@@ -81,7 +81,7 @@ FAMILY_RULES = [
     # Ballistic — strategic
     ("Agni",        "V MIRV",   "Ballistic",            ["agni.*v.*mirv", "mirv.*agni"]),
     ("Agni",        "V",        "Ballistic",            ["agni.?v\\b", "agni.?5\\b"]),
-    ("Agni",        "Prime",    "Ballistic",            ["agni.?p\\b", "agni.*prime"]),
+    ("Agni-P",      "Base",     "Ballistic",            ["agni.?p\\b", "agni.*prime"]),
     ("Agni",        "4",        "Ballistic",            ["agni.?4\\b"]),
     ("Agni",        "3",        "Ballistic",            ["agni.?3\\b"]),
     ("Agni",        "1",        "Ballistic",            ["agni.?1\\b", "agni.?i\\b"]),
@@ -94,12 +94,11 @@ FAMILY_RULES = [
     ("AD2",         "Base",     "Ballistic Missile Defence", ["\\bad2\\b", "ad-2\\b"]),
     ("Sea-Based",   "Endo-Atmospheric Interceptor", "Ballistic Missile Defence", ["sea.based.*endo", "naval.*bmd", "endo.atmospheric.*naval"]),
     # Cruise / LACM
-    ("LR-LACM",     "Base",     "Land-Attack Cruise",   ["lr.?lacm", "lrlacm", "long range land attack cruise"]),
+    ("LR-LACM",     "Base",     "Land-Attack Cruise",   ["lr.?lacm", "lrlacm", "long range land attack cruise", "itcm", "indigenous technology cruise", "nirbhay"]),
     ("LR-LACM",     "LRLACM-01","Land-Attack Cruise",   ["lrlacm.?01"]),
     ("BrahMos",     "ALCM",     "Air-Launched Cruise",  ["brahmos.*alcm", "alcm.*brahmos"]),
     ("BrahMos",     "ER",       "Anti-Ship/Cruise",     ["brahmos.*er\\b", "brahmos.*extended"]),
     ("BrahMos",     "Base",     "Anti-Ship/Cruise",     ["brahmos"]),
-    ("ITCM",        "Base",     "Air-Launched Cruise",  ["itcm", "indigenous technology cruise"]),
     ("SLCM",        "Base",     "Sub-Launched Cruise",  ["\\bslcm\\b", "sub.?marine.*cruise", "underwater.*cruise"]),
     ("RudraM",      "2",        "Air-Launched Cruise",  ["rudram.?2", "rudra.?m.?2"]),
     ("RudraM",      "1",        "Air-Launched Cruise",  ["rudram.?1", "rudra.?m.?1", "\\rudram\\b"]),
