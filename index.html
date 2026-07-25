@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@9.4.3/dist/mermaid.min.js"></script>
 <style>
   :root {
     --red: #cc0000;
@@ -617,6 +617,12 @@
               K15["K-15 SLBM"] -. "Disputed / Denied" .-> Shaurya
               K15 -.-> AAD["AAD / Ashwin"]
               K15 -.-> SMART
+          end
+          
+          subgraph sg5 ["Nag ATGM Lineage"]
+              Nag --> Dhruvastra
+              Nag --> SANT
+              Nag --> MPATGM
           end
       </div>
     </div>
