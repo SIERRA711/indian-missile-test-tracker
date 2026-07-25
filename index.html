@@ -9,6 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
 <style>
   :root {
     --red: #cc0000;
@@ -92,6 +93,21 @@
     border: 1.5px solid var(--red);
   }
   .btn-ghost:hover { background: var(--red-dim); }
+
+  /* ── MODALS ── */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 2000;
+    justify-content: center; align-items: center; padding: 2rem;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-content {
+    background: var(--bg); width: 100%; max-width: 900px; max-height: 85vh;
+    border-radius: 8px; position: relative; padding: 2rem; overflow-y: auto;
+  }
+  .modal-close {
+    position: absolute; top: 1rem; right: 1rem; border: none; background: none; cursor: pointer;
+    font-size: 1.5rem; color: var(--mid);
+  }
 
   /* ── MAIN LAYOUT ── */
   .page { max-width: 1400px; margin: 0 auto; padding: 1.5rem 2rem 3rem; }
@@ -556,11 +572,45 @@
     <p>Open-source flight trial database  curated by <a href="https://www.x.com/singhshwetabh71" target="_blank" rel="noopener"><strong>@singhshwetabh71</strong></a></p>
   </div>
   <div class="masthead-right">
+    <button id="btnExperimental" class="btn btn-ghost" style="border-color:var(--red); color:var(--red);" onclick="openExperimentalModal()">Experimental: Lineage</button>
     <button class="btn btn-ghost" id="themeToggle" onclick="toggleTheme()" title="Toggle Dark Mode" style="font-size: 14px; padding: 6px 10px;">🌙</button>
     <button class="btn btn-ghost" onclick="exportCSV()">↓ Export CSV</button>
     <button class="btn" onclick="scrollToTable()">View Database ↓</button>
   </div>
 </header>
+
+<div class="modal-overlay" id="experimentalModal" onclick="if(event.target===this) closeExperimentalModal()">
+  <div class="modal-content">
+    <button class="modal-close" aria-label="Close" onclick="closeExperimentalModal()">&times;</button>
+    <h2 id="expTitle" style="margin-top:0;">Experimental: System Lineage Graph</h2>
+    <p style="font-size:13px; color:var(--mid); margin-bottom:20px;">A topological view of how different systems are derived from base families.</p>
+    <div id="mermaidContainer" style="background:var(--bg2); border-radius:8px; padding:20px; overflow-x:auto;">
+      <div class="mermaid">
+      graph TD
+          subgraph Nirbhay Lineage
+              Nirbhay --> ITCM
+              ITCM --> LR_LACM[LR-LACM]
+              ITCM --> SLCM
+          end
+          
+          subgraph Agni Lineage
+              Agni_1[Agni-1] --> Agni_2[Agni-2]
+              Agni_1 --> Agni_P[Agni-P]
+              Agni_2 --> Agni_3[Agni-3]
+              Agni_3 --> Agni_4[Agni-4]
+              Agni_4 --> Agni_5[Agni-5]
+              Agni_5 --> Agni_5_MIRV[Agni-5 MIRV]
+          end
+          
+          subgraph Akash Lineage
+              Akash_Base[Akash Base] --> Akash_Mk1S[Akash Mk1S]
+              Akash_Mk1S --> Akash_Prime[Akash Prime]
+              Akash_Prime -.-> Akash_NG[Akash-NG]
+          end
+      </div>
+    </div>
+  </div>
+</div>
 
 <div class="page">
 
@@ -1729,6 +1779,15 @@ function closeSystemDrawer() {
 document.getElementById('drawerClose').addEventListener('click', closeSystemDrawer);
 document.getElementById('drawerOverlay').addEventListener('click', closeSystemDrawer);
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSystemDrawer(); });
+</script>
+<script>
+  function openExperimentalModal() {
+    document.getElementById('experimentalModal').classList.add('open');
+    mermaid.init(undefined, document.querySelectorAll('.mermaid'));
+  }
+  function closeExperimentalModal() {
+    document.getElementById('experimentalModal').classList.remove('open');
+  }
 </script>
 </body>
 </html>
