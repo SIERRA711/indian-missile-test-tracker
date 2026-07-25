@@ -504,6 +504,46 @@
     text-underline-offset: 3px;
   }
   .clickable-family:hover { color: var(--red-dark); }
+  /* ── BROWSE PANEL ── */
+  .browse-panel { margin-bottom: 1.75rem; }
+  .browse-categories { display: flex; flex-direction: column; gap: 0.6rem; }
+  .browse-cat-row { display: flex; align-items: baseline; gap: 0.5rem; flex-wrap: wrap; }
+  .browse-cat-label {
+    font-size: 9px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--mid);
+    white-space: nowrap; min-width: 110px; flex-shrink: 0;
+    padding-top: 2px;
+  }
+  .browse-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 4px 10px;
+    border: 1.5px solid var(--rule);
+    border-radius: 20px;
+    font-size: 11px; font-weight: 700;
+    font-family: var(--mono);
+    color: var(--ink);
+    background: var(--bg2);
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+    user-select: none;
+  }
+  .chip:hover {
+    border-color: var(--red);
+    background: var(--red-dim);
+    color: var(--red);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(204,0,0,0.15);
+  }
+  .chip-count {
+    font-size: 9px; font-weight: 600;
+    color: var(--mid); font-family: var(--mono);
+    background: var(--rule);
+    padding: 1px 5px; border-radius: 8px;
+    transition: background 0.15s, color 0.15s;
+  }
+  .chip:hover .chip-count { background: var(--red); color: #fff; }
 </style>
 <base target="_blank">
 </head>
@@ -578,6 +618,12 @@
     <div class="chart-wrap" style="height: 200px; margin-top: 10px;">
       <canvas id="chartMonth"></canvas>
     </div>
+  </div>
+
+  <!-- ── BROWSE BY SYSTEM ── -->
+  <div class="panel browse-panel">
+    <div class="panel-title" style="margin-bottom:0.75rem">Browse by System &nbsp;<span style="font-size:10px;font-weight:400;color:var(--mid)">— click any chip to see its full test history</span></div>
+    <div class="browse-categories" id="browseCats"></div>
   </div>
 
   <div id="tableSection">
@@ -826,6 +872,7 @@ function initDashboard() {
   buildAgencyChart();
   buildHeatmap();
   buildTopSystems();
+  buildBrowsePanel();
   buildLocationChart();
   buildPlatformChart();
   buildMonthChart(YEARS[0]); // Render the month chart for the latest year automatically
@@ -1310,7 +1357,69 @@ function buildTopSystems() {
   container.appendChild(tbl);
 }
 
+// ── BROWSE PANEL ──
+function buildBrowsePanel() {
+  const container = document.getElementById('browseCats');
+  if (!container) return;
+
+  // Count tests per family
+  const familyCounts = {};
+  const familyCat = {};
+  DB.forEach(r => {
+    familyCounts[r.Family] = (familyCounts[r.Family] || 0) + 1;
+    familyCat[r.Family] = r.Category;
+  });
+
+  // Group families by category, sorted by test count desc within each group
+  const catGroups = {};
+  CATS_ORDER.forEach(c => { catGroups[c] = []; });
+  Object.entries(familyCounts).forEach(([fam, cnt]) => {
+    const cat = familyCat[fam] || 'Uncategorized';
+    if (!catGroups[cat]) catGroups[cat] = [];
+    catGroups[cat].push([fam, cnt]);
+  });
+
+  // Render one row per category that has families
+  const orderedCats = CATS_ORDER.filter(c => catGroups[c] && catGroups[c].length > 0);
+  // Also add any categories not in CATS_ORDER
+  Object.keys(catGroups).forEach(c => {
+    if (!orderedCats.includes(c) && catGroups[c].length > 0) orderedCats.push(c);
+  });
+
+  orderedCats.forEach(cat => {
+    const families = catGroups[cat].sort((a, b) => b[1] - a[1]);
+    if (!families.length) return;
+
+    const row = document.createElement('div');
+    row.className = 'browse-cat-row';
+
+    const label = document.createElement('span');
+    label.className = 'browse-cat-label';
+    label.textContent = CAT_SHORT[cat] || cat;
+    label.title = cat;
+    label.style.cursor = 'pointer';
+    label.addEventListener('click', () => openCategoryDrawer(cat));
+    row.appendChild(label);
+
+    const chips = document.createElement('div');
+    chips.className = 'browse-chips';
+
+    families.forEach(([fam, cnt]) => {
+      const chip = document.createElement('button');
+      chip.className = 'chip';
+      chip.title = `${fam} — ${cnt} test${cnt !== 1 ? 's' : ''}`;
+      chip.innerHTML = `${fam}<span class="chip-count">${cnt}</span>`;
+      chip.addEventListener('click', () => openSystemDrawer(fam));
+      chips.appendChild(chip);
+    });
+
+    row.appendChild(chips);
+    container.appendChild(row);
+  });
+}
+
 // ── LOCATION CHART ──
+
 function buildLocationChart() {
   const locCount = {};
   DB.forEach(r => {
