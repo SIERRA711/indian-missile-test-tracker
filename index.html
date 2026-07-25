@@ -1251,9 +1251,11 @@ function buildHeatmap() {
   // Data rows
   CATS_ORDER.forEach(cat => {
     const label = document.createElement('div');
-    label.className = 'hm-cell hm-row-label';
+    label.className = 'hm-cell hm-row-label clickable-family';
     label.textContent = CAT_SHORT[cat] || cat;
-    label.title = cat;
+    label.title = `Click to view all ${cat} tests`;
+    label.style.cursor = 'pointer';
+    label.addEventListener('click', () => openCategoryDrawer(cat));
     g.appendChild(label);
 
     YEARS.forEach(y => {
@@ -1537,7 +1539,72 @@ function openSystemDrawer(familyName) {
   document.body.style.overflow = 'hidden';
 }
 
+function openCategoryDrawer(category) {
+  const tests = DB
+    .filter(r => r.Category === category)
+    .sort((a, b) => a.Date.localeCompare(b.Date));
+
+  const drawer  = document.getElementById('systemDrawer');
+  const overlay = document.getElementById('drawerOverlay');
+  const titleEl = document.getElementById('drawerTitleEl');
+  const metaEl  = document.getElementById('drawerMetaEl');
+  const body    = document.getElementById('drawerBody');
+
+  // Count unique families
+  const families = [...new Set(tests.map(r => r.Family))].sort();
+
+  titleEl.textContent = category;
+  metaEl.textContent  = `${tests.length} test${tests.length !== 1 ? 's' : ''}  ·  ${families.length} system${families.length !== 1 ? 's' : ''}`;
+
+  body.innerHTML = '';
+
+  // Group by family, show each as a sub-section
+  families.forEach(fam => {
+    const famTests = tests.filter(r => r.Family === fam);
+
+    // Family header — also clickable to drill down to family view
+    const famHeader = document.createElement('div');
+    famHeader.style.cssText = 'padding:0.6rem 0 0.3rem; border-top:2px solid var(--red-dim); margin-top:0.75rem; display:flex; justify-content:space-between; align-items:center; cursor:pointer;';
+    famHeader.innerHTML = `
+      <span class="clickable-family" style="font-weight:700;font-size:13px;font-family:var(--mono);color:var(--red)">${fam}</span>
+      <span style="font-size:11px;color:var(--mid);font-weight:600">${famTests.length} test${famTests.length !== 1 ? 's' : ''} ↗</span>
+    `;
+    famHeader.addEventListener('click', () => openSystemDrawer(fam));
+    body.appendChild(famHeader);
+
+    famTests.forEach(r => {
+      const resultClass = {'Success':'tl-success','Failure':'tl-failure','Partial Success':'tl-partial'}[r.Result] || 'tl-unknown';
+      const variantLabel = (r.Missile !== fam) ? r.Missile : fam;
+      const platform = r.Platform && r.Platform !== 'Unknown' ? r.Platform : '';
+      const svc = r.Agency || '';
+
+      const item = document.createElement('div');
+      item.className = 'timeline-item';
+      item.innerHTML = `
+        <div class="timeline-date">${r.Date}</div>
+        <div class="timeline-content">
+          <div class="timeline-variant">${variantLabel}</div>
+          <div class="timeline-badges">
+            <span class="tl-badge ${resultClass}">${r.Result || 'Unknown'}</span>
+            ${r.Event_Type ? `<span class="tl-badge tl-type">${r.Event_Type}</span>` : ''}
+            ${svc ? `<span class="tl-badge tl-service">${svc}</span>` : ''}
+            ${platform ? `<span class="tl-badge tl-platform">${platform}</span>` : ''}
+          </div>
+          ${r.Notes ? `<div class="timeline-notes">${r.Notes}</div>` : ''}
+          ${r.Source_URL ? `<a class="timeline-src" href="${r.Source_URL}" target="_blank" rel="noopener">&#x2197; Source</a>` : ''}
+        </div>
+      `;
+      body.appendChild(item);
+    });
+  });
+
+  overlay.classList.add('open');
+  requestAnimationFrame(() => { requestAnimationFrame(() => { drawer.classList.add('open'); }); });
+  document.body.style.overflow = 'hidden';
+}
+
 function closeSystemDrawer() {
+
   document.getElementById('systemDrawer').classList.remove('open');
   document.getElementById('drawerOverlay').classList.remove('open');
   document.body.style.overflow = '';
