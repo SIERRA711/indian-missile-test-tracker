@@ -614,7 +614,7 @@
               Prithvi --> PAD
               PAD --> PDV
               PDV --> PDV_Mk2["PDV Mk2"]
-              K15["K-15 SLBM"] -. "Disputed / Denied" .-> Shaurya
+              K15["K-15 SLBM"] -.->|Disputed / Denied| Shaurya
               K15 -.-> AAD["AAD / Ashwin"]
               K15 -.-> SMART
           end
@@ -1798,9 +1798,9 @@ document.getElementById('drawerOverlay').addEventListener('click', closeSystemDr
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSystemDrawer(); });
 </script>
 <script>
+  mermaid.initialize({ startOnLoad: true, theme: 'default' });
   function openExperimentalModal() {
     document.getElementById('experimentalModal').classList.add('open');
-    mermaid.init(undefined, document.querySelectorAll('.mermaid'));
   }
   function closeExperimentalModal() {
     document.getElementById('experimentalModal').classList.remove('open');
