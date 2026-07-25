@@ -207,7 +207,7 @@
     justify-content: center;
   }
   .hm-header { font-size: 10px; font-weight: 700; color: var(--mid); text-transform: uppercase; }
-  .hm-row-label { font-size: 10px; color: var(--mid); font-weight: 600; justify-content: flex-start; font-family: system-ui; }
+  .hm-row-label { font-size: 10px; color: var(--mid); font-weight: 600; justify-content: flex-start; font-family: system-ui; white-space: nowrap; }
 
   /* ── CONTROLS ── */
   .controls {
@@ -1287,7 +1287,7 @@ function buildHeatmap() {
   const wrap = document.getElementById('heatmapWrap');
   const g = document.createElement('div');
   g.className = 'heatmap-grid';
-  g.style.gridTemplateColumns = `60px repeat(${YEARS.length}, 1fr)`;
+  g.style.gridTemplateColumns = `75px repeat(${YEARS.length}, 1fr)`;
 
   // Header row
   const corner = document.createElement('div');
