@@ -151,8 +151,9 @@ FAMILY_RULES = [
     ("122mm Rocket","Base",     "Rocket/Artillery",     ["122\\s*mm"]),
     ("ERASR",       "Base",     "Rocket/Artillery",     ["\\berasr\\b"]),
     ("MR-MOCR",     "Base",     "Rocket/Artillery",     ["\\bmr-mocr\\b", "microwave obscurant chaff rocket"]),
-    # Torpedo
-    ("SMART",       "Base",     "Torpedo",              ["\\bsmart\\b", "supersonc missile assisted"]),
+    # Torpedo / ASW
+    ("SMART",       "Base",     "Torpedo",              ["\\bsmart\\b", "supersonic missile assisted release"]),
+    ("Varunastra",  "Base",     "Torpedo",              ["\\bvarunastra\\b"]),
     ("EHWT",        "Base",     "Torpedo",              ["\\behwt\\b", "electrical heavy weight torpedo"]),
     ("ALWT",        "Base",     "Torpedo",              ["\\balwt\\b", "advanced lightweight torpedo"]),
     # Hypersonic
