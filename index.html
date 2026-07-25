@@ -580,10 +580,11 @@
 </header>
 
 <div class="modal-overlay" id="experimentalModal" onclick="if(event.target===this) closeExperimentalModal()">
-  <div class="modal-content">
+  <div class="modal-content" style="max-width: 1200px;">
     <button class="modal-close" aria-label="Close" onclick="closeExperimentalModal()">&times;</button>
     <h2 id="expTitle" style="margin-top:0;">Experimental: System Lineage Graph</h2>
     <p style="font-size:13px; color:var(--mid); margin-bottom:20px;">A topological view of how different systems are derived from base families.</p>
+    <style>.mermaid svg { max-width: none !important; height: auto; }</style>
     <div id="mermaidContainer" style="background:var(--bg2); border-radius:8px; padding:20px; overflow-x:auto;">
       <div class="mermaid">
       graph TD
