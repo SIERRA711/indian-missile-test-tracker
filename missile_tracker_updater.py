@@ -104,6 +104,7 @@ FAMILY_RULES = [
     ("BrahMos",     "ER",       "Anti-Ship/Cruise",     ["brahmos.*er\\b", "brahmos.*extended"]),
     ("BrahMos",     "Base",     "Anti-Ship/Cruise",     ["brahmos"]),
     ("SLCM",        "Base",     "Sub-Launched Cruise",  ["\\bslcm\\b", "sub.?marine.*cruise", "underwater.*cruise"]),
+    ("RudraM",      "3",        "Anti-Radiation",       ["rudram.?3", "rudra.?m.?3"]),
     ("RudraM",      "2",        "Anti-Radiation",       ["rudram.?2", "rudra.?m.?2"]),
     ("RudraM",      "1",        "Anti-Radiation",       ["rudram.?1", "rudra.?m.?1", "\\rudram\\b", "ngarm"]),
     ("ULPGM",       "V3",       "Precision Guided Munition", ["ulpgm"]),
