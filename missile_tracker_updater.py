@@ -79,8 +79,8 @@ LOCATION_MAP = {
 # ─────────────────────────────────────────────────────────────
 FAMILY_RULES = [
     # Ballistic — strategic
-    ("Agni",        "V MIRV",   "Ballistic",            ["agni.*v.*mirv", "mirv.*agni"]),
-    ("Agni",        "V",        "Ballistic",            ["agni.?v\\b", "agni.?5\\b"]),
+    ("Agni",        "5 MIRV",   "Ballistic",            ["agni.*v.*mirv", "mirv.*agni", "agni.*5.*mirv"]),
+    ("Agni",        "5",        "Ballistic",            ["agni.?v\\b", "agni.?5\\b"]),
     ("Agni-P",      "Base",     "Ballistic",            ["agni.?p\\b", "agni.*prime"]),
     ("Agni",        "4",        "Ballistic",            ["agni.?4\\b"]),
     ("Agni",        "3",        "Ballistic",            ["agni.?3\\b"]),
@@ -96,7 +96,7 @@ FAMILY_RULES = [
     # Cruise / LACM
     ("LR-LACM",     "Base",     "Land-Attack Cruise",   ["lr.?lacm", "lrlacm", "long range land attack cruise", "itcm", "indigenous technology cruise", "nirbhay"]),
     ("LR-LACM",     "LRLACM-01","Land-Attack Cruise",   ["lrlacm.?01"]),
-    ("BrahMos",     "ALCM",     "Air-Launched Cruise",  ["brahmos.*alcm", "alcm.*brahmos"]),
+    ("BrahMos ALCM","Base",     "Air-Launched Cruise",  ["brahmos.*alcm", "alcm.*brahmos"]),
     ("BrahMos",     "ER",       "Anti-Ship/Cruise",     ["brahmos.*er\\b", "brahmos.*extended"]),
     ("BrahMos",     "Base",     "Anti-Ship/Cruise",     ["brahmos"]),
     ("SLCM",        "Base",     "Sub-Launched Cruise",  ["\\bslcm\\b", "sub.?marine.*cruise", "underwater.*cruise"]),
