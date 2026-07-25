@@ -402,6 +402,108 @@
     .masthead { flex-direction: column; align-items: flex-start; }
     .page { padding: 1rem; }
   }
+
+  /* ── SYSTEM DRAWER ── */
+  .drawer-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.45);
+    z-index: 900;
+    backdrop-filter: blur(2px);
+    opacity: 0;
+    transition: opacity 0.25s;
+  }
+  .drawer-overlay.open { display: block; opacity: 1; }
+  .drawer {
+    position: fixed; top: 0; right: 0; bottom: 0;
+    width: min(560px, 100vw);
+    background: var(--bg);
+    border-left: 3px solid var(--red);
+    z-index: 901;
+    transform: translateX(100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex; flex-direction: column;
+    box-shadow: -8px 0 32px rgba(0,0,0,0.18);
+  }
+  .drawer.open { transform: translateX(0); }
+  .drawer-header {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--rule);
+    display: flex; justify-content: space-between; align-items: flex-start;
+    flex-shrink: 0;
+    background: var(--bg2);
+  }
+  .drawer-title {
+    font-size: 1.2rem; font-weight: 800;
+    color: var(--red); font-family: var(--mono);
+    letter-spacing: 0.03em;
+  }
+  .drawer-meta {
+    font-size: 11px; color: var(--mid);
+    font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.06em; margin-top: 3px;
+  }
+  .drawer-close {
+    background: none; border: none; cursor: pointer;
+    color: var(--mid); font-size: 1.4rem; line-height: 1;
+    padding: 4px; border-radius: 4px;
+    transition: color 0.15s, background 0.15s;
+    flex-shrink: 0; margin-left: 1rem;
+  }
+  .drawer-close:hover { color: var(--red); background: var(--red-dim); }
+  .drawer-body {
+    overflow-y: auto; flex: 1;
+    padding: 1rem 1.5rem;
+  }
+  .timeline-item {
+    display: grid;
+    grid-template-columns: 90px 1fr;
+    gap: 0 1rem;
+    padding: 0.85rem 0;
+    border-bottom: 1px solid var(--rule);
+    position: relative;
+  }
+  .timeline-item:last-child { border-bottom: none; }
+  .timeline-date {
+    font-family: var(--mono); font-size: 11px;
+    font-weight: 700; color: var(--red);
+    padding-top: 2px; white-space: nowrap;
+  }
+  .timeline-content { min-width: 0; }
+  .timeline-variant {
+    font-size: 12px; font-weight: 700;
+    color: var(--ink); margin-bottom: 3px;
+  }
+  .timeline-badges { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 6px; }
+  .tl-badge {
+    font-size: 10px; font-weight: 700;
+    padding: 2px 7px; border-radius: 10px;
+    text-transform: uppercase; letter-spacing: 0.03em;
+  }
+  .tl-success { background: #e8f5e9; color: #2e7d32; }
+  .tl-failure { background: #ffebee; color: #c62828; }
+  .tl-partial { background: #fff3e0; color: #e65100; }
+  .tl-unknown { background: #f5f5f5; color: #757575; }
+  .tl-type { background: var(--red-dim); color: var(--red); }
+  .tl-platform { background: var(--bg2); color: var(--mid); border: 1px solid var(--rule); }
+  .tl-service { background: #e3f2fd; color: #1565c0; }
+  .timeline-notes {
+    font-size: 12px; color: var(--mid);
+    line-height: 1.45; margin-top: 4px;
+  }
+  .timeline-src {
+    font-size: 11px; font-weight: 700;
+    color: var(--red); text-decoration: none;
+    display: inline-block; margin-top: 5px;
+  }
+  .timeline-src:hover { text-decoration: underline; }
+  .clickable-family {
+    cursor: pointer;
+    transition: color 0.15s;
+    text-decoration: underline dotted;
+    text-underline-offset: 3px;
+  }
+  .clickable-family:hover { color: var(--red-dark); }
 </style>
 <base target="_blank">
 </head>
@@ -1189,15 +1291,18 @@ function buildTopSystems() {
   tbl.className = 'mini-table';
   top.forEach(([name, count], i) => {
     const tr = document.createElement('tr');
+    tr.style.cursor = 'pointer';
+    tr.title = `Click to see all ${name} tests`;
     const pct = Math.round(count/maxV*100);
     tr.innerHTML = `
       <td>${String(i+1).padStart(2,'0')}</td>
       <td>
-        <span style="font-weight:600;font-size:12px;font-family:var(--mono)">${name}</span>
+        <span class="clickable-family" style="font-weight:600;font-size:12px;font-family:var(--mono)">${name}</span>
         <div class="bar-bg"><div class="bar-fill" style="width:${pct}%"></div></div>
       </td>
       <td>${count}</td>
     `;
+    tr.addEventListener('click', () => openSystemDrawer(name));
     tbl.appendChild(tr);
   });
   container.appendChild(tbl);
@@ -1355,6 +1460,92 @@ document.getElementById('pageSizeSelect').addEventListener('change', (e) => {
   currentPage = 1;
   renderTable(currentFiltered);
 });
+</script>
+
+<!-- ── SYSTEM DETAIL DRAWER ── -->
+<div class="drawer-overlay" id="drawerOverlay"></div>
+<div class="drawer" id="systemDrawer" role="dialog" aria-modal="true" aria-labelledby="drawerTitleEl">
+  <div class="drawer-header">
+    <div>
+      <div class="drawer-title" id="drawerTitleEl"></div>
+      <div class="drawer-meta" id="drawerMetaEl"></div>
+    </div>
+    <button class="drawer-close" id="drawerClose" aria-label="Close">&times;</button>
+  </div>
+  <div class="drawer-body" id="drawerBody"></div>
+</div>
+
+<script>
+// ── SYSTEM DRAWER ──
+function openSystemDrawer(familyName) {
+  const tests = DB
+    .filter(r => r.Family === familyName)
+    .sort((a, b) => a.Date.localeCompare(b.Date));
+
+  const drawer   = document.getElementById('systemDrawer');
+  const overlay  = document.getElementById('drawerOverlay');
+  const titleEl  = document.getElementById('drawerTitleEl');
+  const metaEl   = document.getElementById('drawerMetaEl');
+  const body     = document.getElementById('drawerBody');
+
+  titleEl.textContent = familyName;
+  const cat = tests[0]?.Category || '';
+  metaEl.textContent  = `${tests.length} test${tests.length !== 1 ? 's' : ''} recorded  ·  ${cat}`;
+
+  body.innerHTML = '';
+
+  if (tests.length === 0) {
+    body.innerHTML = '<p style="color:var(--mid);font-size:13px;padding:1rem 0">No tests found.</p>';
+  } else {
+    tests.forEach(r => {
+      const resultClass = {
+        'Success': 'tl-success',
+        'Failure': 'tl-failure',
+        'Partial Success': 'tl-partial',
+      }[r.Result] || 'tl-unknown';
+
+      const variantLabel = (r.Missile !== familyName) ? r.Missile : familyName;
+      const platform = r.Platform && r.Platform !== 'Unknown' ? r.Platform : '';
+      const svc = r.Agency || '';
+
+      const item = document.createElement('div');
+      item.className = 'timeline-item';
+      item.innerHTML = `
+        <div class="timeline-date">${r.Date}</div>
+        <div class="timeline-content">
+          <div class="timeline-variant">${variantLabel}</div>
+          <div class="timeline-badges">
+            <span class="tl-badge ${resultClass}">${r.Result || 'Unknown'}</span>
+            ${r.Event_Type ? `<span class="tl-badge tl-type">${r.Event_Type}</span>` : ''}
+            ${svc ? `<span class="tl-badge tl-service">${svc}</span>` : ''}
+            ${platform ? `<span class="tl-badge tl-platform">${platform}</span>` : ''}
+          </div>
+          ${r.Notes ? `<div class="timeline-notes">${r.Notes}</div>` : ''}
+          ${r.Source_URL ? `<a class="timeline-src" href="${r.Source_URL}" target="_blank" rel="noopener">&#x2197; Source</a>` : ''}
+        </div>
+      `;
+      body.appendChild(item);
+    });
+  }
+
+  // Animate open
+  overlay.classList.add('open');
+  // slight delay so display:block renders before opacity transition
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => { drawer.classList.add('open'); });
+  });
+  document.body.style.overflow = 'hidden';
+}
+
+function closeSystemDrawer() {
+  document.getElementById('systemDrawer').classList.remove('open');
+  document.getElementById('drawerOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+document.getElementById('drawerClose').addEventListener('click', closeSystemDrawer);
+document.getElementById('drawerOverlay').addEventListener('click', closeSystemDrawer);
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSystemDrawer(); });
 </script>
 </body>
 </html>
