@@ -587,35 +587,35 @@
     <div id="mermaidContainer" style="background:var(--bg2); border-radius:8px; padding:20px; overflow-x:auto;">
       <div class="mermaid">
       graph TD
-          subgraph Nirbhay Lineage
+          subgraph sg1 ["Nirbhay Lineage"]
               Nirbhay --> ITCM
-              ITCM --> LR_LACM[LR-LACM]
+              ITCM --> LR_LACM["LR-LACM"]
               ITCM --> SLCM
           end
           
-          subgraph Agni Lineage
-              Agni_1[Agni-1] --> Agni_2[Agni-2]
-              Agni_1 --> Agni_P[Agni-P]
-              Agni_2 --> Agni_3[Agni-3]
-              Agni_3 --> Agni_4[Agni-4]
-              Agni_4 --> Agni_5[Agni-5]
-              Agni_5 --> Agni_5_MIRV[Agni-5 MIRV]
+          subgraph sg2 ["Agni Lineage"]
+              Agni_1["Agni-1"] --> Agni_2["Agni-2"]
+              Agni_1 --> Agni_P["Agni-P"]
+              Agni_2 --> Agni_3["Agni-3"]
+              Agni_3 --> Agni_4["Agni-4"]
+              Agni_4 --> Agni_5["Agni-5"]
+              Agni_5 --> Agni_5_MIRV["Agni-5 MIRV"]
           end
           
-          subgraph Akash Lineage
-              Akash_Base[Akash Base] --> Akash_Mk1S[Akash Mk1S]
-              Akash_Mk1S --> Akash_Prime[Akash Prime]
-              Akash_Prime -.-> Akash_NG[Akash-NG]
+          subgraph sg3 ["Akash Lineage"]
+              Akash_Base["Akash Base"] --> Akash_Mk1S["Akash Mk1S"]
+              Akash_Mk1S --> Akash_Prime["Akash Prime"]
+              Akash_Prime -.-> Akash_NG["Akash-NG"]
               MRSAM -.-> Akash_NG
-              Akash_NG --> Kusha[Kusha / XRSAM]
+              Akash_NG --> Kusha["Kusha / XRSAM"]
           end
           
-          subgraph BMD & K-Family Lineage
+          subgraph sg4 ["BMD & K-Family Lineage"]
               Prithvi --> PAD
               PAD --> PDV
-              PDV --> PDV_Mk2[PDV Mk2]
-              K15[K-15 SLBM] -. "Disputed / Denied" .-> Shaurya
-              K15 -.-> AAD[AAD / Ashwin]
+              PDV --> PDV_Mk2["PDV Mk2"]
+              K15["K-15 SLBM"] -. "Disputed / Denied" .-> Shaurya
+              K15 -.-> AAD["AAD / Ashwin"]
               K15 -.-> SMART
           end
       </div>
