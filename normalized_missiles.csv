@@ -1,4 +1,5 @@
 event_id,date,family,variant,service,platform,location_id,event_type,result,source_type,source_url,confidence,notes
+MTI-OSINT-28fedd18,2023-05-02,ALWT,Base,Indian Navy,Sea King 42B,LOC-UNK,Development Test,Success,OSINT,https://x.com/indiannavy/status/1653712681449426944,High,Hover drop test by Navy and NSTL. Achieved safe release and separation objectives.
 MTI-OSINT-084108da,2025-04-24,MRSAM,Base,Indian Navy,INS Surat,LOC-UNK,User Trial,Success,OSINT,https://www.indiatoday.in/india/story/video-indian-navy-warship-conducts-destroyer-ins-surat-missile-test-in-arabian-sea-2713976-2025-04-24,High,Intercepted a sea-skimming target in the Arabian Sea through precision cooperative engagement.
 MTI-OSINT-36ddf87b,2025-04-04,MRSAM,Base,Indian Army,Ground Launcher,LOC-002,User Trial,Success,Official,https://www.pib.gov.in/PressReleasePage.aspx?PRID=2118918&reg=48&lang=2,High,Operational trial targeting high-speed aerial threats.
 MTI-OSINT-a6afa030,2025-04-04,MRSAM,Base,Indian Army,Ground Launcher,LOC-002,User Trial,Success,Official,https://www.pib.gov.in/PressReleasePage.aspx?PRID=2118918&reg=48&lang=2,High,Operational trial targeting high-speed aerial threats.
