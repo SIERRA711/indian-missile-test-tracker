@@ -1798,10 +1798,20 @@ document.getElementById('drawerOverlay').addEventListener('click', closeSystemDr
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSystemDrawer(); });
 </script>
 <script>
-  mermaid.initialize({ startOnLoad: true, theme: 'default' });
+  mermaid.initialize({ startOnLoad: false, theme: 'default' });
+  let isMermaidRendered = false;
+  
   function openExperimentalModal() {
     document.getElementById('experimentalModal').classList.add('open');
+    if (!isMermaidRendered) {
+      // Small timeout allows the browser to apply display:flex before mermaid calculates SVG dimensions
+      setTimeout(() => {
+        mermaid.init(undefined, document.querySelectorAll('.mermaid'));
+        isMermaidRendered = true;
+      }, 50);
+    }
   }
+  
   function closeExperimentalModal() {
     document.getElementById('experimentalModal').classList.remove('open');
   }
