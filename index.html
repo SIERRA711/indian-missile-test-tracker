@@ -299,6 +299,7 @@
   .cat-ASCM { background: #fce4ec; color: #880e4f; }
   .cat-BM { background: #fff3e0; color: #bf360c; }
   .cat-ATGM { background: #e8f5e9; color: #1b5e20; }
+  .cat-CUAS { background: #e0f2f1; color: #00695c; }
   .cat-RA { background: #f3e5f5; color: #4a148c; }
   .cat-ARM { background: #f3e5f5; color: #8e24aa; }
   .cat-BMD { background: #fff8e1; color: #f57f17; }
@@ -752,6 +753,7 @@ function mapCSVRow(csvRow) {
 
   const catMap = {
     'akash': 'Surface-to-Air', 'akash-ng': 'Surface-to-Air', 'kusha': 'Surface-to-Air', 'xrsam': 'Surface-to-Air', 'qrsam': 'Surface-to-Air', 'anant shastra': 'Surface-to-Air', 'vshorad': 'Surface-to-Air',
+    'bhargavastra': 'Counter-UAS (CUAS)',
     'vshorads': 'Surface-to-Air', 'vl-srsam': 'Surface-to-Air', 'vlsrsam': 'Surface-to-Air',
     'mrsam': 'Surface-to-Air', 'iadws': 'Surface-to-Air',
     'samar': 'Surface-to-Air',
@@ -803,6 +805,7 @@ const CAT_CLASS = {
   'Surface-to-Air': 'cat-SAM',
   'Cruise / Anti-Ship': 'cat-ASCM',
   'Ballistic': 'cat-BM',
+  'Counter-UAS (CUAS)': 'cat-CUAS',
   'Anti-Tank': 'cat-ATGM',
   'Rocket/Artillery': 'cat-RA',
   'Anti-Radiation': 'cat-ARM',
@@ -819,6 +822,7 @@ const CAT_SHORT = {
   'Surface-to-Air': 'SAM',
   'Cruise / Anti-Ship': 'Cruise / AShM',
   'Ballistic': 'BM',
+  'Counter-UAS (CUAS)': 'CUAS',
   'Anti-Tank': 'ATGM',
   'Rocket/Artillery': 'Rocket',
   'Anti-Radiation': 'ARM',
@@ -832,7 +836,7 @@ const CAT_SHORT = {
 };
 
 const CATS_ORDER = [
-  'Surface-to-Air', 'Cruise / Anti-Ship', 'Ballistic', 'Sub-Launched Ballistic', 
+  'Surface-to-Air', 'Counter-UAS (CUAS)', 'Cruise / Anti-Ship', 'Ballistic', 'Sub-Launched Ballistic', 
   'Anti-Tank', 'Air-to-Air', 'Anti-Radiation', 'Ballistic Missile Defence', 
   'Rocket/Artillery', 'Glide Bomb', 'Hypersonic', 'Torpedo'
 ];

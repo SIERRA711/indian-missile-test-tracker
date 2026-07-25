@@ -118,7 +118,10 @@ FAMILY_RULES = [
     ("VL-SRSAM",    "Base",     "Surface-to-Air",       ["vl.?srsam", "vl srsam"]),
     ("MRSAM",       "Base",     "Surface-to-Air",       ["\\bmrsam\\b", "medium range surface to air"]),
     ("QRSAM",       "Base",     "Surface-to-Air",       ["\\bqrsam\\b", "quick reaction surface", "anant shastra"]),
-    ("VSHORADS",    "Base",     "Surface-to-Air",       ["vshorads", "vshorad\\b"]),
+    ("VSHORAD",     "Base",     "Surface-to-Air",       ["vshorad", "very short range"]),
+    # CUAS
+    ("Bhargavastra","Base",     "Counter-UAS (CUAS)",   ["\\bbhargavastra\\b", "counter.?swarm"]),
+    # Anti-tank
     ("SFDR",        "Base",     "Air-to-Air",           ["\\bsfdr\\b", "solid fuel ducted"]),
     ("IADWS",       "Base",     "Surface-to-Air",       ["\\biadws\\b", "integrated air defence"]),
     ("SAMAR",       "Base",     "Surface-to-Air",       ["\\bsamar\\b"]),
