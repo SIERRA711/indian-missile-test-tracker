@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/mermaid@9.4.3/dist/mermaid.min.js"></script>
+<script src="https://d3js.org/d3.v7.min.js"></script>
 <style>
   :root {
     --red: #cc0000;
@@ -96,18 +96,38 @@
 
   /* ── MODALS ── */
   .modal-overlay {
-    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 2000;
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 2000;
     justify-content: center; align-items: center; padding: 2rem;
+    backdrop-filter: blur(8px);
   }
   .modal-overlay.open { display: flex; }
   .modal-content {
-    background: var(--bg); width: 100%; max-width: 900px; max-height: 85vh;
-    border-radius: 8px; position: relative; padding: 2rem; overflow-y: auto;
+    background: var(--bg); width: 100%; max-width: 1200px; max-height: 90vh;
+    border-radius: 12px; position: relative; padding: 2.5rem; overflow-y: hidden;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    display: flex; flex-direction: column;
+    border: 1px solid var(--rule);
   }
   .modal-close {
-    position: absolute; top: 1rem; right: 1rem; border: none; background: none; cursor: pointer;
-    font-size: 1.5rem; color: var(--mid);
+    position: absolute; top: 1.5rem; right: 1.5rem; border: none; background: var(--bg2); cursor: pointer;
+    font-size: 1.5rem; color: var(--mid); width: 36px; height: 36px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; transition: all 0.2s;
   }
+  .modal-close:hover { background: var(--red); color: white; transform: rotate(90deg); }
+  
+  /* ── D3 LINEAGE GRAPH ── */
+  #lineageGraphContainer {
+    flex: 1; min-height: 500px; background: var(--bg2); border-radius: 8px; 
+    border: 1px solid var(--rule); overflow: hidden; position: relative;
+    cursor: grab;
+  }
+  #lineageGraphContainer:active { cursor: grabbing; }
+  .node circle { fill: var(--bg); stroke: var(--red); stroke-width: 2.5px; transition: all 0.3s; }
+  .node:hover circle { fill: var(--red); stroke: var(--red-dark); r: 8; box-shadow: 0 0 10px var(--red); }
+  .node text { font-size: 13px; font-weight: 600; font-family: var(--mono); fill: var(--ink); text-shadow: 0 1px 3px var(--bg); pointer-events: none; }
+  .link { fill: none; stroke: var(--rule); stroke-width: 2px; transition: stroke 0.3s; }
+  .link:hover { stroke: var(--red-dim); stroke-width: 3px; }
+  .node--internal text { text-shadow: 0 1px 0 var(--bg), 1px 0 0 var(--bg), 0 -1px 0 var(--bg), -1px 0 0 var(--bg); }
 
   /* ── MAIN LAYOUT ── */
   .page { max-width: 1400px; margin: 0 auto; padding: 1.5rem 2rem 3rem; }
@@ -580,52 +600,15 @@
 </header>
 
 <div class="modal-overlay" id="experimentalModal" onclick="if(event.target===this) closeExperimentalModal()">
-  <div class="modal-content" style="max-width: 1200px;">
+  <div class="modal-content">
     <button class="modal-close" aria-label="Close" onclick="closeExperimentalModal()">&times;</button>
-    <h2 id="expTitle" style="margin-top:0;">Experimental: System Lineage Graph</h2>
-    <p style="font-size:13px; color:var(--mid); margin-bottom:20px;">A topological view of how different systems are derived from base families.</p>
-    <style>.mermaid svg { max-width: none !important; height: auto; }</style>
-    <div id="mermaidContainer" style="background:var(--bg2); border-radius:8px; padding:20px; overflow-x:auto;">
-      <div class="mermaid">
-      graph TD
-          subgraph NirbhayLineage[Nirbhay Lineage]
-              Nirbhay --> ITCM
-              ITCM --> LR_LACM[LR-LACM]
-              ITCM --> SLCM
-          end
-          
-          subgraph AgniLineage[Agni Lineage]
-              Agni_1[Agni-1] --> Agni_2[Agni-2]
-              Agni_1 --> Agni_P[Agni-P]
-              Agni_2 --> Agni_3[Agni-3]
-              Agni_3 --> Agni_4[Agni-4]
-              Agni_4 --> Agni_5[Agni-5]
-              Agni_5 --> Agni_5_MIRV[Agni-5 MIRV]
-          end
-          
-          subgraph AkashLineage[Akash Lineage]
-              Akash_Base[Akash Base] --> Akash_Mk1S[Akash Mk1S]
-              Akash_Mk1S --> Akash_Prime[Akash Prime]
-              Akash_Prime -.-> Akash_NG[Akash-NG]
-              MRSAM -.-> Akash_NG
-              Akash_NG --> Kusha[Kusha / XRSAM]
-          end
-          
-          subgraph BMDLineage[BMD & K-Family Lineage]
-              Prithvi --> PAD
-              PAD --> PDV
-              PDV --> PDV_Mk2[PDV Mk2]
-              K15[K-15 SLBM] -.-> Shaurya
-              K15 -.-> AAD[AAD / Ashwin]
-              K15 -.-> SMART
-          end
-          
-          subgraph NagLineage[Nag ATGM Lineage]
-              Nag --> Dhruvastra
-              Nag --> SANT
-              Nag --> MPATGM
-          end
-      </div>
+    <h2 id="expTitle" style="margin-top:0; font-size: 1.8rem; letter-spacing: -0.5px;">System Lineage Explorer</h2>
+    <p style="font-size:14px; color:var(--mid); margin-bottom:20px; max-width: 600px;">
+      Interactive evolutionary tree mapping the development of Indian missile systems. 
+      <strong style="color:var(--red);">Drag to pan, scroll to zoom. Hover nodes for details.</strong>
+    </p>
+    <div id="lineageGraphContainer">
+      <!-- D3 will render here -->
     </div>
   </div>
 </div>
@@ -1799,23 +1782,206 @@ document.getElementById('drawerOverlay').addEventListener('click', closeSystemDr
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSystemDrawer(); });
 </script>
 <script>
-  mermaid.initialize({ startOnLoad: false, theme: 'default' });
-  let isMermaidRendered = false;
-  
+  const lineageData = {
+    name: "Indian Missile Systems",
+    children: [
+      {
+        name: "Agni Lineage",
+        children: [
+          {
+            name: "Agni-1",
+            children: [
+              {
+                name: "Agni-2",
+                children: [
+                  {
+                    name: "Agni-3",
+                    children: [
+                      {
+                        name: "Agni-4",
+                        children: [
+                          {
+                            name: "Agni-5",
+                            children: [{ name: "Agni-5 MIRV" }]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              { name: "Agni-P" }
+            ]
+          }
+        ]
+      },
+      {
+        name: "Nirbhay Lineage",
+        children: [
+          {
+            name: "Nirbhay",
+            children: [
+              {
+                name: "ITCM",
+                children: [{ name: "LR-LACM" }, { name: "SLCM" }]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        name: "Akash Lineage",
+        children: [
+          {
+            name: "Akash Base",
+            children: [
+              {
+                name: "Akash Mk1S",
+                children: [
+                  {
+                    name: "Akash Prime",
+                    children: [
+                      {
+                        name: "Akash-NG",
+                        children: [{ name: "Kusha / XRSAM" }]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            name: "MRSAM",
+            children: [{ name: "Akash-NG (Derived Tech)" }]
+          }
+        ]
+      },
+      {
+        name: "BMD & K-Family",
+        children: [
+          {
+            name: "Prithvi",
+            children: [
+              {
+                name: "PAD",
+                children: [
+                  {
+                    name: "PDV",
+                    children: [{ name: "PDV Mk2" }]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            name: "K-15 SLBM",
+            children: [{ name: "Shaurya" }, { name: "AAD / Ashwin" }, { name: "SMART" }]
+          }
+        ]
+      },
+      {
+        name: "Nag ATGM",
+        children: [
+          {
+            name: "Nag",
+            children: [{ name: "Dhruvastra" }, { name: "SANT" }, { name: "MPATGM" }]
+          }
+        ]
+      }
+    ]
+  };
+
+  let graphRendered = false;
+
+  function renderD3Lineage() {
+    if (graphRendered) return;
+    graphRendered = true;
+
+    const container = document.getElementById('lineageGraphContainer');
+    const width = container.clientWidth;
+    const height = container.clientHeight;
+
+    const svg = d3.select('#lineageGraphContainer')
+      .append('svg')
+      .attr('width', width)
+      .attr('height', height);
+
+    const g = svg.append('g');
+
+    // Zoom and Pan
+    const zoom = d3.zoom()
+      .scaleExtent([0.5, 3])
+      .on('zoom', (e) => {
+        g.attr('transform', e.transform);
+      });
+    svg.call(zoom);
+    
+    // Initial zoom transform to center tree
+    svg.call(zoom.transform, d3.zoomIdentity.translate(80, height / 2 - 200).scale(0.85));
+
+    const root = d3.hierarchy(lineageData);
+    
+    // Tree layout
+    const treeLayout = d3.tree().nodeSize([45, 200]);
+    treeLayout(root);
+
+    // Links
+    g.selectAll('.link')
+      .data(root.links())
+      .enter().append('path')
+      .attr('class', 'link')
+      .attr('d', d3.linkHorizontal()
+        .x(d => d.y)
+        .y(d => d.x)
+      );
+
+    // Nodes
+    const node = g.selectAll('.node')
+      .data(root.descendants())
+      .enter().append('g')
+      .attr('class', d => 'node' + (d.children ? ' node--internal' : ' node--leaf'))
+      .attr('transform', d => `translate(${d.y},${d.x})`);
+
+    // Node circles
+    node.append('circle')
+      .attr('r', 6);
+
+    // Node labels
+    node.append('text')
+      .attr('dy', 4)
+      .attr('x', d => d.children ? -12 : 12)
+      .style('text-anchor', d => d.children ? 'end' : 'start')
+      .text(d => d.data.name);
+      
+    // Interaction
+    node.on('click', (event, d) => {
+       if (d.data.name !== "Indian Missile Systems" && !d.data.name.includes("Lineage")) {
+           // Optionally filter main table or open drawer
+           closeExperimentalModal();
+           document.getElementById('searchBox').value = d.data.name.replace(' (Derived Tech)', '');
+           applyFilters();
+       }
+    });
+  }
+
   function openExperimentalModal() {
     document.getElementById('experimentalModal').classList.add('open');
-    if (!isMermaidRendered) {
-      // Small timeout allows the browser to apply display:flex before mermaid calculates SVG dimensions
-      setTimeout(() => {
-        mermaid.init(undefined, document.querySelectorAll('.mermaid'));
-        isMermaidRendered = true;
-      }, 50);
-    }
+    setTimeout(renderD3Lineage, 100);
   }
   
   function closeExperimentalModal() {
     document.getElementById('experimentalModal').classList.remove('open');
   }
+
+  // Handle window resize for D3 graph
+  window.addEventListener('resize', () => {
+    if (graphRendered && document.getElementById('experimentalModal').classList.contains('open')) {
+      const container = document.getElementById('lineageGraphContainer');
+      const svg = d3.select('#lineageGraphContainer svg');
+      svg.attr('width', container.clientWidth).attr('height', container.clientHeight);
+    }
+  });
 </script>
 </body>
 </html>
