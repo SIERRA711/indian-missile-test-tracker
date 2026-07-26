@@ -124,7 +124,7 @@
   #lineageGraphContainer:active { cursor: grabbing; }
   .node circle { fill: var(--bg); stroke: var(--red); stroke-width: 2.5px; transition: all 0.3s; }
   .node:hover circle { fill: var(--red); stroke: var(--red-dark); r: 8; box-shadow: 0 0 10px var(--red); }
-  .node text { font-size: 13px; font-weight: 600; font-family: var(--mono); fill: var(--ink); text-shadow: 0 1px 3px var(--bg); pointer-events: none; }
+  .node text { font-size: 15px; font-weight: 700; font-family: var(--mono); fill: var(--ink); text-shadow: 0 1px 3px var(--bg); pointer-events: none; }
   .link { fill: none; stroke: var(--rule); stroke-width: 2px; transition: stroke 0.3s; }
   .link:hover { stroke: var(--red-dim); stroke-width: 3px; }
   .node--internal text { text-shadow: 0 1px 0 var(--bg), 1px 0 0 var(--bg), 0 -1px 0 var(--bg), -1px 0 0 var(--bg); }
@@ -605,7 +605,8 @@
     <h2 id="expTitle" style="margin-top:0; font-size: 1.8rem; letter-spacing: -0.5px;">System Lineage Explorer</h2>
     <p style="font-size:14px; color:var(--mid); margin-bottom:20px; max-width: 600px;">
       Interactive evolutionary tree mapping the development of Indian missile systems. 
-      <strong style="color:var(--red);">Drag to pan, scroll to zoom. Hover nodes for details.</strong>
+      <strong style="color:var(--red);">Drag to pan, scroll to zoom. Click nodes to filter table.</strong><br><br>
+      <span style="font-size:12px; font-style:italic;">Disclaimer: This graph represents assessed family lineages based on open-source intelligence and visual similarities. It is not supported by official government documentation.</span>
     </p>
     <div id="lineageGraphContainer">
       <!-- D3 will render here -->
