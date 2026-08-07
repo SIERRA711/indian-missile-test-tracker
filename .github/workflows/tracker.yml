@@ -2,8 +2,8 @@ name: Missile Tracker Updater
 
 on:
   schedule:
-    # Runs at 06:00 UTC every Monday
-    - cron: '0 6 * * 1'
+    # Runs every 6 hours to catch all PRs (RSS feed maxes out at 20 entries)
+    - cron: '0 */6 * * *'
   workflow_dispatch: # Allows manual trigger from GitHub UI
 
 jobs:

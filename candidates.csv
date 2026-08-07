@@ -1,1 +1,2 @@
 event_id,date,family,variant,service,platform,location_id,event_type,result,source_type,source_url,confidence,notes,_title,_prid
+MTI-2026-0060,2026-08-06,Agni,4,SFC,Ground Launcher,LOC-001,Development Test,Success,Official,https://www.pib.gov.in/PressReleasePage.aspx?PRID=2295678,High,"Ministry of Defence ‘Agni-4’ Ballistic Missile successfully test-fired प्रविष्टि तिथि: 06 AUG 2026 7:01PM by PIB Delhi Medium Range Ballistic Missile ‘Agni-4’ was successfully test-fired from the Integrated Test Range, C…","Agni-4 Ballistic Missile successfully test-fired",2295678
