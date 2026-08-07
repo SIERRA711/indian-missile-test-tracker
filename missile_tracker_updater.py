@@ -648,7 +648,7 @@ def merge_candidates():
     else:
         merged = new_rows + existing   # newest first
         with open(MAIN_CSV, "w", newline="", encoding="utf-8") as f:
-            writer = csv.DictWriter(f, fieldnames=FIELDNAMES)
+            writer = csv.DictWriter(f, fieldnames=FIELDNAMES, extrasaction='ignore')
             writer.writeheader()
             writer.writerows(merged)
         log(f"[OK] Merged {len(new_rows)} row(s) into {MAIN_CSV}")
