@@ -216,6 +216,7 @@ MISSILE_KEYWORDS = [
     r"anti-tank guided", r"anti-ship", r"surface-to-air", r"air-to-air",
     r"\bbmd\b", r"\batgm\b", r"\baam\b", r"\bashm\b", r"\balcm\b", r"\bsam\b",
     r"guided missile", r"\btorpedo\b", r"hypersonic",
+    r"सफल परीक्षण", r"बैलिस्टिक मिसाइल", r"क्रूज़ मिसाइल", r"मिसाइल",
 ]
 
 # ─────────────────────────────────────────────────────────────
