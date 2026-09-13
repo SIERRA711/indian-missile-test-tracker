@@ -17,6 +17,7 @@ UI_CATMAP = [
     ('iadws',           'Surface-to-Air'),
     ('samar',           'Surface-to-Air'),
     ('astra',           'Air-to-Air'),
+    ('star',            'Air-to-Air'),
     ('ngccm',           'Air-to-Air'),
     ('sfdr',            'Air-to-Air'),
     ('brahmos',         'Anti-Ship/Cruise'),
