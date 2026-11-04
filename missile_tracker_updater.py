@@ -440,15 +440,32 @@ def fetch_rss_prids() -> list[dict]:
     return results
 
 
-def fetch_release_body(prid: str) -> tuple[str, str, str]:
-    """Fetch a PIB press release and return (title, body_text, ministry)."""
+class FetchFailed(Exception):
+    """Raised when a PIB release could not be fetched (network error, etc.)."""
+    pass
+
+
+def fetch_release_body(prid: str, retries: int = 3, retry_delay: float = 5.0) -> tuple[str, str, str]:
+    """Fetch a PIB press release and return (title, body_text, ministry).
+
+    Retries on failure with exponential backoff. Raises FetchFailed after
+    `retries` attempts so callers can distinguish "fetch failed, retry later"
+    from "fetched but empty/not a missile test".
+    """
     url = PIB_RELEASE.format(prid=prid)
-    try:
-        r = requests.get(url, headers=HEADERS, timeout=15)
-        r.raise_for_status()
-    except Exception as e:
-        log(f"  [!] Could not fetch PRID {prid}: {e}")
-        return "", ""
+    for attempt in range(1, retries + 1):
+        try:
+            r = requests.get(url, headers=HEADERS, timeout=30)
+            r.raise_for_status()
+            break
+        except Exception as e:
+            if attempt < retries:
+                wait = retry_delay * (2 ** (attempt - 1))
+                log(f"  [!] PRID {prid}: attempt {attempt}/{retries} failed ({e}); retrying in {wait:g}s...")
+                time.sleep(wait)
+            else:
+                log(f"  [!] Could not fetch PRID {prid} after {retries} attempts: {e}")
+                raise FetchFailed(f"PRID {prid}: {e}") from e
 
     soup = BeautifulSoup(r.text, "html.parser")
 
@@ -679,7 +696,17 @@ def run_once(force_prid: str = None):
         if prid in seen:
             continue
 
-        row = process_prid(prid, entry.get("title",""), entry.get("published",""))
+        try:
+            row = process_prid(prid, entry.get("title",""), entry.get("published",""))
+        except FetchFailed:
+            # Do NOT mark as seen — retry on the next run instead of losing it.
+            log(f"  [!] PRID {prid}: fetch failed, will retry on next run")
+            continue
+        except Exception as e:
+            # One bad PRID must never abort the whole batch.
+            log(f"  [!] PRID {prid}: unexpected error: {e} — skipping")
+            continue
+
         seen.add(prid)
 
         if row:
@@ -760,15 +787,22 @@ def run_scan_range(start: int, end: int, workers: int = 10, delay: float = 0.0, 
         with ThreadPoolExecutor(max_workers=workers) as pool:
             futures = {pool.submit(fetch_one, prid): prid for prid in todo}
             for future in as_completed(futures):
+                failed = False
                 try:
                     prid, row = future.result()
+                except FetchFailed as e:
+                    prid = futures[future]
+                    log(f"  [!] PRID {prid}: fetch failed, will retry later ({e})")
+                    row = None
+                    failed = True
                 except Exception as e:
                     prid = futures[future]
                     log(f"  [!] PRID {prid} error: {e}")
                     row = None
 
                 with lock:
-                    seen.add(prid)
+                    if not failed:
+                        seen.add(prid)
                     counters["done"] += 1
                     done = counters["done"]
 
