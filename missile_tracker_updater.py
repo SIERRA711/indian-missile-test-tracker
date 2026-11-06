@@ -43,7 +43,11 @@ CANDIDATES    = Path("candidates.csv")
 STATE_FILE    = Path(".tracker_state.json")   # stores seen PRIDs + last run time
 POLL_HOURS    = 6                              # interval for --daemon mode
 
-PIB_RSS_MOD   = "https://www.pib.gov.in/RssMain.aspx?ModId=6&Lang=1&Regid=3"
+# PIB's RSS endpoint ignores Lang/Regid and serves the Hindi feed by default.
+# The extra `reg` parameter is what actually switches it to the English feed;
+# without it we only ever see Hindi PRIDs (a separate ID space from the English
+# release), which is how PRID 2333276 slipped past the cron job.
+PIB_RSS_MOD   = "https://www.pib.gov.in/RssMain.aspx?ModId=6&Lang=1&Regid=3&reg=3"
 PIB_RELEASE   = "https://www.pib.gov.in/PressReleasePage.aspx?PRID={prid}"
 
 HEADERS = {
@@ -499,31 +503,55 @@ def fetch_release_body(prid: str, retries: int = 3, retry_delay: float = 5.0) ->
     return title, body, ministry
 
 
+_MONTHS = {
+    "january": "01", "jan": "01",
+    "february": "02", "feb": "02",
+    "march": "03", "mar": "03",
+    "april": "04", "apr": "04",
+    "may": "05",
+    "june": "06", "jun": "06",
+    "july": "07", "jul": "07",
+    "august": "08", "aug": "08",
+    "september": "09", "sep": "09", "sept": "09",
+    "october": "10", "oct": "10",
+    "november": "11", "nov": "11",
+    "december": "12", "dec": "12",
+}
+
+
 def parse_date_from_body(body: str, fallback: str) -> str:
-    """Try to extract YYYY-MM-DD from press release body text."""
-    months = {
-        "january":"01","february":"02","march":"03","april":"04",
-        "may":"05","june":"06","july":"07","august":"08",
-        "september":"09","october":"10","november":"11","december":"12"
-    }
-    # Pattern: "June 15, 2026" or "15 June 2026"
+    """Try to extract YYYY-MM-DD from press release text.
+
+    Handles the forms PIB actually uses:
+      * "Posted On: 05 NOV 2026 7:47PM" (Hindi pages: "प्रविष्टि तिथि:")
+      * "15 June 2026"
+      * "June 15, 2026"
+    Never returns a partial date such as "2026-11" — that used to break --merge.
+    """
+    text = re.sub(r"\s+", " ", body or "")
+
+    # PIB dateline first — the body may mention other dates in passing
     m = re.search(
-        r'(\d{1,2})\s+(January|February|March|April|May|June|July|August|'
-        r'September|October|November|December)\s+(\d{4})',
-        body, re.IGNORECASE
+        r"(?:Posted On|प्रविष्टि तिथि)\s*:?\s*(\d{1,2})\s+([A-Za-z]{3,9})\.?,?\s+(\d{4})",
+        text, re.IGNORECASE
     )
+    if not m:
+        m = re.search(r"(\d{1,2})\s+([A-Za-z]{3,9})\.?,?\s+(\d{4})", text, re.IGNORECASE)
     if m:
-        day, mon, yr = m.group(1), m.group(2).lower(), m.group(3)
-        return f"{yr}-{months[mon]}-{int(day):02d}"
-    m = re.search(
-        r'(January|February|March|April|May|June|July|August|'
-        r'September|October|November|December)\s+(\d{1,2}),?\s+(\d{4})',
-        body, re.IGNORECASE
-    )
+        mon = _MONTHS.get(m.group(2).lower().rstrip("."))
+        if mon:
+            return f"{m.group(3)}-{mon}-{int(m.group(1)):02d}"
+
+    m = re.search(r"([A-Za-z]{3,9})\.?\s+(\d{1,2}),?\s+(\d{4})", text, re.IGNORECASE)
     if m:
-        mon, day, yr = m.group(1).lower(), m.group(2), m.group(3)
-        return f"{yr}-{months[mon]}-{int(day):02d}"
-    return fallback
+        mon = _MONTHS.get(m.group(1).lower().rstrip("."))
+        if mon:
+            return f"{m.group(3)}-{mon}-{int(m.group(2)):02d}"
+
+    # Only accept a complete ISO date as the fallback
+    if re.match(r"^\d{4}-\d{2}-\d{2}$", fallback or ""):
+        return fallback
+    return ""
 
 
 # ─────────────────────────────────────────────────────────────
@@ -557,8 +585,10 @@ def process_prid(prid: str, rss_title: str = "", rss_date: str = "") -> dict | N
     # Date
     event_date = parse_date_from_body(body, rss_date or "")
     if not event_date:
-        # Fall back to current year-month
-        event_date = date.today().strftime("%Y-%m")
+        # The release was picked up today, so today is the best available date.
+        # (A partial "YYYY-MM" date used to be written here and blocked --merge.)
+        event_date = date.today().strftime("%Y-%m-%d")
+        log(f"  [!] PRID {prid}: no date in release, defaulting to {event_date}")
     year = int(event_date[:4]) if event_date and event_date[:4].isdigit() else date.today().year
 
     # Classification
